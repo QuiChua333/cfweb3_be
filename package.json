@@ -27,11 +27,6 @@
       "eslint",
       "prettier --write"
     ],
-    "test/**/*.ts": [
-      "eslint --fix",
-      "eslint",
-      "prettier --write"
-    ],
     "*.json": [
       "prettier --write"
     ]
