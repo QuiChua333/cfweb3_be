@@ -1,3 +1,5 @@
+import { ValidatorException } from '@/exceptions';
+import { CustomFilterExceptionFilter } from '@/filters';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 
 export const loadMiddlewares = (app: INestApplication): void => {
@@ -9,6 +11,8 @@ export const loadMiddlewares = (app: INestApplication): void => {
     new ValidationPipe({
       whitelist: true,
       forbidNonWhitelisted: true,
+      exceptionFactory: (errors) => new ValidatorException(errors),
     }),
   );
+  app.useGlobalFilters(new CustomFilterExceptionFilter());
 };
