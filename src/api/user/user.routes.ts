@@ -5,15 +5,15 @@ import type { IRouteParams } from '@/decorators';
 const UserRoute = {
   root: 'user',
 
-  getAllUsers: <IRouteParams>{
+  findAll: <IRouteParams>{
     path: '/',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: true,
   },
 
-  getCurrentUser: <IRouteParams>{
-    path: '/current',
+  findMe: <IRouteParams>{
+    path: '/me',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: true,

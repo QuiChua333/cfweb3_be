@@ -1,4 +1,4 @@
-import { RegisterUserDto } from '@/api/auth/dto';
+import { RegisterDto } from '@/api/auth/dto';
 import { UserService } from '@/api/user/user.service';
 import { Injectable } from '@nestjs/common';
 
@@ -6,7 +6,7 @@ import { Injectable } from '@nestjs/common';
 export class AuthService {
   constructor(private readonly userService: UserService) {}
 
-  async register(registerUserDto: RegisterUserDto) {
+  async register(registerDto: RegisterDto) {
     return 'This is register';
   }
 }

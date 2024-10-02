@@ -1,5 +1,6 @@
 import { ValidatorException } from '@/exceptions';
 import { CustomFilterExceptionFilter } from '@/filters';
+
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 
 export const loadMiddlewares = (app: INestApplication): void => {

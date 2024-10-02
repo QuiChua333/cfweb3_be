@@ -1,30 +1,24 @@
+import { Role } from '@/constants';
+import { Public } from '@/decorators/public.decorator';
+import { Roles } from '@/decorators/roles.decorator';
 import {
   Get,
-  Put,
   Post,
   Delete,
   HttpCode,
-  UseGuards,
   HttpStatus,
-  SetMetadata,
   RequestMethod,
   applyDecorators,
+  Patch,
 } from '@nestjs/common';
-
-import type { CustomDecorator } from '@nestjs/common';
-
-import { IS_PUBLIC_KEY } from '@/constants';
-import { JwtAuthGuard } from '@/api/auth/guards';
 
 export interface IRouteParams {
   path: string;
   code?: number;
   method: number;
   jwtSecure?: boolean;
-}
-
-function Public(): CustomDecorator<string> {
-  return SetMetadata(IS_PUBLIC_KEY, true);
+  roles?: Role[];
+  jwtRefresh?: boolean;
 }
 
 export function InjectRoute({
@@ -32,10 +26,12 @@ export function InjectRoute({
   jwtSecure = true,
   code = HttpStatus.OK,
   method = RequestMethod.GET,
+  jwtRefresh = false,
+  roles = null,
 }: IRouteParams) {
   const methodDecorator = {
     [RequestMethod.GET]: Get,
-    [RequestMethod.PUT]: Put,
+    [RequestMethod.PATCH]: Patch,
     [RequestMethod.POST]: Post,
     [RequestMethod.DELETE]: Delete,
   };
@@ -44,8 +40,14 @@ export function InjectRoute({
 
   if (!jwtSecure) {
     decorators.push(Public());
-  } else {
-    decorators.push(UseGuards(JwtAuthGuard));
+  }
+
+  if (jwtRefresh) {
+    decorators.push();
+  }
+
+  if (roles) {
+    decorators.push(Roles(roles));
   }
 
   return applyDecorators(...decorators);

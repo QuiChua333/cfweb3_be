@@ -12,8 +12,12 @@ export class UserService {
     return `This action returns all user`;
   }
 
-  findOne(id: string) {
+  findOneById(id: string) {
     return `This action returns a #${id} user`;
+  }
+
+  findOneByEmail(email: string) {
+    return `This action returns a #${email} user`;
   }
 
   update(id: string, updateUserDto: UpdateUserDto) {
