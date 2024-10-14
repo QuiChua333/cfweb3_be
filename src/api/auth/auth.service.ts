@@ -61,10 +61,10 @@ export class AuthService {
   async validateRefreshToken(userId: string, refreshToken: string) {
     const user = await this.userService.findOneById(userId);
 
-    if (!user || !user.refreshToken) throw new BadRequestException('Invalid refresh token');
+    if (!user || !user.refreshToken) throw new ForbiddenException('Invalid refresh token');
     const isRefreshTokenMatched = await argon2.verify(user.refreshToken, refreshToken);
 
-    if (!isRefreshTokenMatched) throw new BadRequestException('Invalid refresh token');
+    if (!isRefreshTokenMatched) throw new ForbiddenException('Invalid refresh token');
   }
 
   async logout(userId: string) {
