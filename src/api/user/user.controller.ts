@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { UserService } from './user.service';
 import { InjectRoute, User } from '@/decorators';
 import UserRoute from '@/api/user/user.routes';
-import { ICurrentUser } from '@/api/auth/auth.interface';
+import { ITokenPayload } from '../auth/auth.interface';
 
 @Controller(UserRoute.root)
 export class UserController {
@@ -14,7 +14,7 @@ export class UserController {
   }
 
   @InjectRoute(UserRoute.findMe)
-  findMe(@User() user: ICurrentUser) {
+  findMe(@User() user: ITokenPayload) {
     const { id } = user;
     return this.userService.findOneById(id);
   }

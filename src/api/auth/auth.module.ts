@@ -4,7 +4,7 @@ import { AuthController } from './auth.controller';
 import { JwtModule } from '@nestjs/jwt';
 import { envs } from '@/config';
 import { UserModule } from '@/api/user/user.module';
-import { JwtStrategy, RefreshTokenStrategy } from '@/api/auth/strategies';
+import { GoogleStrategy, JwtStrategy, RefreshTokenStrategy } from '@/api/auth/strategies';
 import { PassportModule } from '@nestjs/passport';
 
 @Module({
@@ -12,11 +12,11 @@ import { PassportModule } from '@nestjs/passport';
     PassportModule,
     UserModule,
     JwtModule.register({
-      secret: envs.jwtAccessSecret,
-      signOptions: { expiresIn: envs.jwtExpiredAccess },
+      secret: envs.jwt.accessSecret,
+      signOptions: { expiresIn: envs.jwt.expiredAccess },
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService, JwtStrategy, RefreshTokenStrategy],
+  providers: [AuthService, JwtStrategy, RefreshTokenStrategy, GoogleStrategy],
 })
 export class AuthModule {}

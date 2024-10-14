@@ -1,6 +1,7 @@
 import { HttpStatus, RequestMethod } from '@nestjs/common';
 
 import type { IRouteParams } from '@/decorators';
+import { Role } from '@/constants';
 
 const UserRoute = {
   root: 'user',
@@ -10,6 +11,7 @@ const UserRoute = {
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: true,
+    roles: [Role.Admin],
   },
 
   findMe: <IRouteParams>{

@@ -58,23 +58,13 @@ export class AuthService {
     return tokens;
   }
 
-  async refreshTokens(userId: string, refreshToken: string) {
+  async validateRefreshToken(userId: string, refreshToken: string) {
     const user = await this.userService.findOneById(userId);
-    if (!user || !user.refreshToken) throw new ForbiddenException('Access denied');
 
+    if (!user || !user.refreshToken) throw new BadRequestException('Invalid refresh token');
     const isRefreshTokenMatched = await argon2.verify(user.refreshToken, refreshToken);
 
-    if (!isRefreshTokenMatched) throw new ForbiddenException('Access denied');
-
-    const tokens = await this.getTokens({
-      id: user.id,
-      email: user.email,
-      role: user.isAdmin ? Role.Admin : Role.User,
-    });
-
-    await this.updateRefreshToken(user.id, tokens.refreshToken);
-
-    return tokens;
+    if (!isRefreshTokenMatched) throw new BadRequestException('Invalid refresh token');
   }
 
   async logout(userId: string) {
@@ -83,34 +73,23 @@ export class AuthService {
     });
   }
 
-  async validateJwtUser(email: string) {
-    const user = await this.userService.findOneByEmail(email);
-    if (!user) throw new BadRequestException('Wrong credentials provided');
-    return user;
-  }
+  async refreshTokens(tokenPayload: ITokenPayload) {
+    const tokens = await this.getTokens(tokenPayload);
 
-  async validateUser(email: string, password: string) {
-    const user = await this.userService.findOneByEmail(email);
-    if (!(user && user.password === password)) {
-      throw new BadRequestException('Wrong credentials provided');
-    }
+    await this.updateRefreshToken(tokenPayload.id, tokens.refreshToken);
 
-    return user;
-  }
-
-  private async hashData(data: string) {
-    return argon2.hash(data);
+    return tokens;
   }
 
   private async getTokens(payload: ITokenPayload) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
-        secret: envs.jwtAccessSecret,
-        expiresIn: envs.jwtExpiredAccess,
+        secret: envs.jwt.accessSecret,
+        expiresIn: envs.jwt.expiredAccess,
       }),
       this.jwtService.signAsync(payload, {
-        secret: envs.jwtRefreshSecret,
-        expiresIn: envs.jwtExpiredRefresh,
+        secret: envs.jwt.refreshSecret,
+        expiresIn: envs.jwt.expiredRefresh,
       }),
     ]);
 
@@ -122,5 +101,39 @@ export class AuthService {
     await this.userService.update(userId, {
       refreshToken: hashedRefreshToken,
     });
+  }
+
+  async validateUser(email: string, password: string) {
+    const user = await this.userService.findOneByEmail(email);
+    if (!(user && user.password === password)) {
+      throw new BadRequestException('Wrong credentials provided');
+    }
+
+    return user;
+  }
+
+  async validateGoogleUser(googleUser: RegisterDto) {
+    const user = await this.userService.findOneByEmail(googleUser.email);
+    if (user) return user;
+    return await this.userService.create(googleUser, true);
+  }
+
+  async loginAfterGoogleCallback(user: ITokenPayload) {
+    const tokens = await this.getTokens(user);
+
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
+  async validateJwtUser(email: string) {
+    const user = await this.userService.findOneByEmail(email);
+
+    if (!user) throw new BadRequestException('Invalid access token');
+    return user;
+  }
+
+  private async hashData(data: string) {
+    return argon2.hash(data);
   }
 }

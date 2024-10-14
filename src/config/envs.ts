@@ -1,5 +1,7 @@
+import { Env } from '@/constants';
 import 'dotenv/config';
 import * as joi from 'joi';
+import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
 
 interface EnvVars {
   PORT: number;
@@ -9,11 +11,21 @@ interface EnvVars {
   JWT_EXPIRED_ACCESS: string;
   JWT_EXPIRED_REFRESH: string;
 
-  TYPEORM_HOST: string;
-  TYPEORM_PORT: number;
-  TYPEORM_USERNAME: string;
-  TYPEORM_PASSWORD: string;
-  TYPEORM_DATABASE: string;
+  NODE_ENV: string;
+
+  DB_URL: string;
+  DB_HOST: string;
+  DB_TYPE: string;
+  DB_PORT: number;
+  DB_USERNAME: string;
+  DB_PASSWORD: string;
+  DB_DATABASE: string;
+
+  GOOGLE_CLIENT_ID: string;
+  GOOGLE_CLIENT_SECRET: string;
+  GOOGLE_CALLBACK_URL: string;
+
+  FE_HOME_URL: string;
 }
 
 const envSchema = joi
@@ -25,11 +37,23 @@ const envSchema = joi
     JWT_EXPIRED_ACCESS: joi.string().required(),
     JWT_EXPIRED_REFRESH: joi.string().required(),
 
-    TYPEORM_HOST: joi.string().required(),
-    TYPEORM_PORT: joi.number().required(),
-    TYPEORM_USERNAME: joi.string().required(),
-    TYPEORM_PASSWORD: joi.string().required(),
-    TYPEORM_DATABASE: joi.string().required(),
+    NODE_ENV: joi
+      .string()
+      .valid(...Object.values(Env))
+      .required(),
+
+    DB_TYPE: joi.string().required(),
+    DB_HOST: joi.string().required(),
+    DB_PORT: joi.number().required(),
+    DB_USERNAME: joi.string().required(),
+    DB_PASSWORD: joi.string().required(),
+    DB_DATABASE: joi.string().required(),
+
+    GOOGLE_CLIENT_ID: joi.string().required(),
+    GOOGLE_CLIENT_SECRET: joi.string().required(),
+    GOOGLE_CALLBACK_URL: joi.string().required(),
+
+    FE_HOME_URL: joi.string().required(),
   })
   .unknown(true);
 
@@ -43,15 +67,33 @@ const envVars: EnvVars = value;
 
 export const envs = {
   port: envVars.PORT,
+  db: <PostgresConnectionOptions>{
+    type: envVars.DB_TYPE || 'postgres',
+    host: envVars.DB_HOST || 'localhost',
+    port: envVars.DB_PORT || 5432,
+    username: envVars.DB_USERNAME,
+    password: envVars.DB_PASSWORD,
+    database: envVars.DB_DATABASE,
+    entities: [],
+    synchronize: true,
+    autoLoadEntities: true,
+    ssl: envVars.NODE_ENV === Env.DEVELOPMENT ? false : true,
+    // entities: [`${__dirname}/../api/**/*.entity.{js,ts}`],
+  },
+  jwt: {
+    accessSecret: envVars.JWT_ACCESS_SECRET,
+    refreshSecret: envVars.JWT_REFRESH_SECRET,
+    expiredAccess: envVars.JWT_EXPIRED_ACCESS,
+    expiredRefresh: envVars.JWT_EXPIRED_REFRESH,
+  },
 
-  jwtAccessSecret: envVars.JWT_ACCESS_SECRET,
-  jwtRefreshSecret: envVars.JWT_REFRESH_SECRET,
-  jwtExpiredAccess: envVars.JWT_EXPIRED_ACCESS,
-  jwtExpiredRefresh: envVars.JWT_EXPIRED_REFRESH,
+  google: {
+    clientId: envVars.GOOGLE_CLIENT_ID,
+    clientSecret: envVars.GOOGLE_CLIENT_SECRET,
+    callbackUrl: envVars.GOOGLE_CALLBACK_URL,
+  },
 
-  typeormHost: envVars.TYPEORM_HOST,
-  typeormPort: envVars.TYPEORM_PORT,
-  typeormUsername: envVars.TYPEORM_USERNAME,
-  typeormPassword: envVars.TYPEORM_PASSWORD,
-  typeormDatabase: envVars.TYPEORM_DATABASE,
+  fe: {
+    homeUrl: envVars.FE_HOME_URL,
+  },
 };

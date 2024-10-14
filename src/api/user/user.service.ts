@@ -19,8 +19,11 @@ export class UserService {
     return this.userRepository.findOneBy({ email });
   }
 
-  async create(registerDto: RegisterDto) {
-    const newUser = this.userRepository.create(registerDto);
+  async create(registerDto: RegisterDto, isVerifiedEmail: boolean = false) {
+    const newUser = this.userRepository.create({
+      ...registerDto,
+      isVerifiedEmail,
+    });
     return this.userRepository.save(newUser);
   }
 

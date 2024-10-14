@@ -1,6 +1,7 @@
 import { IS_PUBLIC_KEY } from '@/constants';
 import { ExecutionContext, Injectable, UnauthorizedException } from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
+import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 import { AuthGuard } from '@nestjs/passport';
 import { Observable } from 'rxjs';
 
@@ -21,9 +22,14 @@ export class JwtAuthGuard extends AuthGuard('jwt') {
     return super.canActivate(context);
   }
 
-  handleRequest<ICurrentUser>(err: any, user: any): ICurrentUser {
-    if (err) throw err;
-    if (!user) throw new UnauthorizedException('Invalid or expired token');
+  handleRequest(err, user, info) {
+    if (info instanceof TokenExpiredError) {
+      throw new UnauthorizedException('Token has expired');
+    } else if (info instanceof JsonWebTokenError) {
+      throw new UnauthorizedException('Invalid token');
+    } else if (err || !user) {
+      throw err || new UnauthorizedException('Unauthorized');
+    }
 
     return user;
   }

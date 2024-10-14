@@ -1,3 +1,4 @@
+import { GoogleAuthGuard, RefreshTokenGuard } from '@/api/auth/guards';
 import { Role } from '@/constants';
 import { Public } from '@/decorators/public.decorator';
 import { Roles } from '@/decorators/roles.decorator';
@@ -10,6 +11,7 @@ import {
   RequestMethod,
   applyDecorators,
   Patch,
+  UseGuards,
 } from '@nestjs/common';
 
 export interface IRouteParams {
@@ -19,6 +21,7 @@ export interface IRouteParams {
   jwtSecure?: boolean;
   roles?: Role[];
   jwtRefresh?: boolean;
+  googleOAuth?: boolean;
 }
 
 export function InjectRoute({
@@ -27,6 +30,7 @@ export function InjectRoute({
   code = HttpStatus.OK,
   method = RequestMethod.GET,
   jwtRefresh = false,
+  googleOAuth = false,
   roles = null,
 }: IRouteParams) {
   const methodDecorator = {
@@ -43,11 +47,15 @@ export function InjectRoute({
   }
 
   if (jwtRefresh) {
-    decorators.push();
+    decorators.push(UseGuards(RefreshTokenGuard));
   }
 
   if (roles) {
     decorators.push(Roles(roles));
+  }
+
+  if (googleOAuth) {
+    decorators.push(UseGuards(GoogleAuthGuard));
   }
 
   return applyDecorators(...decorators);

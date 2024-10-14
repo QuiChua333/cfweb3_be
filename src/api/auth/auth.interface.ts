@@ -5,7 +5,3 @@ export interface ITokenPayload {
   email: string;
   role: Role;
 }
-
-export interface ICurrentUser extends ITokenPayload {
-  refreshToken: string;
-}

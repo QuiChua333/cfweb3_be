@@ -1,10 +1,4 @@
-import {
-  ExceptionFilter,
-  Catch,
-  ArgumentsHost,
-  HttpException,
-  HttpStatus,
-} from '@nestjs/common';
+import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
 import { Response } from 'express';
 import {
   IBaseExceptionResponse,
@@ -23,12 +17,9 @@ export class CustomFilterExceptionFilter implements ExceptionFilter {
     };
     try {
       if (exception instanceof ValidatorException) {
-        const validtaionExceptionResponse: IvalidatorExceptionResponse =
-          exception.getResponse();
+        const validtaionExceptionResponse: IvalidatorExceptionResponse = exception.getResponse();
 
-        response
-          .status(validtaionExceptionResponse.status)
-          .send(validtaionExceptionResponse);
+        response.status(validtaionExceptionResponse.status).send(validtaionExceptionResponse);
       } else if (exception instanceof HttpException) {
         const status = exception.getStatus();
         const message = exception.message;
@@ -36,19 +27,15 @@ export class CustomFilterExceptionFilter implements ExceptionFilter {
 
         response.status(status).send(baseExceptionResponse);
       } else {
-        console.log(exception);
+        console.log('filter', { exception });
         baseExceptionResponse.message = 'Server Error (Exception?)';
-        response
-          .status(baseExceptionResponse.status)
-          .send(baseExceptionResponse);
+        response.status(baseExceptionResponse.status).send(baseExceptionResponse);
       }
     } catch (error) {
-      console.log(error);
+      console.log('filter', { error });
       baseExceptionResponse.message = 'Server Error (filter)';
 
-      return response
-        .status(baseExceptionResponse.status)
-        .send(baseExceptionResponse);
+      return response.status(baseExceptionResponse.status).send(baseExceptionResponse);
     }
   }
 }

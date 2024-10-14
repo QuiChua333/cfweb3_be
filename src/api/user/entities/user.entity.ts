@@ -1,5 +1,6 @@
 import { Base as BaseEntity } from 'src/common/entities';
 import { Column, Entity } from 'typeorm';
+import { omit } from 'ramda';
 
 @Entity()
 export class User extends BaseEntity {
@@ -12,7 +13,12 @@ export class User extends BaseEntity {
   password: string;
 
   @Column()
-  name: string;
+  fullName: string;
+
+  @Column({
+    nullable: true,
+  })
+  avatar: string;
 
   @Column({
     nullable: true,
@@ -22,5 +28,36 @@ export class User extends BaseEntity {
   @Column({
     default: false,
   })
+  isVerifiedEmail: boolean;
+
+  @Column({
+    default: false,
+  })
+  isVerifiedUser: boolean;
+
+  @Column({
+    default: false,
+  })
   isAdmin: boolean;
+
+  @Column({
+    nullable: true,
+  })
+  facebookLink: string;
+
+  @Column({
+    nullable: true,
+  })
+  phoneNumber: string;
+
+  @Column({
+    nullable: true,
+  })
+  address: string;
+
+  public toResponse(): Omit<this, 'password'> {
+    return {
+      ...omit(['password', 'refreshToken'], this),
+    };
+  }
 }
