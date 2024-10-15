@@ -1,4 +1,9 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { LoginDto, RegisterDto } from 'src/api/auth/dto';
 import { UserService } from 'src/api/user/user.service';
 import * as argon2 from 'argon2';
@@ -6,12 +11,14 @@ import { JwtService } from '@nestjs/jwt';
 import { Role } from '@/constants';
 import { ITokenPayload } from '@/api/auth/auth.interface';
 import { envs } from '@/config';
+import { EmailService } from '@/services/email/email.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly userService: UserService,
     private readonly jwtService: JwtService,
+    private readonly emailService: EmailService,
   ) {}
 
   async register(registerDto: RegisterDto) {
@@ -81,6 +88,21 @@ export class AuthService {
     return tokens;
   }
 
+  async forgotPassword(email: string) {
+    const user = await this.userService.findOneByEmail(email);
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const payload = <ITokenPayload>{
+      email: user.email,
+      id: user.id,
+      role: Role.User,
+    };
+
+    const resetPasswordToken = await this.getTokenLink(payload);
+
+    return this.emailService.sendResetPasswordLink({ email, resetPasswordToken });
+  }
   private async getTokens(payload: ITokenPayload) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -94,6 +116,13 @@ export class AuthService {
     ]);
 
     return { accessToken, refreshToken };
+  }
+
+  private async getTokenLink(payload: ITokenPayload) {
+    return await this.jwtService.signAsync(payload, {
+      secret: envs.jwt.linkSecret,
+      expiresIn: envs.jwt.expiredLink,
+    });
   }
 
   private async updateRefreshToken(userId: string, refreshToken: string) {

@@ -50,10 +50,9 @@ const AuthRoute = {
 
   forgotPassword: <IRouteParams>{
     path: '/forgotPassword',
-    method: RequestMethod.GET,
+    method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: false,
-    googleOAuth: true,
   },
 };
 

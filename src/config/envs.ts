@@ -11,6 +11,8 @@ interface EnvVars {
   JWT_REFRESH_SECRET: string;
   JWT_EXPIRED_ACCESS: string;
   JWT_EXPIRED_REFRESH: string;
+  JWT_LINK_SECRET: string;
+  JWT_EXPIRED_LINK: string;
 
   NODE_ENV: string;
 
@@ -27,6 +29,7 @@ interface EnvVars {
   GOOGLE_CALLBACK_URL: string;
 
   FE_HOME_URL: string;
+  FE_EMAIL_RESET_PASSWORD_URL: string;
 
   MAIL_USER: string;
   MAIL_PASSWORD: string;
@@ -41,6 +44,8 @@ const envSchema = joi
     JWT_REFRESH_SECRET: joi.string().required(),
     JWT_EXPIRED_ACCESS: joi.string().required(),
     JWT_EXPIRED_REFRESH: joi.string().required(),
+    JWT_LINK_SECRET: joi.string().required(),
+    JWT_EXPIRED_LINK: joi.string().required(),
 
     NODE_ENV: joi
       .string()
@@ -59,6 +64,7 @@ const envSchema = joi
     GOOGLE_CALLBACK_URL: joi.string().required(),
 
     FE_HOME_URL: joi.string().required(),
+    FE_EMAIL_RESET_PASSWORD_URL: joi.string().required(),
 
     MAIL_USER: joi.string().required(),
     MAIL_PASSWORD: joi.string().required(),
@@ -94,6 +100,8 @@ export const envs = {
     refreshSecret: envVars.JWT_REFRESH_SECRET,
     expiredAccess: envVars.JWT_EXPIRED_ACCESS,
     expiredRefresh: envVars.JWT_EXPIRED_REFRESH,
+    linkSecret: envVars.JWT_LINK_SECRET,
+    expiredLink: envVars.JWT_EXPIRED_LINK,
   },
 
   google: {
@@ -105,6 +113,7 @@ export const envs = {
 
   fe: {
     homeUrl: envVars.FE_HOME_URL,
+    emailResetPasswordUrl: envVars.FE_EMAIL_RESET_PASSWORD_URL,
   },
 
   email: <MailerOptions>{

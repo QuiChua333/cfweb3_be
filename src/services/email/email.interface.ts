@@ -4,3 +4,8 @@ export interface IEMailObject {
   text?: string;
   html?: string;
 }
+
+export interface ISendMailResetPassword {
+  resetPasswordToken: string;
+  email: string;
+}

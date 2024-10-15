@@ -6,11 +6,13 @@ import { envs } from '@/config';
 import { UserModule } from '@/api/user/user.module';
 import { GoogleStrategy, JwtStrategy, RefreshTokenStrategy } from '@/api/auth/strategies';
 import { PassportModule } from '@nestjs/passport';
+import { EmailModule } from '@/services/email/email.module';
 
 @Module({
   imports: [
     PassportModule,
     UserModule,
+    EmailModule,
     JwtModule.register({
       secret: envs.jwt.accessSecret,
       signOptions: { expiresIn: envs.jwt.expiredAccess },

@@ -2,7 +2,7 @@ import { Body, Controller, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import AuthRoute from '@/api/auth/auth.routes';
 import { InjectRoute, User } from '@/decorators';
-import { LoginDto, RegisterDto } from '@/api/auth/dto';
+import { ForgotPasswordDto, LoginDto, RegisterDto } from '@/api/auth/dto';
 import { ITokenPayload } from './auth.interface';
 import { envs } from '@/config';
 
@@ -40,5 +40,7 @@ export class AuthController {
   }
 
   @InjectRoute(AuthRoute.forgotPassword)
-  async forgotPassword() {}
+  async forgotPassword(@Body() { email }: ForgotPasswordDto) {
+    return this.authService.forgotPassword(email);
+  }
 }
