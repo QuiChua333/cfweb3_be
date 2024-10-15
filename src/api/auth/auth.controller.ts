@@ -38,4 +38,7 @@ export class AuthController {
     const { accessToken, refreshToken } = await this.authService.loginAfterGoogleCallback(user);
     res.redirect(`${envs.fe.homeUrl}?accessToken=${accessToken}&refreshToken=${refreshToken}`);
   }
+
+  @InjectRoute(AuthRoute.forgotPassword)
+  async forgotPassword() {}
 }

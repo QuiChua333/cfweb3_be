@@ -47,6 +47,14 @@ const AuthRoute = {
     jwtSecure: false,
     googleOAuth: true,
   },
+
+  forgotPassword: <IRouteParams>{
+    path: '/forgotPassword',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+    googleOAuth: true,
+  },
 };
 
 export default AuthRoute;

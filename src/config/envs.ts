@@ -1,4 +1,5 @@
 import { Env } from '@/constants';
+import { MailerOptions } from '@nestjs-modules/mailer';
 import 'dotenv/config';
 import * as joi from 'joi';
 import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConnectionOptions';
@@ -26,6 +27,10 @@ interface EnvVars {
   GOOGLE_CALLBACK_URL: string;
 
   FE_HOME_URL: string;
+
+  MAIL_USER: string;
+  MAIL_PASSWORD: string;
+  MAIL_HOST: string;
 }
 
 const envSchema = joi
@@ -54,6 +59,10 @@ const envSchema = joi
     GOOGLE_CALLBACK_URL: joi.string().required(),
 
     FE_HOME_URL: joi.string().required(),
+
+    MAIL_USER: joi.string().required(),
+    MAIL_PASSWORD: joi.string().required(),
+    MAIL_HOST: joi.string().required(),
   })
   .unknown(true);
 
@@ -91,9 +100,26 @@ export const envs = {
     clientId: envVars.GOOGLE_CLIENT_ID,
     clientSecret: envVars.GOOGLE_CLIENT_SECRET,
     callbackUrl: envVars.GOOGLE_CALLBACK_URL,
+    scope: ['email', 'profile'],
   },
 
   fe: {
     homeUrl: envVars.FE_HOME_URL,
+  },
+
+  email: <MailerOptions>{
+    transport: {
+      secure: false,
+      service: 'gmail',
+      host: envVars.MAIL_HOST,
+      port: 587,
+      auth: {
+        user: envVars.MAIL_USER,
+        pass: envVars.MAIL_PASSWORD,
+      },
+    },
+    defaults: {
+      from: `"CrowdFunding" <${envVars.MAIL_USER}>`,
+    },
   },
 };
