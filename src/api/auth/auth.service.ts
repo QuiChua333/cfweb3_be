@@ -4,7 +4,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { LoginDto, RegisterDto } from 'src/api/auth/dto';
+import { LoginDto, RegisterDto, ResetPasswordDto } from 'src/api/auth/dto';
 import { UserService } from 'src/api/user/user.service';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
@@ -31,14 +31,14 @@ export class AuthService {
       password: hashedPassword,
     });
 
-    const tokens = await this.getTokens({
-      id: newUser.id,
+    const payload = <ITokenPayload>{
       email: newUser.email,
+      id: newUser.id,
       role: Role.User,
-    });
+    };
 
-    await this.updateRefreshToken(newUser.id, tokens.refreshToken);
-    return tokens;
+    const verifyEmailToken = await this.getTokenLink(payload);
+    return this.emailService.sendVerifyEmailLink({ email: newUser.email, verifyEmailToken });
   }
 
   async login(loginDtoo: LoginDto) {
@@ -69,15 +69,14 @@ export class AuthService {
     const user = await this.userService.findOneById(userId);
 
     if (!user || !user.refreshToken) throw new ForbiddenException('Invalid refresh token');
+
     const isRefreshTokenMatched = await argon2.verify(user.refreshToken, refreshToken);
 
     if (!isRefreshTokenMatched) throw new ForbiddenException('Invalid refresh token');
   }
 
   async logout(userId: string) {
-    return this.userService.update(userId, {
-      refreshToken: null,
-    });
+    return this.userService.updateRefreshToken(userId, null);
   }
 
   async refreshTokens(tokenPayload: ITokenPayload) {
@@ -103,6 +102,17 @@ export class AuthService {
 
     return this.emailService.sendResetPasswordLink({ email, resetPasswordToken });
   }
+
+  async resetPassword(resetPasswordDto: ResetPasswordDto) {
+    const payload = await this.verifyTokenLink(resetPasswordDto.token);
+    const user = await this.userService.findOneById(payload.id);
+
+    if (!user) throw new BadRequestException('Invalid reset password token');
+
+    const hashedPassword = await this.hashData(resetPasswordDto.password);
+    return this.userService.updatePassword(user.id, hashedPassword);
+  }
+
   private async getTokens(payload: ITokenPayload) {
     const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
@@ -125,15 +135,20 @@ export class AuthService {
     });
   }
 
+  private async verifyTokenLink(token: string): Promise<ITokenPayload> {
+    return this.jwtService.verifyAsync(token, {
+      secret: envs.jwt.linkSecret,
+    });
+  }
+
   private async updateRefreshToken(userId: string, refreshToken: string) {
     const hashedRefreshToken = await this.hashData(refreshToken);
-    await this.userService.update(userId, {
-      refreshToken: hashedRefreshToken,
-    });
+    await this.userService.updateRefreshToken(userId, hashedRefreshToken);
   }
 
   async validateUser(email: string, password: string) {
     const user = await this.userService.findOneByEmail(email);
+
     if (!(user && user.password === password)) {
       throw new BadRequestException('Wrong credentials provided');
     }
@@ -143,7 +158,9 @@ export class AuthService {
 
   async validateGoogleUser(googleUser: RegisterDto) {
     const user = await this.userService.findOneByEmail(googleUser.email);
+
     if (user) return user;
+
     return await this.userService.create(googleUser, true);
   }
 
@@ -155,10 +172,30 @@ export class AuthService {
     return tokens;
   }
 
+  async confirmEmail(token: string) {
+    const payload = await this.verifyTokenLink(token);
+    const user = await this.userService.findOneById(payload.id);
+
+    if (!user) throw new BadRequestException('Invalid verify email token');
+
+    await this.userService.updateVerifiedEmail(user.id);
+
+    const tokens = await this.getTokens({
+      id: user.id,
+      email: user.email,
+      role: Role.User,
+    });
+
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+
+    return tokens;
+  }
+
   async validateJwtUser(email: string) {
     const user = await this.userService.findOneByEmail(email);
 
     if (!user) throw new BadRequestException('Invalid access token');
+
     return user;
   }
 

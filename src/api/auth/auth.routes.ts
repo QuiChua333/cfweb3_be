@@ -54,6 +54,20 @@ const AuthRoute = {
     code: HttpStatus.OK,
     jwtSecure: false,
   },
+
+  resetPassword: <IRouteParams>{
+    path: '/resetPassword',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  confirmEmail: <IRouteParams>{
+    path: '/confirmEmail',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
 };
 
 export default AuthRoute;

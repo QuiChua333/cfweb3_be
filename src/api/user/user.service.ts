@@ -27,10 +27,31 @@ export class UserService {
     return this.userRepository.save(newUser);
   }
 
-  async update(userId: string, updateUserDto: UpdateUserDto) {
+  async updateInfo(userId: string, updateUserDto: UpdateUserDto) {
     return this.userRepository.save({
       id: userId,
       ...updateUserDto,
+    });
+  }
+
+  async updateRefreshToken(userId: string, refreshToken: string) {
+    return this.userRepository.save({
+      id: userId,
+      refreshToken,
+    });
+  }
+
+  async updatePassword(userId: string, password: string) {
+    return this.userRepository.save({
+      id: userId,
+      password,
+    });
+  }
+
+  async updateVerifiedEmail(userId: string) {
+    return this.userRepository.save({
+      id: userId,
+      isVerifiedEmail: true,
     });
   }
 }

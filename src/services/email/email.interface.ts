@@ -9,3 +9,8 @@ export interface ISendMailResetPassword {
   resetPasswordToken: string;
   email: string;
 }
+
+export interface ISendMailVerifyEmail {
+  verifyEmailToken: string;
+  email: string;
+}

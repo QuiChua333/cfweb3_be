@@ -31,6 +31,8 @@ interface EnvVars {
   FE_HOME_URL: string;
   FE_EMAIL_RESET_PASSWORD_URL: string;
 
+  BE_EMAIL_CONFIRM_URL: string;
+
   MAIL_USER: string;
   MAIL_PASSWORD: string;
   MAIL_HOST: string;
@@ -65,6 +67,8 @@ const envSchema = joi
 
     FE_HOME_URL: joi.string().required(),
     FE_EMAIL_RESET_PASSWORD_URL: joi.string().required(),
+
+    BE_EMAIL_CONFIRM_URL: joi.string().required(),
 
     MAIL_USER: joi.string().required(),
     MAIL_PASSWORD: joi.string().required(),
@@ -114,6 +118,10 @@ export const envs = {
   fe: {
     homeUrl: envVars.FE_HOME_URL,
     emailResetPasswordUrl: envVars.FE_EMAIL_RESET_PASSWORD_URL,
+  },
+
+  be: {
+    emailConfirmUrl: envVars.BE_EMAIL_CONFIRM_URL,
   },
 
   email: <MailerOptions>{

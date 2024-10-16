@@ -1,8 +1,8 @@
-import { Body, Controller, Req, Res } from '@nestjs/common';
+import { Body, Controller, Query, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import AuthRoute from '@/api/auth/auth.routes';
 import { InjectRoute, User } from '@/decorators';
-import { ForgotPasswordDto, LoginDto, RegisterDto } from '@/api/auth/dto';
+import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from '@/api/auth/dto';
 import { ITokenPayload } from './auth.interface';
 import { envs } from '@/config';
 
@@ -42,5 +42,16 @@ export class AuthController {
   @InjectRoute(AuthRoute.forgotPassword)
   async forgotPassword(@Body() { email }: ForgotPasswordDto) {
     return this.authService.forgotPassword(email);
+  }
+
+  @InjectRoute(AuthRoute.resetPassword)
+  async resetPassword(@Body() resetPasswordDto: ResetPasswordDto) {
+    return this.authService.resetPassword(resetPasswordDto);
+  }
+
+  @InjectRoute(AuthRoute.confirmEmail)
+  async confirmEmail(@Query('token') token: string, @Res() res) {
+    const { accessToken, refreshToken } = await this.authService.confirmEmail(token);
+    res.redirect(`${envs.fe.homeUrl}?accessToken=${accessToken}&refreshToken=${refreshToken}`);
   }
 }
