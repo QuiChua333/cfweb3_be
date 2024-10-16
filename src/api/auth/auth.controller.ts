@@ -49,6 +49,11 @@ export class AuthController {
     return this.authService.resetPassword(resetPasswordDto);
   }
 
+  @InjectRoute(AuthRoute.resendEmailConfirm)
+  async resendEmailConfirm(@User() user: ITokenPayload) {
+    return this.authService.sendEmailConfirm(user);
+  }
+
   @InjectRoute(AuthRoute.confirmEmail)
   async confirmEmail(@Query('token') token: string, @Res() res) {
     const { accessToken, refreshToken } = await this.authService.confirmEmail(token);

@@ -62,6 +62,13 @@ const AuthRoute = {
     jwtSecure: false,
   },
 
+  resendEmailConfirm: <IRouteParams>{
+    path: '/resendEmailConfirm',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
   confirmEmail: <IRouteParams>{
     path: '/confirmEmail',
     method: RequestMethod.GET,

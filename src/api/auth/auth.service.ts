@@ -37,8 +37,7 @@ export class AuthService {
       role: Role.User,
     };
 
-    const verifyEmailToken = await this.getTokenLink(payload);
-    return this.emailService.sendVerifyEmailLink({ email: newUser.email, verifyEmailToken });
+    return this.sendEmailConfirm(payload);
   }
 
   async login(loginDtoo: LoginDto) {
@@ -172,11 +171,18 @@ export class AuthService {
     return tokens;
   }
 
+  async sendEmailConfirm(payload: ITokenPayload) {
+    const verifyEmailToken = await this.getTokenLink(payload);
+    return this.emailService.sendVerifyEmailLink({ email: payload.email, verifyEmailToken });
+  }
+
   async confirmEmail(token: string) {
     const payload = await this.verifyTokenLink(token);
     const user = await this.userService.findOneById(payload.id);
 
     if (!user) throw new BadRequestException('Invalid verify email token');
+
+    if (user.isVerifiedEmail) throw new BadRequestException('Email already confirmed');
 
     await this.userService.updateVerifiedEmail(user.id);
 
