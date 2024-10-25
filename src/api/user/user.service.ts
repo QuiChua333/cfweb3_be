@@ -1,55 +1,53 @@
 import { Injectable } from '@nestjs/common';
-import { InjectRepository } from '@nestjs/typeorm';
 import { RegisterDto } from 'src/api/auth/dto';
-import { Repository } from 'typeorm';
 import { UpdateUserDto } from './dto';
-import { User } from '@/entities';
+import { RepositoryService } from '@/repositories/repository.service';
 
 @Injectable()
 export class UserService {
-  constructor(@InjectRepository(User) private readonly userRepository: Repository<User>) {}
+  constructor(private readonly repository: RepositoryService) {}
 
   async findAll() {}
 
   async findOneById(id: string) {
-    return this.userRepository.findOneBy({ id });
+    return this.repository.user.findOneBy({ id });
   }
 
   async findOneByEmail(email: string) {
-    return this.userRepository.findOneBy({ email });
+    return this.repository.user.findOneBy({ email });
   }
 
   async create(registerDto: RegisterDto, isVerifiedEmail: boolean = false) {
-    const newUser = this.userRepository.create({
+    const newUser = this.repository.user.create({
       ...registerDto,
       isVerifiedEmail,
     });
-    return this.userRepository.save(newUser);
+    return this.repository.user.save(newUser);
   }
 
   async updateInfo(userId: string, updateUserDto: UpdateUserDto) {
-    return this.userRepository.save({
+    return this.repository.user.save({
       id: userId,
       ...updateUserDto,
     });
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {
-    return this.userRepository.save({
+    return this.repository.user.save({
       id: userId,
       refreshToken,
     });
   }
 
   async updatePassword(userId: string, password: string) {
-    return this.userRepository.save({
+    return this.repository.user.save({
       id: userId,
       password,
     });
   }
 
   async updateVerifiedEmail(userId: string) {
-    return this.userRepository.save({
+    return this.repository.user.save({
       id: userId,
       isVerifiedEmail: true,
     });

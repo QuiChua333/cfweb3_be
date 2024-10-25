@@ -3,6 +3,10 @@ import { BaseEntity } from './base/base.entity';
 import { VerifyStatus } from '@/constants';
 import { UserVerify } from './user-verify.entity';
 import { Campaign } from './campaign.entity';
+import { TeamMember } from './team-member.entity';
+import { FollowCampaign } from './follow-campaign.entity';
+import { Contribution } from './contribution.entity';
+import { Report } from './report.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -64,4 +68,16 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Campaign, (campaign) => campaign.owner)
   campaigns: Campaign[];
+
+  @OneToMany(() => TeamMember, (teamMember) => teamMember.user)
+  teamMembers: TeamMember[];
+
+  @OneToMany(() => FollowCampaign, (followCampaign) => followCampaign.user)
+  followCampaigns: FollowCampaign[];
+
+  @OneToMany(() => Contribution, (contribution) => contribution.user)
+  contributions: Contribution[];
+
+  @OneToMany(() => Report, (report) => report.reportBy)
+  reports: Report[];
 }

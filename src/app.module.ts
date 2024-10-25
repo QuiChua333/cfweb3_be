@@ -4,9 +4,10 @@ import { UserModule } from '@/api/user/user.module';
 import { AppController } from '@/app.controller';
 import { DatabaseModule } from './database/database.module';
 import { EmailModule } from './services/email/email.module';
+import { RepositoryModule } from './repositories/repository.module';
 
 @Module({
-  imports: [DatabaseModule, AuthModule, UserModule, EmailModule],
+  imports: [DatabaseModule, RepositoryModule, AuthModule, UserModule, EmailModule],
   controllers: [AppController],
   providers: [],
 })

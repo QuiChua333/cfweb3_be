@@ -4,8 +4,6 @@ services:
   crowdfunding-db:
     container_name: crowdfunding-container
     image: postgres:16.4
-    volumes:
-      - ./src/database/postgres:/var/lib/postgresql/data
     ports:
       - ${DB_PORT}:5432
     environment:

@@ -11,8 +11,8 @@ import { EmailModule } from '@/services/email/email.module';
 @Module({
   imports: [
     PassportModule,
-    UserModule,
     EmailModule,
+    UserModule,
     JwtModule.register({
       secret: envs.jwt.accessSecret,
       signOptions: { expiresIn: envs.jwt.expiredAccess },

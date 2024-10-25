@@ -2,6 +2,7 @@ import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'type
 import { BaseEntity } from './base/base.entity';
 import { Campaign } from './campaign.entity';
 import { Option } from './option.entity';
+import { DetailPerk } from './detail-perk.entity';
 
 @Entity()
 export class Item extends BaseEntity {
@@ -18,4 +19,7 @@ export class Item extends BaseEntity {
 
   @OneToMany(() => Option, (option) => option.item)
   options: Option[];
+
+  @OneToMany(() => DetailPerk, (detailPerk) => detailPerk.perk)
+  detailPerks: DetailPerk[];
 }

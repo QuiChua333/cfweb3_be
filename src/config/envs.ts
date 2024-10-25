@@ -94,9 +94,12 @@ export const envs = {
     password: envVars.DB_PASSWORD,
     database: envVars.DB_DATABASE,
     entities: [],
-    synchronize: true,
     autoLoadEntities: true,
     ssl: envVars.NODE_ENV === Env.DEVELOPMENT ? false : true,
+    // logging: true,
+    // dropSchema: true,
+    synchronize: true,
+
     // entities: [`${__dirname}/../api/**/*.entity.{js,ts}`],
   },
   jwt: {

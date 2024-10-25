@@ -1,0 +1,54 @@
+import {
+  Campaign,
+  Comment,
+  CommentLike,
+  Contribution,
+  ContributionDetail,
+  DetailPerk,
+  FAQ,
+  Field,
+  FieldGroup,
+  FollowCampaign,
+  Item,
+  Option,
+  Perk,
+  Report,
+  ReportResponse,
+  ShippingFee,
+  TeamMember,
+  User,
+  UserVerify,
+} from '@/entities';
+import { Global, Module } from '@nestjs/common';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { RepositoryService } from './repository.service';
+
+@Global()
+@Module({
+  imports: [
+    TypeOrmModule.forFeature([
+      Campaign,
+      CommentLike,
+      Comment,
+      ContributionDetail,
+      Contribution,
+      DetailPerk,
+      FAQ,
+      FieldGroup,
+      Field,
+      FollowCampaign,
+      Item,
+      Option,
+      Perk,
+      ReportResponse,
+      Report,
+      ShippingFee,
+      TeamMember,
+      UserVerify,
+      User,
+    ]),
+  ],
+  providers: [RepositoryService],
+  exports: [RepositoryService],
+})
+export class RepositoryModule {}

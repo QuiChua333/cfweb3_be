@@ -11,3 +11,18 @@ export enum CampaignStatus {
   FAILED = 'failed',
   DRAFT = 'draft',
 }
+
+export enum ConfirmMemberStatus {
+  PENDING = 'pending',
+  ACCEPTED = 'accepted',
+}
+
+export enum PaymentMethod {
+  BANK_TRANSFER = 'bank transfer',
+}
+
+export enum PaymentStatus {
+  PENDING = 'pending',
+  SUCCESS = 'success',
+  FAILED = 'failed',
+}

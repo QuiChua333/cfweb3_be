@@ -7,6 +7,9 @@ export class Option extends BaseEntity {
   @Column()
   name: string;
 
+  @Column()
+  values: string;
+
   @ManyToOne(() => Item, (item) => item.options)
   item: Item;
 }
