@@ -5,6 +5,15 @@ import { AppController } from '@/app.controller';
 import { DatabaseModule } from './database/database.module';
 import { EmailModule } from './services/email/email.module';
 import { RepositoryModule } from './repositories/repository.module';
+import { FieldModule } from './api/field/field.module';
+import { UserVerifyModule } from './api/user-verify/user-verify.module';
+import { ItemModule } from './api/item/item.module';
+import { OptionModule } from './api/option/option.module';
+import { PerkModule } from './api/perk/perk.module';
+import { ReportResponseModule } from './api/report-response/report-response.module';
+import { ReportModule } from './api/report/report.module';
+import { ShippingFeeModule } from './api/shipping-fee/shipping-fee.module';
+import { TeamMemberModule } from './api/team-member/team-member.module';
 import { CampaignModule } from './api/campaign/campaign.module';
 import { CommentLikeModule } from './api/comment-like/comment-like.module';
 import { CommentModule } from './api/comment/comment.module';
@@ -15,7 +24,30 @@ import { FieldGroupModule } from './api/field-group/field-group.module';
 import { FollowCampaignModule } from './api/follow-campaign/follow-campaign.module';
 
 @Module({
-  imports: [DatabaseModule, RepositoryModule, AuthModule, UserModule, EmailModule, CampaignModule, CommentLikeModule, CommentModule, ContributionModule, DetailPerkModule, FaqModule, FieldGroupModule, FollowCampaignModule],
+  imports: [
+    DatabaseModule,
+    RepositoryModule,
+    AuthModule,
+    UserModule,
+    EmailModule,
+    FieldModule,
+    UserVerifyModule,
+    ItemModule,
+    OptionModule,
+    PerkModule,
+    ReportResponseModule,
+    ReportModule,
+    ShippingFeeModule,
+    TeamMemberModule,
+    CampaignModule,
+    CommentLikeModule,
+    CommentModule,
+    ContributionModule,
+    DetailPerkModule,
+    FaqModule,
+    FieldGroupModule,
+    FollowCampaignModule,
+  ],
   controllers: [AppController],
   providers: [],
 })

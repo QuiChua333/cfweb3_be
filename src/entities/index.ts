@@ -13,7 +13,7 @@ export * from './option.entity';
 export * from './perk.entity';
 export * from './report-response.entity';
 export * from './report.entity';
-export * from './shippng-fee.entity';
+export * from './shipping-fee.entity';
 export * from './team-member.entity';
 export * from './user-verify.entity';
 export * from './user.entity';
