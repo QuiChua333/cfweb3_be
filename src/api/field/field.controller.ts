@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { FieldService } from './field.service';
 import { CreateFieldDto } from './dto/create-field.dto';
 import { UpdateFieldDto } from './dto/update-field.dto';
+import FieldRoute from './field.routes';
+import { InjectRoute } from '@/decorators';
 
 @Controller('field')
 export class FieldController {
@@ -12,7 +14,7 @@ export class FieldController {
     return this.fieldService.create(createFieldDto);
   }
 
-  @Get()
+  @InjectRoute(FieldRoute.findAll)
   findAll() {
     return this.fieldService.findAll();
   }

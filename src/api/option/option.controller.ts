@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { OptionService } from './option.service';
 import { CreateOptionDto } from './dto/create-option.dto';
 import { UpdateOptionDto } from './dto/update-option.dto';
+import OptionRoute from './option.routes';
+import { InjectRoute } from '@/decorators';
 
 @Controller('option')
 export class OptionController {
@@ -12,7 +14,7 @@ export class OptionController {
     return this.optionService.create(createOptionDto);
   }
 
-  @Get()
+  @InjectRoute(OptionRoute.findAll)
   findAll() {
     return this.optionService.findAll();
   }

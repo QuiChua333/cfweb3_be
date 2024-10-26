@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { TeamMemberService } from './team-member.service';
 import { CreateTeamMemberDto } from './dto/create-team-member.dto';
 import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
+import { InjectRoute } from '@/decorators';
+import TeamMemberRoute from './team-member.routes';
 
 @Controller('team-member')
 export class TeamMemberController {
@@ -12,7 +14,7 @@ export class TeamMemberController {
     return this.teamMemberService.create(createTeamMemberDto);
   }
 
-  @Get()
+  @InjectRoute(TeamMemberRoute.findAll)
   findAll() {
     return this.teamMemberService.findAll();
   }

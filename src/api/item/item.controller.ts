@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ItemService } from './item.service';
 import { CreateItemDto } from './dto/create-item.dto';
 import { UpdateItemDto } from './dto/update-item.dto';
+import ItemRoute from './item.routes';
+import { InjectRoute } from '@/decorators';
 
 @Controller('item')
 export class ItemController {
@@ -12,7 +14,7 @@ export class ItemController {
     return this.itemService.create(createItemDto);
   }
 
-  @Get()
+  @InjectRoute(ItemRoute.findAll)
   findAll() {
     return this.itemService.findAll();
   }

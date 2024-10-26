@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ReportResponseService } from './report-response.service';
 import { CreateReportResponseDto } from './dto/create-report-response.dto';
 import { UpdateReportResponseDto } from './dto/update-report-response.dto';
+import ReportResponseRoute from './report-response.routes';
+import { InjectRoute } from '@/decorators';
 
 @Controller('report-response')
 export class ReportResponseController {
@@ -12,7 +14,7 @@ export class ReportResponseController {
     return this.reportResponseService.create(createReportResponseDto);
   }
 
-  @Get()
+  @InjectRoute(ReportResponseRoute.findAll)
   findAll() {
     return this.reportResponseService.findAll();
   }

@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { PerkService } from './perk.service';
 import { CreatePerkDto } from './dto/create-perk.dto';
 import { UpdatePerkDto } from './dto/update-perk.dto';
+import { InjectRoute } from '@/decorators';
+import PerkRoute from './perk.routes';
 
 @Controller('perk')
 export class PerkController {
@@ -12,7 +14,7 @@ export class PerkController {
     return this.perkService.create(createPerkDto);
   }
 
-  @Get()
+  @InjectRoute(PerkRoute.findAll)
   findAll() {
     return this.perkService.findAll();
   }

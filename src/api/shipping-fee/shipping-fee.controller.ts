@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { ShippingFeeService } from './shipping-fee.service';
 import { CreateShippingFeeDto } from './dto/create-shipping-fee.dto';
 import { UpdateShippingFeeDto } from './dto/update-shipping-fee.dto';
+import ShippingFeeRoute from './shipping-fee.routes';
+import { InjectRoute } from '@/decorators';
 
 @Controller('shipping-fee')
 export class ShippingFeeController {
@@ -12,7 +14,7 @@ export class ShippingFeeController {
     return this.shippingFeeService.create(createShippingFeeDto);
   }
 
-  @Get()
+  @InjectRoute(ShippingFeeRoute.findAll)
   findAll() {
     return this.shippingFeeService.findAll();
   }

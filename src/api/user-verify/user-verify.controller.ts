@@ -2,6 +2,8 @@ import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/commo
 import { UserVerifyService } from './user-verify.service';
 import { CreateUserVerifyDto } from './dto/create-user-verify.dto';
 import { UpdateUserVerifyDto } from './dto/update-user-verify.dto';
+import UserVerifyRoute from './user-verify.routes';
+import { InjectRoute } from '@/decorators';
 
 @Controller('user-verify')
 export class UserVerifyController {
@@ -12,7 +14,7 @@ export class UserVerifyController {
     return this.userVerifyService.create(createUserVerifyDto);
   }
 
-  @Get()
+  @InjectRoute(UserVerifyRoute.findAll)
   findAll() {
     return this.userVerifyService.findAll();
   }
