@@ -2,7 +2,7 @@ import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
 import { Campaign } from './campaign.entity';
 import { DetailPerk } from './detail-perk.entity';
-import { ShippingFee } from './shippng-fee.entity';
+import { ShippingFee } from './shipping-fee.entity';
 
 @Entity()
 export class Perk extends BaseEntity {
