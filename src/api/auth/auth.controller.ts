@@ -57,6 +57,8 @@ export class AuthController {
   @InjectRoute(AuthRoute.confirmEmail)
   async confirmEmail(@Query('token') token: string, @Res() res) {
     const { accessToken, refreshToken } = await this.authService.confirmEmail(token);
-    res.redirect(`${envs.fe.homeUrl}?accessToken=${accessToken}&refreshToken=${refreshToken}`);
+
+    //redirect to fe verify email success
+    res.redirect(`${envs.fe.emailVerifySuccessUrl}`);
   }
 }

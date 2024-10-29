@@ -25,7 +25,7 @@ const AuthRoute = {
   },
 
   refreshToken: <IRouteParams>{
-    path: '/refreshToken',
+    path: '/refresh-token',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: false,
@@ -49,28 +49,28 @@ const AuthRoute = {
   },
 
   forgotPassword: <IRouteParams>{
-    path: '/forgotPassword',
+    path: '/forgot-password',
     method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: false,
   },
 
   resetPassword: <IRouteParams>{
-    path: '/resetPassword',
+    path: '/reset-password',
     method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: false,
   },
 
   resendEmailConfirm: <IRouteParams>{
-    path: '/resendEmailConfirm',
+    path: '/resend-email-confirm',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: true,
   },
 
   confirmEmail: <IRouteParams>{
-    path: '/confirmEmail',
+    path: '/confirm-email',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: false,

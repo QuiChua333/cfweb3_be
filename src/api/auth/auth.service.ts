@@ -23,7 +23,7 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     const existedUser = await this.userService.findOneByEmail(registerDto.email);
-    if (existedUser) throw new BadRequestException('User already exists');
+    if (existedUser) throw new BadRequestException('Tài khoản đã tồn tại');
 
     const hashedPassword = await this.hashData(registerDto.password);
     const newUser = await this.userService.create({
@@ -44,13 +44,13 @@ export class AuthService {
     const user = await this.userService.findOneByEmail(loginDtoo.email);
 
     if (!user) {
-      throw new BadRequestException('Email or password is invalid');
+      throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
     }
 
     const isMatchedPassword = await argon2.verify(user.password, loginDtoo.password);
 
     if (!isMatchedPassword) {
-      throw new BadRequestException('Email or password is invalid');
+      throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
     }
 
     const tokens = await this.getTokens({
@@ -61,7 +61,10 @@ export class AuthService {
 
     await this.updateRefreshToken(user.id, tokens.refreshToken);
 
-    return tokens;
+    return {
+      ...tokens,
+      isAdmin: user.isAdmin,
+    };
   }
 
   async validateRefreshToken(userId: string, refreshToken: string) {
