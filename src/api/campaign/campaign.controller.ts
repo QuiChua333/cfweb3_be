@@ -3,15 +3,16 @@ import { CampaignService } from './campaign.service';
 import { CreateCampaignDto } from './dto/create-campaign.dto';
 import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import CampaignRoute from './campaign.routes';
-import { InjectRoute } from '@/decorators';
+import { InjectRoute, User } from '@/decorators';
+import { ITokenPayload } from '../auth/auth.interface';
 
 @Controller(CampaignRoute.root)
 export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
-  @Post()
-  create(@Body() createCampaignDto: CreateCampaignDto) {
-    return this.campaignService.create(createCampaignDto);
+  @InjectRoute(CampaignRoute.create)
+  create(@User() user: ITokenPayload) {
+    return this.campaignService.createCampaign(user);
   }
 
   @InjectRoute(CampaignRoute.findAll)
@@ -19,9 +20,14 @@ export class CampaignController {
     return this.campaignService.findAll();
   }
 
+  @InjectRoute(CampaignRoute.checkOwner)
+  checkOwner(@User() user: ITokenPayload, @Param('id') campaignId: string) {
+    return this.campaignService.checkOwner(campaignId, user);
+  }
+
   @Get(':id')
   findOne(@Param('id') id: string) {
-    return this.campaignService.findOne(+id);
+    return this.campaignService.findOneById(id);
   }
 
   @Patch(':id')

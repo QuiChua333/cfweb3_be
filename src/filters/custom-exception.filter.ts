@@ -16,6 +16,7 @@ export class CustomFilterExceptionFilter implements ExceptionFilter {
       status: HttpStatus.INTERNAL_SERVER_ERROR,
       message: 'Something went wrong',
     };
+
     try {
       if (exception instanceof ValidatorException) {
         const validtaionExceptionResponse: IvalidatorExceptionResponse = exception.getResponse();

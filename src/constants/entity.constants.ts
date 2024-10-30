@@ -1,20 +1,20 @@
 export enum VerifyStatus {
-  UNVERIFY = 'unverify',
-  PENDING = 'pending',
-  SUCCESS = 'success',
+  UNVERIFY = 'Chưa xác thực',
+  PENDING = 'Chờ xác thực',
+  SUCCESS = 'Thành công',
 }
 
 export enum CampaignStatus {
-  FUNDING = 'funding',
-  COMPLETE = 'complete',
+  FUNDING = 'Đang gây quỹ',
+  COMPLETE = 'Đã hoàn thành',
   TERMINATE = 'terminate',
-  FAILED = 'failed',
-  DRAFT = 'draft',
+  FAILED = 'Thất bại',
+  DRAFT = 'Bản nháp',
 }
 
 export enum ConfirmMemberStatus {
-  PENDING = 'pending',
-  ACCEPTED = 'accepted',
+  PENDING = 'Chờ chấp nhận',
+  ACCEPTED = 'Thành viên',
 }
 
 export enum PaymentMethod {
@@ -22,7 +22,7 @@ export enum PaymentMethod {
 }
 
 export enum PaymentStatus {
-  PENDING = 'pending',
-  SUCCESS = 'success',
-  FAILED = 'failed',
+  PENDING = 'Đang chờ',
+  SUCCESS = 'Thành công',
+  FAILED = 'Thất bại',
 }

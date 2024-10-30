@@ -15,7 +15,7 @@ const UserRoute = {
   },
 
   findMe: <IRouteParams>{
-    path: '/me',
+    path: '/findMe',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: true,

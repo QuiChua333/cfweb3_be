@@ -14,16 +14,24 @@ import { Report } from './report.entity';
 
 @Entity()
 export class Campaign extends BaseEntity {
-  @Column()
+  @Column({
+    nullable: true,
+  })
   title: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   tagline: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   imageDetailPage: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   location: string;
 
   @Column({
@@ -40,6 +48,7 @@ export class Campaign extends BaseEntity {
 
   @Column({
     type: 'int',
+    nullable: true,
   })
   duration: number;
 
@@ -60,11 +69,17 @@ export class Campaign extends BaseEntity {
 
   @Column({
     type: 'bigint',
+    nullable: true,
   })
   goal: number;
 
   @ManyToOne(() => User, (user) => user.userVerify)
   owner: User;
+
+  @Column({
+    type: 'uuid',
+  })
+  ownerId: string;
 
   @OneToMany(() => Item, (item) => item.campaign)
   items: Item[];

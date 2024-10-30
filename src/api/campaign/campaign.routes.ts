@@ -12,6 +12,21 @@ const CampaignRoute = {
     code: HttpStatus.OK,
     jwtSecure: false,
   },
+
+  create: <IRouteParams>{
+    path: '/new',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+    roles: [Role.User],
+  },
+
+  checkOwner: <IRouteParams>{
+    path: '/:id/checkOwner',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default CampaignRoute;
