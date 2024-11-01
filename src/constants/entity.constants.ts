@@ -7,7 +7,8 @@ export enum VerifyStatus {
 export enum CampaignStatus {
   FUNDING = 'Đang gây quỹ',
   COMPLETE = 'Đã hoàn thành',
-  TERMINATE = 'terminate',
+  PENDING = 'Chờ xác nhận',
+  TERMINATE = 'Tạm dừng',
   FAILED = 'Thất bại',
   DRAFT = 'Bản nháp',
 }

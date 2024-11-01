@@ -1,16 +1,26 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { CampaignService } from './campaign.service';
-import { CreateCampaignDto } from './dto/create-campaign.dto';
-import { UpdateCampaignDto } from './dto/update-campaign.dto';
 import CampaignRoute from './campaign.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
+import { UpdateCampaignDto } from './dto';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller(CampaignRoute.root)
 export class CampaignController {
   constructor(private readonly campaignService: CampaignService) {}
 
-  @InjectRoute(CampaignRoute.create)
+  @InjectRoute(CampaignRoute.createCampaign)
   create(@User() user: ITokenPayload) {
     return this.campaignService.createCampaign(user);
   }
@@ -25,18 +35,19 @@ export class CampaignController {
     return this.campaignService.checkOwner(campaignId, user);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.campaignService.findOneById(id);
+  @InjectRoute(CampaignRoute.editCampaign)
+  @UseInterceptors(FileInterceptor('file'))
+  editCampaign(
+    @UploadedFile() file: Express.Multer.File,
+    @User() user: ITokenPayload,
+    @Param('id') campaignId: string,
+    @Body() data: UpdateCampaignDto,
+  ) {
+    return this.campaignService.editCampaign(campaignId, user, data, file);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCampaignDto: UpdateCampaignDto) {
-    return this.campaignService.update(+id, updateCampaignDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.campaignService.remove(+id);
+  @InjectRoute(CampaignRoute.launchCampaign)
+  launchCampaign(@User() user: ITokenPayload, @Param('id') campaignId: string) {
+    return this.campaignService.launchCampaign(campaignId, user);
   }
 }

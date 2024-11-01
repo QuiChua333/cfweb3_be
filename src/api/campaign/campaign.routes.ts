@@ -13,10 +13,10 @@ const CampaignRoute = {
     jwtSecure: false,
   },
 
-  create: <IRouteParams>{
+  createCampaign: <IRouteParams>{
     path: '/new',
     method: RequestMethod.POST,
-    code: HttpStatus.OK,
+    code: HttpStatus.CREATED,
     jwtSecure: true,
     roles: [Role.User],
   },
@@ -24,6 +24,20 @@ const CampaignRoute = {
   checkOwner: <IRouteParams>{
     path: '/:id/checkOwner',
     method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  editCampaign: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  launchCampaign: <IRouteParams>{
+    path: '/:id/launch',
+    method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: true,
   },

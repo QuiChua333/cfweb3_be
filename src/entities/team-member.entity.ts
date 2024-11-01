@@ -7,7 +7,9 @@ import { Campaign } from './campaign.entity';
 
 @Entity()
 export class TeamMember extends BaseEntity {
-  @Column()
+  @Column({
+    nullable: true,
+  })
   role: string;
 
   @Column({
@@ -22,8 +24,16 @@ export class TeamMember extends BaseEntity {
   })
   isEdit: boolean;
 
+  @Column()
+  email: string;
+
   @ManyToOne(() => User, (user) => user.teamMembers)
   user: User;
+
+  @Column({
+    type: 'uuid',
+  })
+  userId: string;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.teamMembers)
   campaign: Campaign;

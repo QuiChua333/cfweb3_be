@@ -38,6 +38,11 @@ interface EnvVars {
   MAIL_USER: string;
   MAIL_PASSWORD: string;
   MAIL_HOST: string;
+
+  CLOUDINARY_NAME: string;
+  CLOUDINARY_API_KEY: string;
+  CLOUDINARY_API_SECRET: string;
+  CLOUDINARY_FOLDER_NAME: string;
 }
 
 const envSchema = joi
@@ -77,6 +82,11 @@ const envSchema = joi
     MAIL_USER: joi.string().required(),
     MAIL_PASSWORD: joi.string().required(),
     MAIL_HOST: joi.string().required(),
+
+    CLOUDINARY_NAME: joi.string().required(),
+    CLOUDINARY_API_KEY: joi.string().required(),
+    CLOUDINARY_API_SECRET: joi.string().required(),
+    CLOUDINARY_FOLDER_NAME: joi.string().required(),
   })
   .unknown(true);
 
@@ -147,5 +157,12 @@ export const envs = {
     defaults: {
       from: `"CrowdFunding" <${envVars.MAIL_USER}>`,
     },
+  },
+
+  cloudinary: {
+    cloud_name: envVars.CLOUDINARY_NAME,
+    api_key: envVars.CLOUDINARY_API_KEY,
+    api_secret: envVars.CLOUDINARY_API_SECRET,
+    folder_name: envVars.CLOUDINARY_FOLDER_NAME,
   },
 };

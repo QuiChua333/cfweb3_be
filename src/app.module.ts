@@ -22,6 +22,7 @@ import { DetailPerkModule } from './api/detail-perk/detail-perk.module';
 import { FaqModule } from './api/faq/faq.module';
 import { FieldGroupModule } from './api/field-group/field-group.module';
 import { FollowCampaignModule } from './api/follow-campaign/follow-campaign.module';
+import { CloudinaryModule } from './services/cloudinary/cloudinary.module';
 
 @Module({
   imports: [
@@ -47,6 +48,7 @@ import { FollowCampaignModule } from './api/follow-campaign/follow-campaign.modu
     FaqModule,
     FieldGroupModule,
     FollowCampaignModule,
+    CloudinaryModule,
   ],
   controllers: [AppController],
   providers: [],

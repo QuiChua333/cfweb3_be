@@ -1,30 +1,73 @@
-import { Injectable } from '@nestjs/common';
-import { CreateTeamMemberDto } from './dto/create-team-member.dto';
-import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
+import { CampaignService } from '../campaign/campaign.service';
+import { ITokenPayload } from '../auth/auth.interface';
+import { InvitateMemberDto } from './dto';
 
 @Injectable()
 export class TeamMemberService {
   constructor(
-    private readonly repository: RepositoryService
+    private readonly repository: RepositoryService,
+    private readonly campaignService: CampaignService,
   ) {}
-  create(createTeamMemberDto: CreateTeamMemberDto) {
-    return 'This action adds a new teamMember';
+
+  async getTeamMemberByCampaignId(campaignId: string) {
+    const campaign = await this.campaignService.findOneById(campaignId);
+    if (!campaign) throw new NotFoundException('Chiến dịch không tồn tại');
+    return this.repository.teamMember.find({
+      where: {
+        campaign: {
+          id: campaignId,
+        },
+      },
+      relations: ['user'],
+      select: {
+        user: {
+          avatar: true,
+          email: true,
+        },
+      },
+    });
   }
 
-  findAll() {
-    return `This action returns all teamMember`;
+  async invitateMember(
+    campaignId: string,
+    invitateMemberDto: InvitateMemberDto,
+    user: ITokenPayload,
+  ) {
+    // checkowner
+    await this.campaignService.checkOwner(campaignId, user);
+    const { email, isEdit } = invitateMemberDto;
+    const invitatedUser = await this.repository.user.findOne({
+      where: {
+        email: email,
+      },
+    });
+    let invitatedUserId: string;
+    if (invitatedUser && invitatedUser.isVerifiedEmail) {
+      invitatedUserId = invitatedUser.id;
+    }
+    await this.repository.teamMember.save({
+      campaign: {
+        id: campaignId,
+      },
+      isEdit,
+      user: {
+        id: invitatedUserId,
+      },
+    });
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} teamMember`;
-  }
-
-  update(id: number, updateTeamMemberDto: UpdateTeamMemberDto) {
-    return `This action updates a #${id} teamMember`;
-  }
-
-  remove(id: number) {
-    return `This action removes a #${id} teamMember`;
+  async deleteMember(campaignId: string, userId: string, curerntUser: ITokenPayload) {
+    // checkowner
+    await this.campaignService.checkOwner(campaignId, curerntUser);
+    return await this.repository.teamMember.delete({
+      user: {
+        id: userId,
+      },
+      campaign: {
+        id: campaignId,
+      },
+    });
   }
 }
