@@ -12,6 +12,27 @@ const CommentRoute = {
     code: HttpStatus.OK,
     jwtSecure: false,
   },
+
+  createComment: <IRouteParams>{
+    path: '/',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  deleteComment: <IRouteParams>{
+    path: '/:commentId',
+    method: RequestMethod.DELETE,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  updateComment: <IRouteParams>{
+    path: '/:commentId',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default CommentRoute;

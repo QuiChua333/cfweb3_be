@@ -4,13 +4,11 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateCampaignDto } from './dto/create-campaign.dto';
-import { CampaignImageTypeName, UpdateCampaignDto } from './dto/update-campaign.dto';
 import { RepositoryService } from '@/repositories/repository.service';
 import { ITokenPayload } from '../auth/auth.interface';
 import { CampaignStatus, Role } from '@/constants';
-import { TeamMember } from '@/entities';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
+import { UpdateCampaignDto } from './dto';
 
 @Injectable()
 export class CampaignService {
@@ -86,6 +84,36 @@ export class CampaignService {
       publishedAt: new Date(),
       status: CampaignStatus.PENDING,
     });
+  }
+
+  async deleteCampaign(campaignId: string, user: ITokenPayload) {
+    await this.checkOwner(campaignId, user);
+    return await this.repository.campaign.softDelete(campaignId);
+  }
+
+  async getCampaignsOfOwner(userId: string) {
+    return await this.repository.campaign.find({
+      where: {
+        owner: {
+          id: userId,
+        },
+      },
+    });
+  }
+
+  async getQuantityCampaignsOfOwner(campaignId: string) {
+    const campaign = await this.findOneById(campaignId);
+    if (!campaign) throw new NotFoundException('Chiến dịch không tồn tại');
+    const ownerId = campaign.ownerId;
+    const [_campaigns, count] = await this.repository.campaign.findAndCount({
+      where: {
+        owner: {
+          id: ownerId,
+        },
+      },
+    });
+
+    return count;
   }
 
   findOneById(id: string) {

@@ -1,7 +1,7 @@
 import { IsNotEmpty, IsString } from 'class-validator';
 
-export class UpdateCommentDto {
+export class FollowCampaignDto {
   @IsString()
   @IsNotEmpty()
-  content: string;
+  campaignId: string;
 }

@@ -12,6 +12,13 @@ const CommentLikeRoute = {
     code: HttpStatus.OK,
     jwtSecure: false,
   },
+
+  likeComment: <IRouteParams>{
+    path: '/',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default CommentLikeRoute;

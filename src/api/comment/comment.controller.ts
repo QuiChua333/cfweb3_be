@@ -1,36 +1,30 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Param } from '@nestjs/common';
 import { CommentService } from './comment.service';
-import { CreateCommentDto } from './dto/create-comment.dto';
-import { UpdateCommentDto } from './dto/update-comment.dto';
 import CommentRoute from './comment.routes';
-import { InjectRoute } from '@/decorators';
+import { InjectRoute, User } from '@/decorators';
+import { ITokenPayload } from '../auth/auth.interface';
+import { CreateCommentDto, UpdateCommentDto } from './dto';
 
 @Controller(CommentRoute.root)
 export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
-  @Post()
-  create(@Body() createCommentDto: CreateCommentDto) {
-    return this.commentService.create(createCommentDto);
+  @InjectRoute(CommentRoute.createComment)
+  createComment(@User() user: ITokenPayload, createCommentDto: CreateCommentDto) {
+    return this.commentService.createComment(user, createCommentDto);
   }
 
-  @InjectRoute(CommentRoute.findAll)
-  findAll() {
-    return this.commentService.findAll();
+  @InjectRoute(CommentRoute.deleteComment)
+  deleteComment(@User() user: ITokenPayload, @Param('commentId') commentId: string) {
+    return this.commentService.deleteComment(user, commentId);
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.commentService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateCommentDto: UpdateCommentDto) {
-    return this.commentService.update(+id, updateCommentDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.commentService.remove(+id);
+  @InjectRoute(CommentRoute.updateComment)
+  updateComment(
+    @User() user: ITokenPayload,
+    @Param('commentId') commentId: string,
+    @Body() updateCommentDto: UpdateCommentDto,
+  ) {
+    return this.commentService.updateComment(user, commentId, updateCommentDto);
   }
 }

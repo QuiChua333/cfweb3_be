@@ -1,6 +1,7 @@
 import {
   Campaign,
   Comment,
+  CommentLike,
   Contribution,
   ContributionDetail,
   DetailPerk,
@@ -27,6 +28,7 @@ export class RepositoryService {
   constructor(
     @InjectRepository(Campaign) public readonly campaign: Repository<Campaign>,
     @InjectRepository(Comment) public readonly comment: Repository<Comment>,
+    @InjectRepository(CommentLike) public readonly commentLike: Repository<CommentLike>,
     @InjectRepository(ContributionDetail)
     public readonly contributionDetail: Repository<ContributionDetail>,
     @InjectRepository(Contribution) public readonly contribution: Repository<Contribution>,

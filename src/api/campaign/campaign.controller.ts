@@ -50,4 +50,19 @@ export class CampaignController {
   launchCampaign(@User() user: ITokenPayload, @Param('id') campaignId: string) {
     return this.campaignService.launchCampaign(campaignId, user);
   }
+
+  @InjectRoute(CampaignRoute.deleteCampaign)
+  deleteCampaign(@User() user: ITokenPayload, @Param('id') campaignId: string) {
+    return this.campaignService.deleteCampaign(campaignId, user);
+  }
+
+  @InjectRoute(CampaignRoute.getCampaignsOfOwner)
+  getCampaignsOfOwner(@Param('id') userId: string) {
+    return this.campaignService.getCampaignsOfOwner(userId);
+  }
+
+  @InjectRoute(CampaignRoute.getQuantityCampaignsOfOwner)
+  getQuantityCampaignsOfOwner(@Param('campaignId') campaignId: string) {
+    return this.campaignService.getQuantityCampaignsOfOwner(campaignId);
+  }
 }

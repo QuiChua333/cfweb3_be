@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToMany } from 'typeorm';
+import { Column, DeleteDateColumn, Entity, ManyToOne, OneToMany } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
 import { CampaignStatus } from '@/constants';
 import { User } from './user.entity';
@@ -107,4 +107,7 @@ export class Campaign extends BaseEntity {
 
   @OneToMany(() => Report, (report) => report.campaign)
   reports: Report[];
+
+  @DeleteDateColumn()
+  deletedAt?: Date;
 }

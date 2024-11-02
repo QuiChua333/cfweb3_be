@@ -41,6 +41,25 @@ const CampaignRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  deleteCampaign: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.DELETE,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  getCampaignsOfOwner: <IRouteParams>{
+    path: '/owner/:userId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  getQuantityCampaignsOfOwner: <IRouteParams>{
+    path: '/quantity/owner/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
 };
 
 export default CampaignRoute;

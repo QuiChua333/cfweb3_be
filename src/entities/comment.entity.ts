@@ -9,12 +9,9 @@ export class Comment extends BaseEntity {
   @Column()
   content: string;
 
-  @Column()
-  values: string;
-
   @OneToOne(() => Comment)
   @JoinColumn()
-  parent: string;
+  reply: Comment;
 
   @ManyToOne(() => User)
   author: User;

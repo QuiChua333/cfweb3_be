@@ -12,6 +12,20 @@ const FollowCampaignRoute = {
     code: HttpStatus.OK,
     jwtSecure: false,
   },
+
+  getCampaignsFollowed: <IRouteParams>{
+    path: '/me',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  follow: <IRouteParams>{
+    path: '/follow',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default FollowCampaignRoute;
