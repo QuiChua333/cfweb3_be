@@ -1,36 +1,37 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFiles,
+} from '@nestjs/common';
 import { ReportService } from './report.service';
-import { CreateReportDto } from './dto/create-report.dto';
-import { UpdateReportDto } from './dto/update-report.dto';
-import { InjectRoute } from '@/decorators';
+import { InjectRoute, User } from '@/decorators';
 import ReportRoute from './report.routes';
+import { CreateReportDto } from './dto';
+import { FilesInterceptor } from '@nestjs/platform-express';
+import { ITokenPayload } from '../auth/auth.interface';
 
-@Controller('report')
+@Controller(ReportRoute.root)
 export class ReportController {
   constructor(private readonly reportService: ReportService) {}
-
-  @Post()
-  create(@Body() createReportDto: CreateReportDto) {
-    return this.reportService.create(createReportDto);
-  }
 
   @InjectRoute(ReportRoute.findAll)
   findAll() {
     return this.reportService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.reportService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateReportDto: UpdateReportDto) {
-    return this.reportService.update(+id, updateReportDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.reportService.remove(+id);
+  @InjectRoute(ReportRoute.createReport)
+  @UseInterceptors(FilesInterceptor('files'))
+  createReport(
+    @User() currentUser: ITokenPayload,
+    @Body() createReportDto: CreateReportDto,
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.reportService.createReport(currentUser, createReportDto, files);
   }
 }

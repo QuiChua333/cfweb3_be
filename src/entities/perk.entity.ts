@@ -46,7 +46,9 @@ export class Perk extends BaseEntity {
   @ManyToOne(() => Campaign, (campaign) => campaign.perks)
   campaign: Campaign;
 
-  @OneToMany(() => DetailPerk, (detailPerk) => detailPerk.perk)
+  @OneToMany(() => DetailPerk, (detailPerk) => detailPerk.perk, {
+    cascade: ['insert', 'remove', 'update'],
+  })
   detailPerks: DetailPerk[];
 
   @OneToMany(() => ShippingFee, (shippingFee) => shippingFee.perk)

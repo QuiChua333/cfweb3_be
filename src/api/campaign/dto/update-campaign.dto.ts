@@ -1,7 +1,24 @@
-import { IsEnum, IsNumber, IsOptional, IsString, Max } from 'class-validator';
+import { Type } from 'class-transformer';
+import {
+  IsArray,
+  IsEnum,
+  IsNumber,
+  IsOptional,
+  IsString,
+  Max,
+  ValidateNested,
+} from 'class-validator';
 export enum CampaignImageTypeName {
   CARD_IMAGE = 'cardImage',
   IMAGE_DETAIL_PAGE = 'imageDetailPage',
+}
+
+export class FaqDto {
+  @IsString()
+  question: string;
+
+  @IsString()
+  answer: string;
 }
 export class UpdateCampaignDto {
   @IsString()
@@ -22,6 +39,7 @@ export class UpdateCampaignDto {
 
   @Max(60)
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   duration?: number;
 
@@ -43,5 +61,10 @@ export class UpdateCampaignDto {
 
   @IsNumber()
   @IsOptional()
-  goal: number;
+  goal?: number;
+
+  @ValidateNested({ each: true })
+  @IsArray()
+  @IsOptional()
+  faqs?: FaqDto[];
 }

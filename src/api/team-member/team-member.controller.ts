@@ -6,7 +6,7 @@ import TeamMemberRoute from './team-member.routes';
 import { InvitateMemberDto } from './dto';
 import { ITokenPayload } from '../auth/auth.interface';
 
-@Controller('team-member')
+@Controller(TeamMemberRoute.root)
 export class TeamMemberController {
   constructor(private readonly teamMemberService: TeamMemberService) {}
 

@@ -7,6 +7,7 @@ import { TeamMember } from './team-member.entity';
 import { FollowCampaign } from './follow-campaign.entity';
 import { Contribution } from './contribution.entity';
 import { Report } from './report.entity';
+import { Gift } from './gift.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -80,4 +81,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Report, (report) => report.reportBy)
   reports: Report[];
+
+  @OneToMany(() => Gift, (gift) => gift.campaign)
+  gifts: Gift[];
 }

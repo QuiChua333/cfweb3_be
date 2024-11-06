@@ -13,6 +13,13 @@ const CampaignRoute = {
     jwtSecure: false,
   },
 
+  getCampaignById: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   createCampaign: <IRouteParams>{
     path: '/new',
     method: RequestMethod.POST,
@@ -30,7 +37,7 @@ const CampaignRoute = {
 
   editCampaign: <IRouteParams>{
     path: '/:id',
-    method: RequestMethod.GET,
+    method: RequestMethod.PATCH,
     code: HttpStatus.OK,
     jwtSecure: true,
   },
@@ -57,6 +64,24 @@ const CampaignRoute = {
 
   getQuantityCampaignsOfOwner: <IRouteParams>{
     path: '/quantity/owner/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  getCampaignsOfUser: <IRouteParams>{
+    path: '/user/:userId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  getQuantityCampaignsOfUser: <IRouteParams>{
+    path: '/quantity/user/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  getPopulateCampaigns: <IRouteParams>{
+    path: '/populate',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
   },

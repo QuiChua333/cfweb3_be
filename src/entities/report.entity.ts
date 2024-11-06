@@ -17,7 +17,7 @@ export class Report extends BaseEntity {
   date: Date;
 
   @Column()
-  image: string;
+  images: string;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.reports)
   campaign: Campaign;

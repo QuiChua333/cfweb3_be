@@ -13,6 +13,12 @@ const FieldRoute = {
     jwtSecure: true,
     roles: [Role.Admin],
   },
+
+  getFieldsGroupByCategory: <IRouteParams>{
+    path: 'group-by-category',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
 };
 
 export default FieldRoute;

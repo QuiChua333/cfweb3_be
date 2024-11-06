@@ -3,8 +3,14 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
+  UnauthorizedException,
 } from '@nestjs/common';
-import { LoginDto, RegisterDto, ResetPasswordDto } from 'src/api/auth/dto';
+import {
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+  UpdatePasswordBaseOldPasswordDto,
+} from 'src/api/auth/dto';
 import { UserService } from 'src/api/user/user.service';
 import * as argon2 from 'argon2';
 import { JwtService } from '@nestjs/jwt';
@@ -70,11 +76,11 @@ export class AuthService {
   async validateRefreshToken(userId: string, refreshToken: string) {
     const user = await this.userService.findOneById(userId);
 
-    if (!user || !user.refreshToken) throw new ForbiddenException('Invalid refresh token');
+    if (!user || !user.refreshToken) throw new UnauthorizedException('Invalid refresh token');
 
     const isRefreshTokenMatched = await argon2.verify(user.refreshToken, refreshToken);
 
-    if (!isRefreshTokenMatched) throw new ForbiddenException('Invalid refresh token');
+    if (!isRefreshTokenMatched) throw new UnauthorizedException('Invalid refresh token');
   }
 
   async logout(userId: string) {
@@ -82,7 +88,12 @@ export class AuthService {
   }
 
   async refreshTokens(tokenPayload: ITokenPayload) {
-    const tokens = await this.getTokens(tokenPayload);
+    const payload: ITokenPayload = {
+      email: tokenPayload.email,
+      id: tokenPayload.id,
+      role: tokenPayload.role,
+    };
+    const tokens = await this.getTokens(payload);
 
     await this.updateRefreshToken(tokenPayload.id, tokens.refreshToken);
 
@@ -200,6 +211,19 @@ export class AuthService {
     return tokens;
   }
 
+  async updatePasswordBaseOldPassword(
+    user: ITokenPayload,
+    updatePasswordBaseOldPassword: UpdatePasswordBaseOldPasswordDto,
+  ) {
+    const currentUser = await this.userService.findOneById(user.id);
+    const isMatchedOldPassword = await this.compareData(
+      currentUser.password,
+      updatePasswordBaseOldPassword.currentPassword,
+    );
+    if (!isMatchedOldPassword) throw new BadRequestException('Mật khẩu hiện tại không đúng');
+    const hashedPassword = await this.hashData(updatePasswordBaseOldPassword.newPassword);
+    return this.userService.updatePassword(user.id, hashedPassword);
+  }
   async validateJwtUser(email: string) {
     const user = await this.userService.findOneByEmail(email);
 
@@ -210,5 +234,9 @@ export class AuthService {
 
   private async hashData(data: string) {
     return argon2.hash(data);
+  }
+
+  private async compareData(hashedText, plainText) {
+    return await argon2.verify(hashedText, plainText);
   }
 }

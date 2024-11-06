@@ -14,9 +14,16 @@ const UserVerifyRoute = {
     roles: [Role.Admin],
   },
 
-  findMe: <IRouteParams>{
-    path: '/me',
+  getInfoVerifyUser: <IRouteParams>{
+    path: '/:id',
     method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  requestVerifyUser: <IRouteParams>{
+    path: '/',
+    method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: true,
   },

@@ -75,6 +75,13 @@ const AuthRoute = {
     code: HttpStatus.OK,
     jwtSecure: false,
   },
+
+  updatePasswordBaseOldPassword: <IRouteParams>{
+    path: '/user/:id',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default AuthRoute;

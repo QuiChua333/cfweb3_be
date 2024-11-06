@@ -14,8 +14,8 @@ export enum CampaignStatus {
 }
 
 export enum ConfirmMemberStatus {
-  PENDING = 'Chờ chấp nhận',
-  ACCEPTED = 'Thành viên',
+  PENDING = 'Chờ xác nhận',
+  ACCEPTED = 'Đã xác nhận',
 }
 
 export enum PaymentMethod {

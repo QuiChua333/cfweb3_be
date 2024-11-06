@@ -10,8 +10,7 @@ export const loadMiddlewares = (app: INestApplication): void => {
 
   app.useGlobalPipes(
     new ValidationPipe({
-      whitelist: true,
-      forbidNonWhitelisted: true,
+      transform: true,
       exceptionFactory: (errors) => new ValidatorException(errors),
     }),
   );

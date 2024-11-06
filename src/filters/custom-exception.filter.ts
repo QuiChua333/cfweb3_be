@@ -1,4 +1,11 @@
-import { ExceptionFilter, Catch, ArgumentsHost, HttpException, HttpStatus } from '@nestjs/common';
+import {
+  ExceptionFilter,
+  Catch,
+  ArgumentsHost,
+  HttpException,
+  HttpStatus,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { JsonWebTokenError, TokenExpiredError } from '@nestjs/jwt';
 import { Response } from 'express';
 import {
@@ -22,20 +29,16 @@ export class CustomFilterExceptionFilter implements ExceptionFilter {
         const validtaionExceptionResponse: IvalidatorExceptionResponse = exception.getResponse();
 
         response.status(validtaionExceptionResponse.status).send(validtaionExceptionResponse);
+      } else if (exception instanceof UnauthorizedException) {
+        baseExceptionResponse.status = HttpStatus.UNAUTHORIZED;
+        baseExceptionResponse.message = 'Token is expired or invalid';
+        response.status(baseExceptionResponse.status).send(baseExceptionResponse);
       } else if (exception instanceof HttpException) {
         const status = exception.getStatus();
         const message = exception.message;
         baseExceptionResponse = { status, message };
 
         response.status(status).send(baseExceptionResponse);
-      } else if (exception instanceof TokenExpiredError) {
-        baseExceptionResponse.status = HttpStatus.UNAUTHORIZED;
-        baseExceptionResponse.message = 'Token has expired';
-        response.status(baseExceptionResponse.status).send(baseExceptionResponse);
-      } else if (exception instanceof JsonWebTokenError) {
-        baseExceptionResponse.status = HttpStatus.UNAUTHORIZED;
-        baseExceptionResponse.message = 'Invalid token';
-        response.status(baseExceptionResponse.status).send(baseExceptionResponse);
       } else {
         console.log('filter', { exception });
         baseExceptionResponse.message = 'Server Error (Exception?)';

@@ -20,6 +20,25 @@ const UserRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  getUserByEmail: <IRouteParams>{
+    path: '/email/:email',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  getUserById: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  updateProfile: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default UserRoute;

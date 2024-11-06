@@ -17,7 +17,9 @@ export class Item extends BaseEntity {
   @ManyToOne(() => Campaign, (campaign) => campaign.items)
   campaign: Campaign;
 
-  @OneToMany(() => Option, (option) => option.item)
+  @OneToMany(() => Option, (option) => option.item, {
+    cascade: ['insert', 'update', 'remove'],
+  })
   options: Option[];
 
   @OneToMany(() => DetailPerk, (detailPerk) => detailPerk.perk)

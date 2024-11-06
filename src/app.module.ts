@@ -23,6 +23,7 @@ import { FaqModule } from './api/faq/faq.module';
 import { FieldGroupModule } from './api/field-group/field-group.module';
 import { FollowCampaignModule } from './api/follow-campaign/follow-campaign.module';
 import { CloudinaryModule } from './services/cloudinary/cloudinary.module';
+import { GiftModule } from './api/gift/gift.module';
 
 @Module({
   imports: [
@@ -49,6 +50,7 @@ import { CloudinaryModule } from './services/cloudinary/cloudinary.module';
     FieldGroupModule,
     FollowCampaignModule,
     CloudinaryModule,
+    GiftModule,
   ],
   controllers: [AppController],
   providers: [],

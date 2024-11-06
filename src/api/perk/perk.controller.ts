@@ -1,36 +1,68 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Patch,
+  Param,
+  Delete,
+  UseInterceptors,
+  UploadedFile,
+} from '@nestjs/common';
 import { PerkService } from './perk.service';
-import { CreatePerkDto } from './dto/create-perk.dto';
-import { UpdatePerkDto } from './dto/update-perk.dto';
-import { InjectRoute } from '@/decorators';
+import { InjectRoute, User } from '@/decorators';
 import PerkRoute from './perk.routes';
+import { CreatePerkDto, UpdatePerkDto } from './dto';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ITokenPayload } from '../auth/auth.interface';
 
-@Controller('perk')
+@Controller(PerkRoute.root)
 export class PerkController {
   constructor(private readonly perkService: PerkService) {}
-
-  @Post()
-  create(@Body() createPerkDto: CreatePerkDto) {
-    return this.perkService.create(createPerkDto);
-  }
 
   @InjectRoute(PerkRoute.findAll)
   findAll() {
     return this.perkService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.perkService.findOne(+id);
+  @InjectRoute(PerkRoute.getPerksByCampaign)
+  getPerksByCampaign(@Param('id') campaignId: string) {
+    return this.perkService.getPerksByCampaign(campaignId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updatePerkDto: UpdatePerkDto) {
-    return this.perkService.update(+id, updatePerkDto);
+  @InjectRoute(PerkRoute.getPerk)
+  getPerk(@Param('id') perkId: string) {
+    return this.perkService.getPerk(perkId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.perkService.remove(+id);
+  @InjectRoute(PerkRoute.deletePerk)
+  deletePerk(@User() currentUser: ITokenPayload, @Param('id') perkId: string) {
+    return this.perkService.deletePerk(currentUser, perkId);
+  }
+
+  @InjectRoute(PerkRoute.addPerk)
+  @UseInterceptors(FileInterceptor('file'))
+  addPerk(
+    @User() currentUser: ITokenPayload,
+    @Body() createPerkDto: CreatePerkDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.perkService.addPerk(currentUser, createPerkDto, file);
+  }
+
+  @InjectRoute(PerkRoute.editPerk)
+  @UseInterceptors(FileInterceptor('file'))
+  editPerk(
+    @User() currentUser: ITokenPayload,
+    @Body() updatePerkDto: UpdatePerkDto,
+    @UploadedFile() file: Express.Multer.File,
+    @Param('id') perkid: string,
+  ) {
+    return this.perkService.editPerk(currentUser, updatePerkDto, file, perkid);
+  }
+
+  @InjectRoute(PerkRoute.getPerksContainItemsByCampaignId)
+  getPerksContainItemsByCampaignId(@Param('campaignId') campaignId: string) {
+    return this.perkService.getPerksContainItemsByCampaignId(campaignId);
   }
 }

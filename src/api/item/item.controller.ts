@@ -1,36 +1,51 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Param } from '@nestjs/common';
 import { ItemService } from './item.service';
-import { CreateItemDto } from './dto/create-item.dto';
-import { UpdateItemDto } from './dto/update-item.dto';
-import ItemRoute from './item.routes';
-import { InjectRoute } from '@/decorators';
 
-@Controller('item')
+import ItemRoute from './item.routes';
+import { InjectRoute, User } from '@/decorators';
+import { ITokenPayload } from '../auth/auth.interface';
+import { CreateItemDto, UpdateItemDto } from './dto';
+
+@Controller(ItemRoute.root)
 export class ItemController {
   constructor(private readonly itemService: ItemService) {}
-
-  @Post()
-  create(@Body() createItemDto: CreateItemDto) {
-    return this.itemService.create(createItemDto);
-  }
 
   @InjectRoute(ItemRoute.findAll)
   findAll() {
     return this.itemService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.itemService.findOne(+id);
+  @InjectRoute(ItemRoute.getItemsByCampaign)
+  getItemsByCampaign(@Param('id') campaignId: string) {
+    return this.itemService.getItemsByCampaign(campaignId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateItemDto: UpdateItemDto) {
-    return this.itemService.update(+id, updateItemDto);
+  @InjectRoute(ItemRoute.addItem)
+  addItem(@User() currentUser: ITokenPayload, @Body() createItemDto: CreateItemDto) {
+    return this.itemService.addItem(currentUser, createItemDto);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.itemService.remove(+id);
+  @InjectRoute(ItemRoute.editItem)
+  editItem(
+    @User() currentUser: ITokenPayload,
+    @Body() updateItemDto: UpdateItemDto,
+    @Param('id') itemId: string,
+  ) {
+    return this.itemService.editItem(currentUser, updateItemDto, itemId);
+  }
+
+  @InjectRoute(ItemRoute.deleteItem)
+  deleteItem(@Param('id') itemId: string) {
+    return this.itemService.deleteItem(itemId);
+  }
+
+  @InjectRoute(ItemRoute.getItemsContainPerksByCampaignId)
+  getItemsContainPerksByCampaignId(@Param('campaignId') campaignId: string) {
+    return this.itemService.getItemsContainPerksByCampaignId(campaignId);
+  }
+
+  @InjectRoute(ItemRoute.getItemContainPerks)
+  getItemContainPerks(@Param('id') itemId: string) {
+    return this.itemService.getItemContainPerks(itemId);
   }
 }

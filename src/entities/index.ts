@@ -17,3 +17,4 @@ export * from './shipping-fee.entity';
 export * from './team-member.entity';
 export * from './user-verify.entity';
 export * from './user.entity';
+export * from './gift.entity';

@@ -8,6 +8,7 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  Req,
 } from '@nestjs/common';
 import { CampaignService } from './campaign.service';
 import CampaignRoute from './campaign.routes';
@@ -15,6 +16,7 @@ import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
 import { UpdateCampaignDto } from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { Request } from 'express';
 
 @Controller(CampaignRoute.root)
 export class CampaignController {
@@ -28,6 +30,11 @@ export class CampaignController {
   @InjectRoute(CampaignRoute.findAll)
   findAll() {
     return this.campaignService.findAll();
+  }
+
+  @InjectRoute(CampaignRoute.getCampaignById)
+  getCampaignById(@Param('id') id: string) {
+    return this.campaignService.findOneDetail(id);
   }
 
   @InjectRoute(CampaignRoute.checkOwner)
@@ -57,12 +64,17 @@ export class CampaignController {
   }
 
   @InjectRoute(CampaignRoute.getCampaignsOfOwner)
-  getCampaignsOfOwner(@Param('id') userId: string) {
+  getCampaignsOfOwner(@Param('userId') userId: string) {
     return this.campaignService.getCampaignsOfOwner(userId);
   }
 
   @InjectRoute(CampaignRoute.getQuantityCampaignsOfOwner)
   getQuantityCampaignsOfOwner(@Param('campaignId') campaignId: string) {
     return this.campaignService.getQuantityCampaignsOfOwner(campaignId);
+  }
+
+  @InjectRoute(CampaignRoute.getPopulateCampaigns)
+  getPopulateCampaigns() {
+    return this.campaignService.getPopulateCampaigns();
   }
 }

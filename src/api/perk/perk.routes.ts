@@ -13,6 +13,45 @@ const PerkRoute = {
     jwtSecure: true,
     roles: [Role.Admin],
   },
+
+  getPerksByCampaign: <IRouteParams>{
+    path: '/campaign/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  getPerk: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
+
+  deletePerk: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.DELETE,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  addPerk: <IRouteParams>{
+    path: '/',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  editPerk: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  getPerksContainItemsByCampaignId: <IRouteParams>{
+    path: '/contain-items/campaign/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
 };
 
 export default PerkRoute;

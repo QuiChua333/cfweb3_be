@@ -9,6 +9,7 @@ import { ITokenPayload } from '../auth/auth.interface';
 import { CampaignStatus, Role } from '@/constants';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 import { UpdateCampaignDto } from './dto';
+import { FAQ } from '@/entities';
 
 @Injectable()
 export class CampaignService {
@@ -46,10 +47,11 @@ export class CampaignService {
       },
       relations: ['teamMembers'],
     });
+
     if (!campaign) throw new BadRequestException('Chiến dịch không tồn tại');
     const isMatched = campaign.ownerId === user.id || user.role === Role.Admin;
     if (!isMatched) throw new ForbiddenException('Không có quyền truy cập tài nguyên');
-    return true;
+    return campaign;
   }
 
   async editCampaign(
@@ -61,7 +63,8 @@ export class CampaignService {
     // checkonwer
     await this.checkOwner(campaignId, user);
     const campaign = await this.findOneById(campaignId);
-    const { imageTypeName, ...dataUpdate } = data;
+    const { imageTypeName, faqs, ...dataUpdate } = data;
+
     if (file) {
       if (!imageTypeName) throw new BadRequestException('Vui lòng bổ sung loại hình ảnh');
       const url = campaign[imageTypeName];
@@ -71,6 +74,26 @@ export class CampaignService {
       const res = await this.cloudinaryService.uploadFile(file);
       dataUpdate[imageTypeName] = res.secure_url as string;
     }
+    if (faqs) {
+      await this.repository.faq.delete({
+        campaign: {
+          id: campaign.id,
+        },
+      });
+      const newFaqs: FAQ[] = [];
+      faqs.forEach((item) => {
+        const faq = this.repository.faq.create({
+          campaign: {
+            id: campaign.id,
+          },
+          question: item.question,
+          answer: item.answer,
+        });
+        newFaqs.push(faq);
+      });
+      await this.repository.faq.save(newFaqs);
+    }
+
     return await this.repository.campaign.save({
       id: campaignId,
       ...dataUpdate,
@@ -92,13 +115,28 @@ export class CampaignService {
   }
 
   async getCampaignsOfOwner(userId: string) {
-    return await this.repository.campaign.find({
+    const campaigns = await this.repository.campaign.find({
       where: {
         owner: {
           id: userId,
         },
       },
+      relations: {
+        owner: true,
+        teamMembers: {
+          user: true,
+        },
+      },
+      select: {
+        teamMembers: {
+          user: {
+            id: true,
+          },
+        },
+      },
     });
+
+    return campaigns;
   }
 
   async getQuantityCampaignsOfOwner(campaignId: string) {
@@ -116,9 +154,27 @@ export class CampaignService {
     return count;
   }
 
+  async getPopulateCampaigns() {
+    const campaigns = await this.repository.campaign.find({
+      take: 20,
+    });
+    return campaigns;
+  }
+
   findOneById(id: string) {
     return this.repository.campaign.findOneBy({
       id,
+    });
+  }
+
+  async findOneDetail(id: string) {
+    return this.repository.campaign.findOne({
+      where: {
+        id: id,
+      },
+      relations: {
+        field: true,
+      },
     });
   }
 }

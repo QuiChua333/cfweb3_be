@@ -1,36 +1,14 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import { FieldService } from './field.service';
-import { CreateFieldDto } from './dto/create-field.dto';
-import { UpdateFieldDto } from './dto/update-field.dto';
 import FieldRoute from './field.routes';
 import { InjectRoute } from '@/decorators';
 
-@Controller('field')
+@Controller(FieldRoute.root)
 export class FieldController {
   constructor(private readonly fieldService: FieldService) {}
 
-  @Post()
-  create(@Body() createFieldDto: CreateFieldDto) {
-    return this.fieldService.create(createFieldDto);
-  }
-
-  @InjectRoute(FieldRoute.findAll)
-  findAll() {
-    return this.fieldService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.fieldService.findOne(+id);
-  }
-
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateFieldDto: UpdateFieldDto) {
-    return this.fieldService.update(+id, updateFieldDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.fieldService.remove(+id);
+  @InjectRoute(FieldRoute.getFieldsGroupByCategory)
+  getFieldsGroupByCategory() {
+    return this.fieldService.getFieldsGroupByCategory();
   }
 }

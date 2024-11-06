@@ -11,6 +11,7 @@ import { FollowCampaign } from './follow-campaign.entity';
 import { Comment } from './comment.entity';
 import { Contribution } from './contribution.entity';
 import { Report } from './report.entity';
+import { Gift } from './gift.entity';
 
 @Entity()
 export class Campaign extends BaseEntity {
@@ -107,6 +108,9 @@ export class Campaign extends BaseEntity {
 
   @OneToMany(() => Report, (report) => report.campaign)
   reports: Report[];
+
+  @OneToMany(() => Gift, (gift) => gift.campaign)
+  gifts: Gift[];
 
   @DeleteDateColumn()
   deletedAt?: Date;

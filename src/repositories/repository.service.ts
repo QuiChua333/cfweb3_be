@@ -19,6 +19,7 @@ import {
   User,
   UserVerify,
 } from '@/entities';
+import { Gift } from '@/entities/gift.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -32,6 +33,7 @@ export class RepositoryService {
     @InjectRepository(ContributionDetail)
     public readonly contributionDetail: Repository<ContributionDetail>,
     @InjectRepository(Contribution) public readonly contribution: Repository<Contribution>,
+    @InjectRepository(Gift) public readonly gift: Repository<Gift>,
     @InjectRepository(DetailPerk) public readonly detailPerk: Repository<DetailPerk>,
     @InjectRepository(FAQ) public readonly faq: Repository<FAQ>,
     @InjectRepository(FieldGroup) public readonly fieldGroup: Repository<FieldGroup>,

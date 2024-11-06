@@ -33,6 +33,11 @@ export class Contribution extends BaseEntity {
   })
   status: PaymentStatus;
 
+  @Column({
+    default: false,
+  })
+  isFinish: boolean;
+
   @ManyToOne(() => Campaign, (campaign) => campaign.contributions)
   campaign: Campaign;
 

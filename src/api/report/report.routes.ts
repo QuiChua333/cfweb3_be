@@ -13,6 +13,13 @@ const ReportRoute = {
     jwtSecure: true,
     roles: [Role.Admin],
   },
+
+  createReport: <IRouteParams>{
+    path: '/',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default ReportRoute;

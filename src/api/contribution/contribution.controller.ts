@@ -1,36 +1,47 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Body, Controller, Param } from '@nestjs/common';
 import { ContributionService } from './contribution.service';
-import { CreateContributionDto } from './dto/create-contribution.dto';
-import { UpdateContributionDto } from './dto/update-contribution.dto';
 import ContributionRoute from './contribution.routes';
-import { InjectRoute } from '@/decorators';
+import { InjectRoute, User } from '@/decorators';
+import { ITokenPayload } from '../auth/auth.interface';
+import { UpdateContributionDto } from './dto';
 
 @Controller(ContributionRoute.root)
 export class ContributionController {
   constructor(private readonly contributionService: ContributionService) {}
-
-  @Post()
-  create(@Body() createContributionDto: CreateContributionDto) {
-    return this.contributionService.create(createContributionDto);
-  }
 
   @InjectRoute(ContributionRoute.findAll)
   findAll() {
     return this.contributionService.findAll();
   }
 
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.contributionService.findOne(+id);
+  @InjectRoute(ContributionRoute.getTopContributionsByCampaign)
+  getTopContributionsByCampaign(
+    @User() currenUser: ITokenPayload,
+    @Param('campaignId') campaignId: string,
+  ) {
+    return this.contributionService.getTopContributionsByCampaign(currenUser, campaignId);
   }
 
-  @Patch(':id')
-  update(@Param('id') id: string, @Body() updateContributionDto: UpdateContributionDto) {
-    return this.contributionService.update(+id, updateContributionDto);
+  @InjectRoute(ContributionRoute.getTotalMoneyByCampaign)
+  getTotalMoneyByCampaign(@Param('campaignId') campaignId: string) {
+    return this.contributionService.getTotalMoneyByCampaign(campaignId);
   }
 
-  @Delete(':id')
-  remove(@Param('id') id: string) {
-    return this.contributionService.remove(+id);
+  @InjectRoute(ContributionRoute.getQuantityPeopleByCampaign)
+  getQuantityPeopleByCampaign(@Param('campaignId') campaignId: string) {
+    return this.contributionService.getQuantityPeopleByCampaign(campaignId);
+  }
+
+  @InjectRoute(ContributionRoute.editStatus)
+  editStatus(
+    @Param('contributionId') contributionId: string,
+    @Body() updateContributionDto: UpdateContributionDto,
+  ) {
+    return this.contributionService.editStatus(contributionId, updateContributionDto);
+  }
+
+  @InjectRoute(ContributionRoute.getQuantityContributionOfUser)
+  getQuantityContributionOfUser(@User() currenUser: ITokenPayload) {
+    return this.contributionService.getQuantityContributionOfUser(currenUser);
   }
 }

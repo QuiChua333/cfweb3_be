@@ -1,20 +1,31 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { RegisterDto } from 'src/api/auth/dto';
-import { UpdateUserDto } from './dto';
 import { RepositoryService } from '@/repositories/repository.service';
+import { ITokenPayload } from '../auth/auth.interface';
+import { UpdateProfileUserDto } from './dto';
+import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
+import { AuthService } from '../auth/auth.service';
+import { VerifyStatus } from '@/constants';
 
 @Injectable()
 export class UserService {
-  constructor(private readonly repository: RepositoryService) {}
+  constructor(
+    private readonly repository: RepositoryService,
+    private readonly cloudinaryService: CloudinaryService,
+  ) {}
 
   async findAll() {}
 
   async findOneById(id: string) {
-    return this.repository.user.findOneBy({ id });
+    const user = this.repository.user.findOneBy({ id });
+    if (!user) throw new NotFoundException('Người dùng không tồn tại');
+    return user;
   }
 
   async findOneByEmail(email: string) {
-    return this.repository.user.findOneBy({ email });
+    const user = this.repository.user.findOneBy({ email });
+    if (!user) throw new NotFoundException('Người dùng không tồn tại');
+    return user;
   }
 
   async create(registerDto: RegisterDto, isVerifiedEmail: boolean = false) {
@@ -25,9 +36,24 @@ export class UserService {
     return this.repository.user.save(newUser);
   }
 
-  async updateInfo(userId: string, updateUserDto: UpdateUserDto) {
-    return this.repository.user.save({
-      id: userId,
+  async updateProfile(
+    user: ITokenPayload,
+    updateUserDto: UpdateProfileUserDto,
+    file: Express.Multer.File,
+  ) {
+    const currentUser = await this.findOneById(user.id);
+    if (file) {
+      const url = currentUser.avatar;
+      if (url) {
+        await this.cloudinaryService.destroyFile(url);
+      }
+      const res = await this.cloudinaryService.uploadFile(file);
+      const avatar = res.secure_url as string;
+      updateUserDto['avatar'] = avatar;
+    }
+
+    return await this.repository.user.save({
+      id: user.id,
       ...updateUserDto,
     });
   }
@@ -43,6 +69,13 @@ export class UserService {
     return this.repository.user.save({
       id: userId,
       password,
+    });
+  }
+
+  async updateVerifyStatus(userId: string, status: VerifyStatus) {
+    await this.repository.user.save({
+      id: userId,
+      verifyStatus: status,
     });
   }
 

@@ -2,7 +2,13 @@ import { Body, Controller, Query, Req, Res } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import AuthRoute from '@/api/auth/auth.routes';
 import { InjectRoute, User } from '@/decorators';
-import { ForgotPasswordDto, LoginDto, RegisterDto, ResetPasswordDto } from '@/api/auth/dto';
+import {
+  ForgotPasswordDto,
+  LoginDto,
+  RegisterDto,
+  ResetPasswordDto,
+  UpdatePasswordBaseOldPasswordDto,
+} from '@/api/auth/dto';
 import { ITokenPayload } from './auth.interface';
 import { envs } from '@/config';
 
@@ -60,5 +66,13 @@ export class AuthController {
 
     //redirect to fe verify email success
     res.redirect(`${envs.fe.emailVerifySuccessUrl}`);
+  }
+
+  @InjectRoute(AuthRoute.updatePasswordBaseOldPassword)
+  updatePasswordBaseOldPassword(
+    @User() user: ITokenPayload,
+    @Body() updatePasswordBaseOldPassword: UpdatePasswordBaseOldPasswordDto,
+  ) {
+    return this.authService.updatePasswordBaseOldPassword(user, updatePasswordBaseOldPassword);
   }
 }

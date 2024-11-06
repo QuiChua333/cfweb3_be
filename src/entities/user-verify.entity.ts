@@ -22,6 +22,11 @@ export class UserVerify extends BaseEntity {
   @Column()
   identifyCardImage: string;
 
+  @Column({
+    default: true,
+  })
+  isNew: boolean;
+
   @OneToOne(() => User, (user) => user.userVerify)
   @JoinColumn()
   user: User;
