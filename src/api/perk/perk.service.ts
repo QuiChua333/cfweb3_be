@@ -1,10 +1,10 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
-import { CreatePerkDto, UpdatePerkDto } from './dto';
+import { CreatePerkDto, DetailPerkDto, ShippingFeeDto, UpdatePerkDto } from './dto';
 import { ITokenPayload } from '../auth/auth.interface';
 import { CampaignService } from '../campaign/campaign.service';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
-import { DetailPerk } from '@/entities';
+import { DetailPerk, ShippingFee } from '@/entities';
 
 @Injectable()
 export class PerkService {
@@ -28,7 +28,23 @@ export class PerkService {
         },
       },
     });
-    return perks;
+    const claimeds: number[] = [];
+    for (let i = 0; i < perks.length; i++) {
+      const claimed = await this.repository.contributionDetail
+        .createQueryBuilder('contributionDetail')
+        .where('contributionDetail.perks @> :perkCondition1', {
+          perkCondition1: JSON.stringify([{ id: perks[i].id }]),
+        })
+        .getCount();
+      claimeds.push(claimed);
+    }
+    const response = perks.map((perk, index) => {
+      return {
+        ...perk,
+        claimed: claimeds[index],
+      };
+    });
+    return response;
   }
 
   async getPerk(perkId: string) {
@@ -52,6 +68,22 @@ export class PerkService {
     });
     if (!perk) throw new NotFoundException('Đặc quyền không tồn tại');
     await this.campaignService.checkOwner(perk.campaign.id, currentUser);
+
+    const contributionDetail = await this.repository.contributionDetail
+      .createQueryBuilder('contributionDetail')
+      .leftJoinAndSelect('contributionDetail.contribution', 'contribution')
+      .where('contribution.isFinish = :isFinish', { isFinish: false })
+      .andWhere('contributionDetail.perks @> :perkCondition', {
+        perkCondition: JSON.stringify([{ id: perkId }]),
+      })
+      .getOne();
+
+    if (contributionDetail)
+      throw new BadRequestException('Đặc quyền có người đặt và chưa được giao');
+    const url = perk.image;
+    if (url) {
+      await this.cloudinaryService.destroyFile(url);
+    }
     return await this.repository.perk.remove(perk);
   }
 
@@ -60,20 +92,43 @@ export class PerkService {
     createPerkDto: CreatePerkDto,
     file: Express.Multer.File,
   ) {
-    const { campaignId, items, ...createData } = createPerkDto;
+    const {
+      campaignId,
+      detailPerks,
+      shippingFees,
+      estDeliveryDate,
+      isFeatured,
+      isShipping,
+      isVisible,
+      ...createData
+    } = createPerkDto;
     await this.campaignService.checkOwner(campaignId, currentUser);
-    const res = await this.cloudinaryService.uploadFile(file);
-    const image = res.secure_url as string;
+
+    let image: string;
+
+    if (file) {
+      const res = await this.cloudinaryService.uploadFile(file);
+      image = res.secure_url as string;
+    }
+    const [month, year] = estDeliveryDate.split('/').map(Number);
+    const date = new Date(year, month - 1);
     const perk = await this.repository.perk.save({
       ...createData,
+      isFeatured: this.getBoolean(isFeatured),
+      isShipping: this.getBoolean(isShipping),
+      isVisible: this.getBoolean(isVisible),
       image,
+      estDeliveryDate: date,
       campaign: {
         id: campaignId,
       },
     });
 
-    const detailPerks: DetailPerk[] = [];
-    items.forEach((item) => {
+    const newDetailPerks: DetailPerk[] = [];
+    const detailPerksParse = JSON.parse(detailPerks) as DetailPerkDto[];
+
+    detailPerksParse.forEach((item) => {
+      console.log({ item });
       const detailPerk = this.repository.detailPerk.create({
         quantity: item.quantity,
         perk: {
@@ -83,9 +138,28 @@ export class PerkService {
           id: item.itemId,
         },
       });
-      detailPerks.push(detailPerk);
+      newDetailPerks.push(detailPerk);
     });
-    await this.repository.detailPerk.save(detailPerks);
+
+    const newShippingFees: ShippingFee[] = [];
+    if (shippingFees) {
+      const shippingFeesParse = JSON.parse(shippingFees) as ShippingFeeDto[];
+      shippingFeesParse.forEach((item) => {
+        const shippingFee = this.repository.shippingFee.create({
+          perk: {
+            id: perk.id,
+          },
+          location: item.location,
+          fee: item.fee,
+        });
+        newShippingFees.push(shippingFee);
+      });
+    }
+    await Promise.all([
+      this.repository.detailPerk.save(newDetailPerks),
+      this.repository.shippingFee.save(newShippingFees),
+    ]);
+
     return perk;
   }
 
@@ -95,6 +169,15 @@ export class PerkService {
     file: Express.Multer.File,
     perkId: string,
   ) {
+    const {
+      detailPerks,
+      shippingFees,
+      estDeliveryDate,
+      isFeatured,
+      isShipping,
+      isVisible,
+      ...updateData
+    } = updatePerkDto;
     let perk = await this.repository.perk.findOne({
       where: {
         id: perkId,
@@ -113,27 +196,64 @@ export class PerkService {
       const image = res.secure_url as string;
       updatePerkDto.image = image;
     }
-    const { items, ...updateData } = updatePerkDto;
-    perk.detailPerks = [];
-    await this.repository.perk.save(perk);
+
+    let date: Date;
+    if (estDeliveryDate) {
+      const [month, year] = estDeliveryDate.split('/').map(Number);
+      const newDate = new Date(year, month - 1);
+      date = newDate;
+    }
 
     perk = await this.repository.perk.save({
+      ...perk,
       ...updateData,
+      ...(isFeatured ? { isFeatured: this.getBoolean(isFeatured) } : {}),
+      ...(isShipping ? { isShipping: this.getBoolean(isShipping) } : {}),
+      ...(isVisible ? { isVisible: this.getBoolean(isVisible) } : {}),
+      ...(estDeliveryDate ? { estDeliveryDate: date } : {}),
     });
-    const detailPerks: DetailPerk[] = [];
-    items.forEach((item) => {
-      const detailPerk = this.repository.detailPerk.create({
-        quantity: item.quantity,
-        perk: {
-          id: perk.id,
-        },
-        item: {
-          id: item.itemId,
-        },
+
+    if (detailPerks) {
+      await this.repository.perk.save({
+        id: perkId,
+        detailPerks: [],
       });
-      detailPerks.push(detailPerk);
-    });
-    await this.repository.detailPerk.save(detailPerks);
+      const newDetailPerks: DetailPerk[] = [];
+      const detailPerksParse = JSON.parse(detailPerks) as DetailPerkDto[];
+      detailPerksParse.forEach((item) => {
+        const detailPerk = this.repository.detailPerk.create({
+          quantity: item.quantity,
+          perk: {
+            id: perkId,
+          },
+          item: {
+            id: item.itemId,
+          },
+        });
+        newDetailPerks.push(detailPerk);
+      });
+      await this.repository.detailPerk.save(newDetailPerks);
+    }
+
+    if (shippingFees) {
+      await this.repository.perk.save({
+        id: perkId,
+        shippingFees: [],
+      });
+      const newShippingFees: ShippingFee[] = [];
+      const shippingFeesParse = JSON.parse(shippingFees) as ShippingFeeDto[];
+      shippingFeesParse.forEach((item) => {
+        const shippingFee = this.repository.shippingFee.create({
+          perk: {
+            id: perkId,
+          },
+          location: item.location,
+          fee: item.fee,
+        });
+        newShippingFees.push(shippingFee);
+      });
+      await this.repository.shippingFee.save(newShippingFees);
+    }
 
     return perk;
   }
@@ -154,5 +274,11 @@ export class PerkService {
       },
     });
     return perks;
+  }
+
+  getBoolean(value: string) {
+    let res: boolean;
+    ['1', 'true'].includes(value) ? (res = true) : (res = false);
+    return res;
   }
 }

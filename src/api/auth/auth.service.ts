@@ -141,7 +141,7 @@ export class AuthService {
     return { accessToken, refreshToken };
   }
 
-  private async getTokenLink(payload: ITokenPayload) {
+  async getTokenLink(payload: ITokenPayload) {
     return await this.jwtService.signAsync(payload, {
       secret: envs.jwt.linkSecret,
       expiresIn: envs.jwt.expiredLink,

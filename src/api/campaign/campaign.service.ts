@@ -6,10 +6,11 @@ import {
 } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
 import { ITokenPayload } from '../auth/auth.interface';
-import { CampaignStatus, Role } from '@/constants';
+import { CampaignStatus, ConfirmMemberStatus, Role } from '@/constants';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
-import { UpdateCampaignDto } from './dto';
+import { FaqDto, UpdateCampaignDto } from './dto';
 import { FAQ } from '@/entities';
+import { envs } from '@/config';
 
 @Injectable()
 export class CampaignService {
@@ -45,11 +46,17 @@ export class CampaignService {
       where: {
         id: campaignId,
       },
-      relations: ['teamMembers'],
+      relations: ['teamMembers.user', 'owner'],
     });
 
     if (!campaign) throw new BadRequestException('Chiến dịch không tồn tại');
-    const isMatched = campaign.ownerId === user.id || user.role === Role.Admin;
+    const isMatched =
+      campaign.ownerId === user.id ||
+      user.role === Role.Admin ||
+      campaign.teamMembers.some(
+        (member) =>
+          member.confirmStatus === ConfirmMemberStatus.ACCEPTED && member.user.id === user.id,
+      );
     if (!isMatched) throw new ForbiddenException('Không có quyền truy cập tài nguyên');
     return campaign;
   }
@@ -63,7 +70,7 @@ export class CampaignService {
     // checkonwer
     await this.checkOwner(campaignId, user);
     const campaign = await this.findOneById(campaignId);
-    const { imageTypeName, faqs, ...dataUpdate } = data;
+    const { imageTypeName, faqs, fieldId, ...dataUpdate } = data;
 
     if (file) {
       if (!imageTypeName) throw new BadRequestException('Vui lòng bổ sung loại hình ảnh');
@@ -81,7 +88,8 @@ export class CampaignService {
         },
       });
       const newFaqs: FAQ[] = [];
-      faqs.forEach((item) => {
+      const faqsParse = JSON.parse(faqs) as FaqDto[];
+      faqsParse.forEach((item) => {
         const faq = this.repository.faq.create({
           campaign: {
             id: campaign.id,
@@ -97,6 +105,13 @@ export class CampaignService {
     return await this.repository.campaign.save({
       id: campaignId,
       ...dataUpdate,
+      ...(fieldId
+        ? {
+            field: {
+              id: fieldId,
+            },
+          }
+        : {}),
     });
   }
 
@@ -174,7 +189,20 @@ export class CampaignService {
       },
       relations: {
         field: true,
+        faqs: true,
+        teamMembers: true,
+        owner: true,
+      },
+      select: {
+        owner: {
+          verifyStatus: true,
+        },
       },
     });
+  }
+
+  async CKEUpload(file: Express.Multer.File) {
+    const res = await this.cloudinaryService.uploadFile(file, envs.cloudinary.cke_folder_name);
+    return res.secure_url as string;
   }
 }

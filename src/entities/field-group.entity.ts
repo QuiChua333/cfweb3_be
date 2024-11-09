@@ -5,7 +5,9 @@ import { Field } from './field.entity';
 
 @Entity()
 export class FieldGroup extends BaseEntity {
-  @Column()
+  @Column({
+    unique: true,
+  })
   name: string;
 
   @OneToMany(() => Field, (field) => field.fieldGroup)

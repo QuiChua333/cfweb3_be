@@ -1,44 +1,50 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsDate,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
-import { ItemInPerkDto } from './create-perk.dto';
+import { IsBoolean, IsNumber, IsOptional, IsString } from 'class-validator';
+import { Type } from 'class-transformer';
 
 export class UpdatePerkDto {
   @IsString()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsNumber()
-  price: number;
+  @Type(() => Number)
+  @IsOptional()
+  price?: number;
 
-  @IsBoolean()
-  isFeatured: boolean;
+  @IsString()
+  @IsOptional()
+  isFeatured?: string;
 
-  @IsBoolean()
-  isVisible: boolean;
+  @IsString()
+  @IsOptional()
+  isVisible?: string;
 
-  @IsBoolean()
-  isShipping: boolean;
+  @IsString()
+  @IsOptional()
+  isShipping?: string;
 
   @IsNumber()
-  quantity: number;
+  @Type(() => Number)
+  @IsOptional()
+  quantity?: number;
 
   @IsString()
   @IsOptional()
   image?: string;
 
-  @IsDate()
-  estDeliveryDate: Date;
+  @IsString()
+  @IsOptional()
+  estDeliveryDate?: string;
 
   @IsString()
-  description: string;
+  @IsOptional()
+  description?: string;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  items: ItemInPerkDto[];
+  @IsString()
+  @IsOptional()
+  detailPerks?: string;
+
+  @IsString()
+  @IsOptional()
+  shippingFees?: string;
 }

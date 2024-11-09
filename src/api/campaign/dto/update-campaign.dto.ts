@@ -63,8 +63,10 @@ export class UpdateCampaignDto {
   @IsOptional()
   goal?: number;
 
-  @ValidateNested({ each: true })
-  @IsArray()
+  @IsString()
   @IsOptional()
-  faqs?: FaqDto[];
+  fieldId?: string;
+
+  @IsOptional()
+  faqs?: string;
 }

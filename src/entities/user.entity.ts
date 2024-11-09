@@ -1,6 +1,6 @@
 import { Column, Entity, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
-import { VerifyStatus } from '@/constants';
+import { UserStatus, VerifyStatus } from '@/constants';
 import { UserVerify } from './user-verify.entity';
 import { Campaign } from './campaign.entity';
 import { TeamMember } from './team-member.entity';
@@ -43,6 +43,13 @@ export class User extends BaseEntity {
     enum: VerifyStatus,
   })
   verifyStatus: VerifyStatus;
+
+  @Column({
+    default: UserStatus.ACTIVATE,
+    type: 'enum',
+    enum: UserStatus,
+  })
+  userStatus: UserStatus;
 
   @Column({
     default: false,

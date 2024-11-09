@@ -18,10 +18,10 @@ export class Item extends BaseEntity {
   campaign: Campaign;
 
   @OneToMany(() => Option, (option) => option.item, {
-    cascade: ['insert', 'update', 'remove'],
+    cascade: true,
   })
   options: Option[];
 
-  @OneToMany(() => DetailPerk, (detailPerk) => detailPerk.perk)
+  @OneToMany(() => DetailPerk, (detailPerk) => detailPerk.item)
   detailPerks: DetailPerk[];
 }

@@ -26,9 +26,24 @@ export class ItemService {
           id: campaignId,
         },
       },
+      relations: {
+        options: true,
+      },
     });
 
-    return items;
+    const response = items.map((item) => {
+      return {
+        ...item,
+        options: item.options.map((option) => {
+          return {
+            ...option,
+            values: option.values.split('|'),
+          };
+        }),
+      };
+    });
+
+    return response;
   }
 
   async addItem(currentUser: ITokenPayload, createItemDto: CreateItemDto) {
@@ -62,9 +77,12 @@ export class ItemService {
     item.options = [];
     await this.repository.item.save(item);
     const options: Option[] = [];
-    if (updateItemDto.isHasOption) {
+    if (updateItemDto.isHasOption && updateItemDto.options?.length > 0) {
       updateItemDto.options.forEach((item) => {
         const option = this.repository.option.create({
+          item: {
+            id: itemId,
+          },
           name: item.name,
           values: item.values.join('|'),
         });
@@ -76,6 +94,7 @@ export class ItemService {
       id: itemId,
       isHasOption: updateItemDto.isHasOption,
       options: options,
+      name: updateItemDto.name,
     });
   }
 
@@ -88,6 +107,7 @@ export class ItemService {
   async getItemsContainPerksByCampaignId(campaignId: string) {
     const campaign = await this.repository.campaign.findOneBy({ id: campaignId });
     if (!campaign) throw new NotFoundException('Chiến dịch không tồn tại');
+
     const items = await this.repository.item.find({
       where: {
         campaign: {
@@ -98,21 +118,26 @@ export class ItemService {
         detailPerks: {
           perk: true,
         },
-      },
-      select: {
-        detailPerks: {
-          perk: {
-            name: true,
-          },
-        },
+        options: true,
       },
     });
-
-    return items;
+    const response = items.map((item) => {
+      return {
+        ...item,
+        detailPerks: item.detailPerks.map((detailPerk) => {
+          return {
+            perk: {
+              name: detailPerk.perk.name,
+            },
+          };
+        }),
+      };
+    });
+    return response;
   }
 
   async getItemContainPerks(itemId: string) {
-    const item = await this.repository.item.find({
+    const item = await this.repository.item.findOne({
       where: {
         id: itemId,
       },
@@ -120,15 +145,19 @@ export class ItemService {
         detailPerks: {
           perk: true,
         },
-      },
-      select: {
-        detailPerks: {
-          perk: {
-            name: true,
-          },
-        },
+        options: true,
       },
     });
-    return item;
+    const response = {
+      ...item,
+      detailPerks: item.detailPerks.map((detailPerk) => {
+        return {
+          perk: {
+            name: detailPerk.perk.name,
+          },
+        };
+      }),
+    };
+    return response;
   }
 }

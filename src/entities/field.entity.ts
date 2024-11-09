@@ -6,7 +6,9 @@ import { Campaign } from './campaign.entity';
 
 @Entity()
 export class Field extends BaseEntity {
-  @Column()
+  @Column({
+    unique: true,
+  })
   name: string;
 
   @ManyToOne(() => FieldGroup, (fieldGroup) => fieldGroup.fields)

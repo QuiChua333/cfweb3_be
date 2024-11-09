@@ -1,4 +1,4 @@
-import { IsArray, IsBoolean, IsString, ValidateNested } from 'class-validator';
+import { IsArray, IsBoolean, IsOptional, IsString, ValidateNested } from 'class-validator';
 import { OptionDto } from './create-item.dto';
 
 export class UpdateItemDto {
@@ -6,12 +6,15 @@ export class UpdateItemDto {
   campaignId: string;
 
   @IsString()
-  name: string;
+  @IsOptional()
+  name?: string;
 
   @IsBoolean()
-  isHasOption: boolean;
+  @IsOptional()
+  isHasOption?: boolean;
 
   @IsArray()
   @ValidateNested({ each: true })
-  options: OptionDto[];
+  @IsOptional()
+  options?: OptionDto[];
 }

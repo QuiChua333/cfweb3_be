@@ -15,7 +15,7 @@ const FieldRoute = {
   },
 
   getFieldsGroupByCategory: <IRouteParams>{
-    path: 'group-by-category',
+    path: '/group-by-category',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
   },

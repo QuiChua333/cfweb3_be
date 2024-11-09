@@ -8,11 +8,14 @@ import * as streamifier from 'streamifier';
 export type CloudinaryResponse = UploadApiResponse | UploadApiErrorResponse;
 @Injectable()
 export class CloudinaryService {
-  uploadFile(file: Express.Multer.File): Promise<CloudinaryResponse> {
+  uploadFile(
+    file: Express.Multer.File,
+    folder = envs.cloudinary.folder_name,
+  ): Promise<CloudinaryResponse> {
     return new Promise<CloudinaryResponse>((resolve, reject) => {
       const uploadStream = cloudinary.uploader.upload_stream(
         {
-          folder: envs.cloudinary.folder_name,
+          folder: folder,
         },
         (error, result) => {
           if (error) return reject(error);

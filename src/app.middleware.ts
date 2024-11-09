@@ -1,6 +1,6 @@
 import { ValidatorException } from '@/exceptions';
 import { CustomFilterExceptionFilter } from '@/filters';
-
+import * as bodyParser from 'body-parser';
 import { ValidationPipe, type INestApplication } from '@nestjs/common';
 
 export const loadMiddlewares = (app: INestApplication): void => {
@@ -15,4 +15,7 @@ export const loadMiddlewares = (app: INestApplication): void => {
     }),
   );
   app.useGlobalFilters(new CustomFilterExceptionFilter());
+
+  app.use(bodyParser.json({ limit: '10mb' }));
+  app.use(bodyParser.urlencoded({ limit: '10mb', extended: true }));
 };

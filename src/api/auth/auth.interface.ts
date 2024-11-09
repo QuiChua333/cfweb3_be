@@ -4,4 +4,5 @@ export interface ITokenPayload {
   id: string;
   email: string;
   role: Role;
+  campaignId?: string;
 }

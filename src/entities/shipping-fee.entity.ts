@@ -12,6 +12,9 @@ export class ShippingFee extends BaseEntity {
   })
   fee: number;
 
-  @ManyToOne(() => Perk, (perk) => perk.shippingFees)
+  @ManyToOne(() => Perk, (perk) => perk.shippingFees, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   perk: Perk;
 }

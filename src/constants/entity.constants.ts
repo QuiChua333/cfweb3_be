@@ -1,7 +1,12 @@
 export enum VerifyStatus {
   UNVERIFY = 'Chưa xác thực',
   PENDING = 'Chờ xác thực',
-  SUCCESS = 'Thành công',
+  SUCCESS = 'Đã xác thực',
+}
+
+export enum UserStatus {
+  INACTIVATE = 'Tạm khóa',
+  ACTIVATE = 'Đang hoạt động',
 }
 
 export enum CampaignStatus {

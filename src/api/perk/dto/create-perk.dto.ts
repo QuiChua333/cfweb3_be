@@ -1,17 +1,22 @@
-import {
-  IsArray,
-  IsBoolean,
-  IsDate,
-  IsNumber,
-  IsOptional,
-  IsString,
-  ValidateNested,
-} from 'class-validator';
+import { Type } from 'class-transformer';
+import { IsArray, IsBoolean, IsDate, IsNumber, IsOptional, IsString } from 'class-validator';
+import { boolean } from 'joi';
 
-export class ItemInPerkDto {
+export class DetailPerkDto {
   @IsString()
   itemId: string;
+
+  @IsNumber()
+  @Type(() => Number)
   quantity: number;
+}
+
+export class ShippingFeeDto {
+  @IsString()
+  location: string;
+
+  @IsNumber()
+  fee: number;
 }
 export class CreatePerkDto {
   @IsString()
@@ -21,31 +26,36 @@ export class CreatePerkDto {
   name: string;
 
   @IsNumber()
+  @Type(() => Number)
   price: number;
 
-  @IsBoolean()
-  isFeatured: boolean;
+  @IsString()
+  isFeatured: string = 'false';
 
-  @IsBoolean()
-  isVisible: boolean;
+  @IsString()
+  isVisible: string;
 
-  @IsBoolean()
-  isShipping: boolean;
+  @IsString()
+  isShipping: string;
 
   @IsNumber()
+  @Type(() => Number)
   quantity: number;
 
   @IsString()
   @IsOptional()
   image?: string;
 
-  @IsDate()
-  estDeliveryDate: Date;
+  @IsString()
+  estDeliveryDate: string;
 
   @IsString()
   description: string;
 
-  @IsArray()
-  @ValidateNested({ each: true })
-  items: ItemInPerkDto[];
+  @IsString()
+  detailPerks: string;
+
+  @IsString()
+  @IsOptional()
+  shippingFees?: string;
 }

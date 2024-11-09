@@ -69,6 +69,21 @@ export class Campaign extends BaseEntity {
   story: string;
 
   @Column({
+    nullable: true,
+  })
+  bankName: string;
+
+  @Column({
+    nullable: true,
+  })
+  bankAccountNumber: string;
+
+  @Column({
+    nullable: true,
+  })
+  bankUsername: string;
+
+  @Column({
     type: 'bigint',
     nullable: true,
   })
@@ -91,7 +106,9 @@ export class Campaign extends BaseEntity {
   @ManyToOne(() => Field, (field) => field.campaigns)
   field: Field;
 
-  @OneToMany(() => FAQ, (faq) => faq.campaign)
+  @OneToMany(() => FAQ, (faq) => faq.campaign, {
+    cascade: ['remove'],
+  })
   faqs: FAQ[];
 
   @OneToMany(() => TeamMember, (teamMember) => teamMember.campaign)

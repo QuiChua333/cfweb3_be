@@ -77,4 +77,10 @@ export class CampaignController {
   getPopulateCampaigns() {
     return this.campaignService.getPopulateCampaigns();
   }
+
+  @InjectRoute(CampaignRoute.CKEUpload)
+  @UseInterceptors(FileInterceptor('file'))
+  CKEUpload(@UploadedFile() file: Express.Multer.File) {
+    return this.campaignService.CKEUpload(file);
+  }
 }

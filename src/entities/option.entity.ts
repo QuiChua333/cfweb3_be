@@ -10,6 +10,9 @@ export class Option extends BaseEntity {
   @Column()
   values: string;
 
-  @ManyToOne(() => Item, (item) => item.options)
+  @ManyToOne(() => Item, (item) => item.options, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   item: Item;
 }

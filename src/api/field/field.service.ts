@@ -7,7 +7,18 @@ export class FieldService {
 
   async getFieldsGroupByCategory() {
     const listFieldsGroupByCategory = await this.repository.fieldGroup.find({
-      relations: ['fields'],
+      relations: {
+        fields: true,
+      },
+      select: {
+        id: true,
+        name: true,
+        fields: {
+          id: true,
+          name: true,
+        },
+      },
     });
+    return listFieldsGroupByCategory;
   }
 }

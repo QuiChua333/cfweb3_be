@@ -5,12 +5,13 @@ import { Perk } from './perk.entity';
 
 @Entity()
 export class DetailPerk extends BaseEntity {
-  @Column({
-    type: 'int',
-  })
+  @Column()
   quantity: number;
 
-  @ManyToOne(() => Perk, (perk) => perk.detailPerks)
+  @ManyToOne(() => Perk, (perk) => perk.detailPerks, {
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
+  })
   perk: Perk;
 
   @ManyToOne(() => Item, (item) => item.detailPerks)

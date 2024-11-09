@@ -1,10 +1,10 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from '@nestjs/common';
 import { TeamMemberService } from './team-member.service';
-import { UpdateTeamMemberDto } from './dto/update-team-member.dto';
 import { InjectRoute, User } from '@/decorators';
 import TeamMemberRoute from './team-member.routes';
-import { InvitateMemberDto } from './dto';
+import { InvitateMemberDto, UpdateTeamMemberDto } from './dto';
 import { ITokenPayload } from '../auth/auth.interface';
+import { envs } from '@/config';
 
 @Controller(TeamMemberRoute.root)
 export class TeamMemberController {
@@ -27,9 +27,28 @@ export class TeamMemberController {
   @InjectRoute(TeamMemberRoute.deleteMember)
   deleteMember(
     @Param('campaignId') campaignId: string,
-    @Param('userId') userId: string,
+    @Param('email') email: string,
     @User() currentUser: ITokenPayload,
   ) {
-    return this.teamMemberService.deleteMember(campaignId, userId, currentUser);
+    return this.teamMemberService.deleteMember(campaignId, email, currentUser);
+  }
+
+  @InjectRoute(TeamMemberRoute.confirmInvitation)
+  async confirmInvitation(@Query('token') token: string, @Res() res) {
+    const { email, campaignId, existedUser } =
+      await this.teamMemberService.confirmInvitation(token);
+
+    if (!existedUser) res.redirect(`${envs.fe.homeUrl}/login`);
+    else res.redirect(`${envs.fe.homeUrl}/campaigns/${campaignId}/edit/team`);
+    //redirect to fe verify email success
+  }
+
+  @InjectRoute(TeamMemberRoute.editTeamMembers)
+  editTeamMembers(
+    @User() currentUser: ITokenPayload,
+    @Param('campaignId') campaignId: string,
+    @Body() updateTeamMemberDto: UpdateTeamMemberDto,
+  ) {
+    return this.teamMemberService.editTeamMembers(currentUser, campaignId, updateTeamMemberDto);
   }
 }

@@ -16,6 +16,7 @@ import { EmailModule } from '@/services/email/email.module';
     JwtModule.register({
       secret: envs.jwt.accessSecret,
       signOptions: { expiresIn: envs.jwt.expiredAccess },
+      global: true,
     }),
   ],
   controllers: [AuthController],

@@ -85,6 +85,13 @@ const CampaignRoute = {
     method: RequestMethod.GET,
     code: HttpStatus.OK,
   },
+
+  CKEUpload: <IRouteParams>{
+    path: '/CKEUpload',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default CampaignRoute;

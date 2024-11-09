@@ -34,6 +34,7 @@ interface EnvVars {
   FE_LOGIN_URL: string;
 
   BE_EMAIL_CONFIRM_URL: string;
+  BE_URL: string;
 
   MAIL_USER: string;
   MAIL_PASSWORD: string;
@@ -43,6 +44,7 @@ interface EnvVars {
   CLOUDINARY_API_KEY: string;
   CLOUDINARY_API_SECRET: string;
   CLOUDINARY_FOLDER_NAME: string;
+  CLOUDINARY_CKE_UPLOAD_FOLDER_NAME: string;
 }
 
 const envSchema = joi
@@ -78,6 +80,7 @@ const envSchema = joi
     FE_LOGIN_URL: joi.string().required(),
 
     BE_EMAIL_CONFIRM_URL: joi.string().required(),
+    BE_URL: joi.string().required(),
 
     MAIL_USER: joi.string().required(),
     MAIL_PASSWORD: joi.string().required(),
@@ -87,6 +90,7 @@ const envSchema = joi
     CLOUDINARY_API_KEY: joi.string().required(),
     CLOUDINARY_API_SECRET: joi.string().required(),
     CLOUDINARY_FOLDER_NAME: joi.string().required(),
+    CLOUDINARY_CKE_UPLOAD_FOLDER_NAME: joi.string().required(),
   })
   .unknown(true);
 
@@ -141,6 +145,7 @@ export const envs = {
 
   be: {
     emailConfirmUrl: envVars.BE_EMAIL_CONFIRM_URL,
+    beUrl: envVars.BE_URL,
   },
 
   email: <MailerOptions>{
@@ -164,5 +169,6 @@ export const envs = {
     api_key: envVars.CLOUDINARY_API_KEY,
     api_secret: envVars.CLOUDINARY_API_SECRET,
     folder_name: envVars.CLOUDINARY_FOLDER_NAME,
+    cke_folder_name: envVars.CLOUDINARY_CKE_UPLOAD_FOLDER_NAME,
   },
 };
