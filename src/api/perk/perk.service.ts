@@ -5,6 +5,7 @@ import { ITokenPayload } from '../auth/auth.interface';
 import { CampaignService } from '../campaign/campaign.service';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 import { DetailPerk, ShippingFee } from '@/entities';
+import { PaymentStatus } from '@/constants';
 
 @Injectable()
 export class PerkService {
@@ -30,9 +31,12 @@ export class PerkService {
     });
     const claimeds: number[] = [];
     for (let i = 0; i < perks.length; i++) {
-      const claimed = await this.repository.contributionDetail
-        .createQueryBuilder('contributionDetail')
-        .where('contributionDetail.perks @> :perkCondition1', {
+      const claimed = await this.repository.contribution
+        .createQueryBuilder('contribution')
+        .where('contribution.status = :status', {
+          status: PaymentStatus.SUCCESS,
+        })
+        .andWhere('contribution.perks @> :perkCondition1', {
           perkCondition1: JSON.stringify([{ id: perks[i].id }]),
         })
         .getCount();
@@ -69,17 +73,20 @@ export class PerkService {
     if (!perk) throw new NotFoundException('Đặc quyền không tồn tại');
     await this.campaignService.checkOwner(perk.campaign.id, currentUser);
 
-    const contributionDetail = await this.repository.contributionDetail
-      .createQueryBuilder('contributionDetail')
-      .leftJoinAndSelect('contributionDetail.contribution', 'contribution')
-      .where('contribution.isFinish = :isFinish', { isFinish: false })
-      .andWhere('contributionDetail.perks @> :perkCondition', {
+    const contribution = await this.repository.contribution
+      .createQueryBuilder('contribution')
+      .where('contribution.isFinish = :isFinish', {
+        isFinish: false,
+      })
+      .where('contribution.status = :status', {
+        status: PaymentStatus.SUCCESS,
+      })
+      .andWhere('contribution.perks @> :perkCondition', {
         perkCondition: JSON.stringify([{ id: perkId }]),
       })
       .getOne();
 
-    if (contributionDetail)
-      throw new BadRequestException('Đặc quyền có người đặt và chưa được giao');
+    if (contribution) throw new BadRequestException('Đặc quyền có người đặt và chưa được giao');
     const url = perk.image;
     if (url) {
       await this.cloudinaryService.destroyFile(url);
@@ -269,11 +276,33 @@ export class PerkService {
       },
       relations: {
         detailPerks: {
-          item: true,
+          item: {
+            options: true,
+          },
         },
+        shippingFees: true,
       },
     });
-    return perks;
+    const claimeds: number[] = [];
+    for (let i = 0; i < perks.length; i++) {
+      const claimed = await this.repository.contribution
+        .createQueryBuilder('contribution')
+        .where('contribution.status = :status', {
+          status: PaymentStatus.SUCCESS,
+        })
+        .andWhere('contribution.perks @> :perkCondition1', {
+          perkCondition1: JSON.stringify([{ id: perks[i].id }]),
+        })
+        .getCount();
+      claimeds.push(claimed);
+    }
+    const response = perks.map((perk, index) => {
+      return {
+        ...perk,
+        claimed: claimeds[index],
+      };
+    });
+    return response;
   }
 
   getBoolean(value: string) {

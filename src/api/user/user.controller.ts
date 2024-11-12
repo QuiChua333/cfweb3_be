@@ -5,20 +5,21 @@ import UserRoute from '@/api/user/user.routes';
 import { ITokenPayload } from '../auth/auth.interface';
 import { UpdateProfileUserDto } from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { UserPaginationDto } from './dto/user-pagination.dto';
 
 @Controller(UserRoute.root)
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
   @InjectRoute(UserRoute.findAll)
-  findAll() {
-    return this.userService.findAll();
+  findAll(@Query() userPaginationDto: UserPaginationDto) {
+    return this.userService.findAll(userPaginationDto);
   }
 
   @InjectRoute(UserRoute.findMe)
   findMe(@User() user: ITokenPayload) {
     const { id } = user;
-    return this.userService.findOneById(id);
+    return this.userService.findOneDetail(id);
   }
 
   @InjectRoute(UserRoute.getUserByEmail)
@@ -39,5 +40,10 @@ export class UserController {
     @UploadedFile() file: Express.Multer.File,
   ) {
     return this.userService.updateProfile(user, updateProfileUserDto, file);
+  }
+
+  @InjectRoute(UserRoute.changeStatus)
+  changeStatus(@Param('userId') userId: string) {
+    return this.userService.changeStatus(userId);
   }
 }

@@ -45,6 +45,34 @@ const ContributionRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  paymentStripe: <IRouteParams>{
+    path: '/payment/stripe',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  paymentMomo: <IRouteParams>{
+    path: '/payment/momo',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  webhookStripe: <IRouteParams>{
+    path: '/webhook/stripe',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  webhookMomo: <IRouteParams>{
+    path: '/webhook/momo',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
 };
 
 export default ContributionRoute;

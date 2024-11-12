@@ -32,9 +32,13 @@ interface EnvVars {
   FE_EMAIL_RESET_PASSWORD_URL: string;
   FE_EMAIL_VERIFY_SUCCESS_URL: string;
   FE_LOGIN_URL: string;
+  FE_PAYMENT_SUCCESS_URL: string;
+  FE_PAYMENT_CANCEL_URL: string;
 
   BE_EMAIL_CONFIRM_URL: string;
   BE_URL: string;
+
+  MOMO_HOOKDECK_URL: string;
 
   MAIL_USER: string;
   MAIL_PASSWORD: string;
@@ -45,6 +49,9 @@ interface EnvVars {
   CLOUDINARY_API_SECRET: string;
   CLOUDINARY_FOLDER_NAME: string;
   CLOUDINARY_CKE_UPLOAD_FOLDER_NAME: string;
+
+  STRIPE_API_KEY_SECRET: string;
+  STRIPE_ENDPOINT_SECRET: string;
 }
 
 const envSchema = joi
@@ -78,9 +85,13 @@ const envSchema = joi
     FE_EMAIL_RESET_PASSWORD_URL: joi.string().required(),
     FE_EMAIL_VERIFY_SUCCESS_URL: joi.string().required(),
     FE_LOGIN_URL: joi.string().required(),
+    FE_PAYMENT_SUCCESS_URL: joi.string().required(),
+    FE_PAYMENT_CANCEL_URL: joi.string().required(),
 
     BE_EMAIL_CONFIRM_URL: joi.string().required(),
     BE_URL: joi.string().required(),
+
+    MOMO_HOOKDECK_URL: joi.string().required(),
 
     MAIL_USER: joi.string().required(),
     MAIL_PASSWORD: joi.string().required(),
@@ -91,6 +102,9 @@ const envSchema = joi
     CLOUDINARY_API_SECRET: joi.string().required(),
     CLOUDINARY_FOLDER_NAME: joi.string().required(),
     CLOUDINARY_CKE_UPLOAD_FOLDER_NAME: joi.string().required(),
+
+    STRIPE_API_KEY_SECRET: joi.string().required(),
+    STRIPE_ENDPOINT_SECRET: joi.string().required(),
   })
   .unknown(true);
 
@@ -141,6 +155,8 @@ export const envs = {
     emailResetPasswordUrl: envVars.FE_EMAIL_RESET_PASSWORD_URL,
     emailVerifySuccessUrl: envVars.FE_EMAIL_VERIFY_SUCCESS_URL,
     loginUrl: envVars.FE_LOGIN_URL,
+    paymentSuccessUrl: envVars.FE_PAYMENT_SUCCESS_URL,
+    paymentCancelUrl: envVars.FE_PAYMENT_CANCEL_URL,
   },
 
   be: {
@@ -170,5 +186,14 @@ export const envs = {
     api_secret: envVars.CLOUDINARY_API_SECRET,
     folder_name: envVars.CLOUDINARY_FOLDER_NAME,
     cke_folder_name: envVars.CLOUDINARY_CKE_UPLOAD_FOLDER_NAME,
+  },
+
+  stripe: {
+    apiKeySecret: envVars.STRIPE_API_KEY_SECRET,
+    endpointSecret: envVars.STRIPE_ENDPOINT_SECRET,
+  },
+
+  momo: {
+    hookdeckUrl: envVars.MOMO_HOOKDECK_URL,
   },
 };

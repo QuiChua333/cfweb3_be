@@ -1,9 +1,10 @@
-import { Body, Controller, Param } from '@nestjs/common';
+import { Body, Controller, Param, Req, Res } from '@nestjs/common';
 import { ContributionService } from './contribution.service';
 import ContributionRoute from './contribution.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
-import { UpdateContributionDto } from './dto';
+import { PaymentDto, UpdateContributionDto } from './dto';
+import { Request } from 'express';
 
 @Controller(ContributionRoute.root)
 export class ContributionController {
@@ -43,5 +44,25 @@ export class ContributionController {
   @InjectRoute(ContributionRoute.getQuantityContributionOfUser)
   getQuantityContributionOfUser(@User() currenUser: ITokenPayload) {
     return this.contributionService.getQuantityContributionOfUser(currenUser);
+  }
+
+  @InjectRoute(ContributionRoute.paymentStripe)
+  paymentStripe(@Body() paymentDto: PaymentDto) {
+    return this.contributionService.paymentStripe(paymentDto);
+  }
+
+  @InjectRoute(ContributionRoute.webhookStripe)
+  webhookStripe(@Req() req: Request) {
+    return this.contributionService.webhookStripe(req);
+  }
+
+  @InjectRoute(ContributionRoute.paymentMomo)
+  paymentMomo(@Body() paymentDto: PaymentDto) {
+    return this.contributionService.paymentMomo(paymentDto);
+  }
+
+  @InjectRoute(ContributionRoute.webhookMomo)
+  webhookMomo(@Body() momoBody) {
+    return this.contributionService.webhookMomo(momoBody);
   }
 }

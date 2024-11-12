@@ -15,6 +15,7 @@ export class ShippingFee extends BaseEntity {
   @ManyToOne(() => Perk, (perk) => perk.shippingFees, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete',
   })
   perk: Perk;
 }

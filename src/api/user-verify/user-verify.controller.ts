@@ -8,13 +8,14 @@ import {
   Delete,
   UseInterceptors,
   UploadedFile,
+  UploadedFiles,
 } from '@nestjs/common';
 import { UserVerifyService } from './user-verify.service';
 import UserVerifyRoute from './user-verify.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
-import { RequestVerifyUserDto } from './dto';
-import { FileInterceptor } from '@nestjs/platform-express';
+import { RequestVerifyUserDto, UpdateVerifyUserDto } from './dto';
+import { FileFieldsInterceptor, FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 
 @Controller(UserVerifyRoute.root)
 export class UserVerifyController {
@@ -31,12 +32,33 @@ export class UserVerifyController {
   }
 
   @InjectRoute(UserVerifyRoute.requestVerifyUser)
-  @UseInterceptors(FileInterceptor('file'))
+  @UseInterceptors(FilesInterceptor('files', 2))
   requestVerifyUser(
     @User() currentUser: ITokenPayload,
     @Body() requestVerifyUserDto: RequestVerifyUserDto,
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFiles() files: Express.Multer.File[],
   ) {
-    return this.userVerifyService.requestVerifyUser(currentUser, requestVerifyUserDto, file);
+    return this.userVerifyService.requestVerifyUser(currentUser, requestVerifyUserDto, files);
+  }
+
+  @InjectRoute(UserVerifyRoute.updateVerifyUser)
+  @UseInterceptors(FilesInterceptor('files', 2))
+  updateVerifyUser(
+    @User() currentUser: ITokenPayload,
+    @Body() updateVerifyUserDto: UpdateVerifyUserDto,
+    @Body('filePresence') filePresence: string[],
+    @UploadedFiles() files: Express.Multer.File[],
+  ) {
+    return this.userVerifyService.updateVerifyUser(
+      currentUser,
+      updateVerifyUserDto,
+      files,
+      filePresence,
+    );
+  }
+
+  @InjectRoute(UserVerifyRoute.adminVerify)
+  adminVerify(@Param('userId') userId: string) {
+    return this.userVerifyService.adminVerify(userId);
   }
 }

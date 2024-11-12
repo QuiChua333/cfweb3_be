@@ -5,7 +5,9 @@ import { loadGuards } from './app.guard';
 import { loadMiddlewares } from './app.middleware';
 
 export const initApplication = async (): Promise<INestApplication> => {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule, {
+    rawBody: true,
+  });
 
   app.setGlobalPrefix('api');
 

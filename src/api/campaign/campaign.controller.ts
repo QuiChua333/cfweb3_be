@@ -9,14 +9,16 @@ import {
   UseInterceptors,
   UploadedFile,
   Req,
+  Query,
 } from '@nestjs/common';
 import { CampaignService } from './campaign.service';
 import CampaignRoute from './campaign.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
-import { UpdateCampaignDto } from './dto';
+import { CampaignExplorePaginationDto, CampaignPaginationDto, UpdateCampaignDto } from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
+import { CampaignStatus } from '@/constants';
 
 @Controller(CampaignRoute.root)
 export class CampaignController {
@@ -28,13 +30,23 @@ export class CampaignController {
   }
 
   @InjectRoute(CampaignRoute.findAll)
-  findAll() {
-    return this.campaignService.findAll();
+  findAll(@Query() campaignPaginationDto: CampaignPaginationDto) {
+    return this.campaignService.findAll(campaignPaginationDto);
+  }
+
+  @InjectRoute(CampaignRoute.getCampaignsExplore)
+  getCampaignsExplore(@Query() campaignExplorePaginationDto: CampaignExplorePaginationDto) {
+    return this.campaignService.getCampaignsExplore(campaignExplorePaginationDto);
   }
 
   @InjectRoute(CampaignRoute.getCampaignById)
   getCampaignById(@Param('id') id: string) {
     return this.campaignService.findOneDetail(id);
+  }
+
+  @InjectRoute(CampaignRoute.getQuantitySuccessCampaignByCampaignId)
+  getQuantitySuccessCampaignByCampaignId(@Param('campaignId') campaignId: string) {
+    return this.campaignService.getQuantitySuccessCampaignByCampaignId(campaignId);
   }
 
   @InjectRoute(CampaignRoute.checkOwner)
@@ -82,5 +94,13 @@ export class CampaignController {
   @UseInterceptors(FileInterceptor('file'))
   CKEUpload(@UploadedFile() file: Express.Multer.File) {
     return this.campaignService.CKEUpload(file);
+  }
+
+  @InjectRoute(CampaignRoute.adminChangeStatus)
+  adminChangeStatus(
+    @Body() { status }: { status: CampaignStatus.TERMINATE | CampaignStatus.FUNDING },
+    @Param('campaignId') campaignId: string,
+  ) {
+    return this.campaignService.adminChangeStatus(campaignId, status);
   }
 }

@@ -11,6 +11,7 @@ export class DetailPerk extends BaseEntity {
   @ManyToOne(() => Perk, (perk) => perk.detailPerks, {
     onDelete: 'CASCADE',
     onUpdate: 'CASCADE',
+    orphanedRowAction: 'delete',
   })
   perk: Perk;
 

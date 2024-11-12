@@ -20,7 +20,10 @@ export class UserVerify extends BaseEntity {
   identifyNumber: string;
 
   @Column()
-  identifyCardImage: string;
+  identifyCardImageFront: string;
+
+  @Column()
+  identifyCardImageBack: string;
 
   @Column({
     default: true,

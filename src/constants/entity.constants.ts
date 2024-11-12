@@ -24,11 +24,17 @@ export enum ConfirmMemberStatus {
 }
 
 export enum PaymentMethod {
-  BANK_TRANSFER = 'bank transfer',
+  STRIPE = 'stripe',
+  MOMO = 'momo',
 }
 
 export enum PaymentStatus {
   PENDING = 'Đang chờ',
   SUCCESS = 'Thành công',
   FAILED = 'Thất bại',
+}
+
+export enum ReportStatus {
+  NO_RESPONSE = 'CHƯA PHẢN HỒI',
+  RESPONSE = 'ĐÃ PHẢN HỒI',
 }

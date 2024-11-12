@@ -28,7 +28,7 @@ export const verifyEmailTemplate = (url: string) => {
         >
           <tr>
             <td style="background-color: #ffffff; padding: 30px">
-              <img src="https://i.ibb.co/CPZBhtp/GForm-logo.png" class="img" />
+              <img src="https://res.cloudinary.com/dlotmnagu/image/upload/v1731468220/logo-email_ppjv2y.png" class="img" />
               <h2>Xác minh email của bạn</h2>
               <p>
                 Vui lòng nhấn vào nút bên dưới để xác minh địa chỉ email của bạn.
@@ -39,7 +39,7 @@ export const verifyEmailTemplate = (url: string) => {
                   style="
                     cursor: pointer;
                     display: inline-block;
-                    background-color: #fcc934;
+                    background-color: #34CA96;
                     color: white;
                     padding: 10px 20px;
                     text-decoration: none;

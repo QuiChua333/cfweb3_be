@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
-import { CreateReportDto } from './dto';
+import { CreateReportDto, ReportPaginationDto, ReportQueryStatus } from './dto';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 import { ITokenPayload } from '../auth/auth.interface';
 
@@ -11,8 +11,48 @@ export class ReportService {
     private readonly cloudinaryService: CloudinaryService,
   ) {}
 
-  findAll() {
-    return `This action returns all report`;
+  async findAll(reportPaginationDto: ReportPaginationDto) {
+    const { page = 1, limit = 10, searchString, status } = reportPaginationDto;
+    const query = this.repository.report
+      .createQueryBuilder('report')
+      .leftJoinAndSelect('report.campaign', 'campaign') // Tham chiếu đúng đến report.campaign
+      .leftJoinAndSelect('report.reportBy', 'reportBy') // Tham chiếu đúng đến report.reportBy
+      .select([
+        'report.id',
+        'report.title',
+        'report.content',
+        'report.date',
+        'report.status',
+        'campaign.id', // Chỉ lấy ID để liên kết, nếu cần
+        'campaign.title', // Lấy title từ campaign
+        'reportBy.id', // Chỉ lấy ID để liên kết, nếu cần
+        'reportBy.fullName', // Lấy fullName từ reportBy
+        'reportBy.email', // Lấy email từ reportBy
+      ]);
+    // Tìm kiếm không phân biệt hoa thường theo searchString trong title
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere('report.title ILIKE :searchString', {
+        searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
+      });
+    }
+
+    // Tìm kiếm theo status
+    if (status && status !== ReportQueryStatus.ALL) {
+      query.andWhere('report.status = :status', { status });
+    }
+
+    // Phân trang
+    const [results, total] = await query
+      .take(limit) // Giới hạn số bản ghi trên mỗi trang
+      .skip((page - 1) * limit) // Bắt đầu từ vị trí dựa trên trang
+      .getManyAndCount(); // Lấy dữ liệu và tổng số bản ghi
+    const totalPages = Math.ceil(total / limit);
+    return {
+      reports: results,
+      totalPages,
+      page,
+      limit,
+    };
   }
 
   async createReport(

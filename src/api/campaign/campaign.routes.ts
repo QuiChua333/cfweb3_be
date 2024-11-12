@@ -13,6 +13,13 @@ const CampaignRoute = {
     jwtSecure: false,
   },
 
+  getCampaignsExplore: <IRouteParams>{
+    path: '/explore',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   getCampaignById: <IRouteParams>{
     path: '/:id',
     method: RequestMethod.GET,
@@ -84,6 +91,7 @@ const CampaignRoute = {
     path: '/populate',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
+    jwtSecure: false,
   },
 
   CKEUpload: <IRouteParams>{
@@ -91,6 +99,21 @@ const CampaignRoute = {
     method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: true,
+  },
+
+  adminChangeStatus: <IRouteParams>{
+    path: '/admin-change-status/:campaignId',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+    roles: [Role.Admin],
+  },
+
+  getQuantitySuccessCampaignByCampaignId: <IRouteParams>{
+    path: '/quantity-success/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
   },
 };
 

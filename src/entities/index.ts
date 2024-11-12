@@ -1,7 +1,6 @@
 export * from './campaign.entity';
 export * from './comment-like.entity';
 export * from './comment.entity';
-export * from './contribution-detail.entity';
 export * from './contribution.entity';
 export * from './detail-perk.entity';
 export * from './faq.entity';

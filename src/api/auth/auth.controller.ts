@@ -11,6 +11,7 @@ import {
 } from '@/api/auth/dto';
 import { ITokenPayload } from './auth.interface';
 import { envs } from '@/config';
+import { Request } from 'express';
 
 @Controller(AuthRoute.root)
 export class AuthController {

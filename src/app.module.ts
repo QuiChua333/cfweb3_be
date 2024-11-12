@@ -24,6 +24,7 @@ import { FieldGroupModule } from './api/field-group/field-group.module';
 import { FollowCampaignModule } from './api/follow-campaign/follow-campaign.module';
 import { CloudinaryModule } from './services/cloudinary/cloudinary.module';
 import { GiftModule } from './api/gift/gift.module';
+import { AdminModule } from './api/admin/admin.module';
 
 @Module({
   imports: [
@@ -51,6 +52,7 @@ import { GiftModule } from './api/gift/gift.module';
     FollowCampaignModule,
     CloudinaryModule,
     GiftModule,
+    AdminModule,
   ],
   controllers: [AppController],
   providers: [],

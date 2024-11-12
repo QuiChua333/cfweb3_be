@@ -18,6 +18,7 @@ import { Role } from '@/constants';
 import { ITokenPayload } from '@/api/auth/auth.interface';
 import { envs } from '@/config';
 import { EmailService } from '@/services/email/email.service';
+import { Request } from 'express';
 
 @Injectable()
 export class AuthService {
@@ -43,7 +44,8 @@ export class AuthService {
       role: Role.User,
     };
 
-    return this.sendEmailConfirm(payload);
+    this.sendEmailConfirm(payload);
+    return true;
   }
 
   async login(loginDtoo: LoginDto) {
@@ -53,12 +55,15 @@ export class AuthService {
       throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
     }
 
+    if (!user.password) throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
     const isMatchedPassword = await argon2.verify(user.password, loginDtoo.password);
 
     if (!isMatchedPassword) {
       throw new BadRequestException('Sai tài khoản hoặc mật khẩu');
     }
-
+    if (!user.isVerifiedEmail) {
+      throw new BadRequestException('Vui lòng xác minh địa chỉ email');
+    }
     const tokens = await this.getTokens({
       id: user.id,
       email: loginDtoo.email,
@@ -186,12 +191,20 @@ export class AuthService {
   }
 
   async sendEmailConfirm(payload: ITokenPayload) {
-    const verifyEmailToken = await this.getTokenLink(payload);
+    // const verifyEmailToken = await this.getTokenLink(payload);
+
+    const verifyEmailToken = await this.jwtService.signAsync(payload, {
+      secret: envs.jwt.linkSecret,
+      expiresIn: '365d',
+    });
+
     return this.emailService.sendVerifyEmailLink({ email: payload.email, verifyEmailToken });
   }
 
   async confirmEmail(token: string) {
+    console.log(token);
     const payload = await this.verifyTokenLink(token);
+
     const user = await this.userService.findOneById(payload.id);
 
     if (!user) throw new BadRequestException('Invalid verify email token');

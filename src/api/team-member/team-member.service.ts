@@ -40,6 +40,7 @@ export class TeamMemberService {
     });
     const newMembers = members.map((member) => {
       return {
+        userId: member.user?.id || '',
         email: member.email,
         name: member.user?.fullName || '',
         avatar: member.user?.avatar || '',
@@ -50,6 +51,7 @@ export class TeamMemberService {
       };
     });
     const owner = {
+      userId: campaign.owner?.id || '',
       email: campaign.owner.email,
       name: campaign.owner.fullName,
       avatar: campaign.owner.avatar,

@@ -39,6 +39,14 @@ const UserRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  changeStatus: <IRouteParams>{
+    path: '/change-status/:userId',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+    roles: [Role.Admin],
+  },
 };
 
 export default UserRoute;

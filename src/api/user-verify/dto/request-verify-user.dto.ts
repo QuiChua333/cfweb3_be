@@ -11,7 +11,7 @@ export class RequestVerifyUserDto {
 
   @IsString()
   @IsNotEmpty()
-  bod: Date;
+  bod: string;
 
   @IsString()
   @IsNotEmpty()

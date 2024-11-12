@@ -1,9 +1,9 @@
 import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
-import { Item } from './item.entity';
 import { Campaign } from './campaign.entity';
 import { User } from './user.entity';
 import { ReportResponse } from './report-response.entity';
+import { ReportStatus } from '@/constants';
 
 @Entity()
 export class Report extends BaseEntity {
@@ -18,6 +18,13 @@ export class Report extends BaseEntity {
 
   @Column()
   images: string;
+
+  @Column({
+    type: 'enum',
+    enum: ReportStatus,
+    default: ReportStatus.NO_RESPONSE,
+  })
+  status: ReportStatus;
 
   @ManyToOne(() => Campaign, (campaign) => campaign.reports)
   campaign: Campaign;

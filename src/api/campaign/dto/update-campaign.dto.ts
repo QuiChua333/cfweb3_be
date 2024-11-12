@@ -60,6 +60,7 @@ export class UpdateCampaignDto {
   story?: string;
 
   @IsNumber()
+  @Type(() => Number)
   @IsOptional()
   goal?: number;
 
@@ -69,4 +70,16 @@ export class UpdateCampaignDto {
 
   @IsOptional()
   faqs?: string;
+
+  @IsString()
+  @IsOptional()
+  bankName?: string;
+
+  @IsString()
+  @IsOptional()
+  bankAccountNumber?: string;
+
+  @IsString()
+  @IsOptional()
+  bankUsername?: string;
 }

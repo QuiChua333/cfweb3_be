@@ -38,7 +38,7 @@ const invitationTeamTemplate = ({
     >
       <tr>
         <td style="background-color: #ffffff; padding: 30px">
-          <img src="https://i.ibb.co/CPZBhtp/GForm-logo.png" class="img" />
+          <img src="https://res.cloudinary.com/dlotmnagu/image/upload/v1731468220/logo-email_ppjv2y.png" class="img" />
           <h2>Tham gia chiến dịch: ${campaignTitle}</h2>
          
           <p>Nhấn vào nút bên dưới để tham gia vào chiến dịch của ${ownerName}</p>
@@ -48,7 +48,7 @@ const invitationTeamTemplate = ({
               style="
                 cursor: pointer;
                 display: inline-block;
-                background-color: #fcc934;
+                background-color: #34CA96;
                 color: white;
                 padding: 10px 20px;
                 text-decoration: none;

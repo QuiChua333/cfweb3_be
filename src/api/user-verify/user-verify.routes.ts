@@ -27,6 +27,21 @@ const UserVerifyRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  updateVerifyUser: <IRouteParams>{
+    path: '/',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  adminVerify: <IRouteParams>{
+    path: '/admin-verify/:userId',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+    roles: [Role.Admin],
+  },
 };
 
 export default UserVerifyRoute;

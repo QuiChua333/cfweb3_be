@@ -27,7 +27,7 @@ export const resetPasswordTemplate = (url: string) => {
         >
           <tr>
             <td style="background-color: #ffffff; padding: 30px">
-              <img src="https://i.ibb.co/CPZBhtp/GForm-logo.png" class="img" />
+              <img src="https://res.cloudinary.com/dlotmnagu/image/upload/v1731468220/logo-email_ppjv2y.png" class="img" />
               <h2>Thay đổi mật khẩu</h2>
               <p>Nhấn vào nút bên dưới để đến trang thay đổi mật khẩu</p>
               <p style="text-align: center; margin-top: 30px">
@@ -36,7 +36,7 @@ export const resetPasswordTemplate = (url: string) => {
                   style="
                     cursor: pointer;
                     display: inline-block;
-                    background-color: #fcc934;
+                    background-color: #34CA96;
                     color: white;
                     padding: 10px 20px;
                     text-decoration: none;

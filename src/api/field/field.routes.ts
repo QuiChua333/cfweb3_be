@@ -18,6 +18,7 @@ const FieldRoute = {
     path: '/group-by-category',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
+    jwtSecure: false,
   },
 };
 

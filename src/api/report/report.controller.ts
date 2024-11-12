@@ -8,11 +8,12 @@ import {
   Delete,
   UseInterceptors,
   UploadedFiles,
+  Query,
 } from '@nestjs/common';
 import { ReportService } from './report.service';
 import { InjectRoute, User } from '@/decorators';
 import ReportRoute from './report.routes';
-import { CreateReportDto } from './dto';
+import { CreateReportDto, ReportPaginationDto } from './dto';
 import { FilesInterceptor } from '@nestjs/platform-express';
 import { ITokenPayload } from '../auth/auth.interface';
 
@@ -21,8 +22,8 @@ export class ReportController {
   constructor(private readonly reportService: ReportService) {}
 
   @InjectRoute(ReportRoute.findAll)
-  findAll() {
-    return this.reportService.findAll();
+  findAll(@Query() reportPaginationDto: ReportPaginationDto) {
+    return this.reportService.findAll(reportPaginationDto);
   }
 
   @InjectRoute(ReportRoute.createReport)

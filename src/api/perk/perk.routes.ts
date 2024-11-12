@@ -18,6 +18,7 @@ const PerkRoute = {
     path: '/campaign/:id',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
+    jwtSecure: false,
   },
 
   getPerk: <IRouteParams>{
@@ -51,6 +52,7 @@ const PerkRoute = {
     path: '/contain-items/campaign/:campaignId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
+    jwtSecure: false,
   },
 };
 
