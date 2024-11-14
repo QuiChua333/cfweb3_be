@@ -10,6 +10,7 @@ const TeamMemberRoute = {
     path: '/campaign/:id',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
+    jwtSecure: false,
   },
 
   invitateMember: <IRouteParams>{

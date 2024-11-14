@@ -83,6 +83,7 @@ export class CampaignService {
       .select([
         'campaign.id',
         'campaign.title',
+        'campaign.cardImage',
         'campaign.tagline',
         'campaign.status',
         'campaign.publishedAt',
@@ -335,10 +336,70 @@ export class CampaignService {
     return count;
   }
 
-  async getPopulateCampaigns() {
-    const campaigns = await this.repository.campaign.find({
-      take: 20,
-    });
+  async getPopularCampaigns() {
+    const campaigns = await this.repository.campaign
+      .createQueryBuilder('campaign')
+      .leftJoinAndSelect('campaign.contributions', 'contribution')
+      .leftJoinAndSelect('campaign.field', 'field')
+      .leftJoinAndSelect('field.fieldGroup', 'fieldGroup')
+      .where('campaign.status = :status', { status: CampaignStatus.FUNDING })
+      .andWhere('campaign.deletedAt IS NULL')
+      .groupBy('campaign.id')
+      .addGroupBy('campaign.title')
+      .addGroupBy('campaign.cardImage')
+      .addGroupBy('campaign.tagline')
+      .addGroupBy('campaign.status')
+      .addGroupBy('campaign.publishedAt')
+      .addGroupBy('campaign.goal')
+      .addGroupBy('campaign.duration')
+      .addGroupBy('field.name')
+      .addGroupBy('field.id')
+      .addGroupBy('fieldGroup.name')
+      .addGroupBy('fieldGroup.id')
+      .limit(10)
+      .select([
+        'campaign.id',
+        'campaign.title',
+        'campaign.tagline',
+        'campaign.cardImage',
+        'campaign.status',
+        'campaign.publishedAt',
+        'campaign.goal',
+        'campaign.duration',
+        'field.name',
+        'fieldGroup.name',
+        'COUNT(contribution.id) AS contributionCount',
+      ])
+      .getMany();
+
+    for (let i = 0; i < campaigns.length; i++) {
+      const campaign = campaigns[i];
+      const total = await this.repository.contribution
+        .createQueryBuilder('contribution')
+        .select('SUM(contribution.amount)', 'totalAmount')
+        .where('contribution.campaignId = :campaignId', { campaignId: campaign.id })
+        .andWhere('contribution.status = :status', {
+          status: PaymentStatus.SUCCESS,
+        })
+        .getRawOne();
+      campaign['currentMoney'] = total ? Number(total.totalAmount) : 0;
+
+      const endDate = new Date(campaign.publishedAt);
+      endDate.setDate(endDate.getDate() + campaign.duration); // Cộng duration vào publishedAt
+
+      // Tính thời gian còn lại (milliseconds)
+      const currentTime = new Date();
+      const remainingHours = Math.ceil(
+        (endDate.getTime() - currentTime.getTime()) / (1000 * 60 * 60),
+      );
+      let daysLeft = '';
+      if (remainingHours > 24) daysLeft = Math.ceil(remainingHours / 24) + ' ngày';
+      else if (remainingHours > 0) {
+        daysLeft = Math.ceil(remainingHours) + ' giờ';
+      } else daysLeft = 'Hết hạn';
+      campaign['daysLeft'] = daysLeft;
+      campaign['percentProgress'] = (campaign['currentMoney'] / campaign.goal) * 100;
+    }
     return campaigns;
   }
 

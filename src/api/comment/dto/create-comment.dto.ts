@@ -10,6 +10,10 @@ export class CreateCommentDto {
   replyId?: string;
 
   @IsString()
+  @IsOptional()
+  tagId?: string;
+
+  @IsString()
   @IsNotEmpty()
   campaignId: string;
 }

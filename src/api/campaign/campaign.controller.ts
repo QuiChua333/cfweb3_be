@@ -85,9 +85,9 @@ export class CampaignController {
     return this.campaignService.getQuantityCampaignsOfOwner(campaignId);
   }
 
-  @InjectRoute(CampaignRoute.getPopulateCampaigns)
-  getPopulateCampaigns() {
-    return this.campaignService.getPopulateCampaigns();
+  @InjectRoute(CampaignRoute.getPopularCampaigns)
+  getPopularCampaigns() {
+    return this.campaignService.getPopularCampaigns();
   }
 
   @InjectRoute(CampaignRoute.CKEUpload)

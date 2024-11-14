@@ -8,6 +8,7 @@ import { FollowCampaign } from './follow-campaign.entity';
 import { Contribution } from './contribution.entity';
 import { Report } from './report.entity';
 import { Gift } from './gift.entity';
+import { Comment } from './comment.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -85,6 +86,16 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Contribution, (contribution) => contribution.user)
   contributions: Contribution[];
+
+  @OneToMany(() => Comment, (comment) => comment.author, {
+    cascade: true,
+  })
+  authoredComments: Comment[];
+
+  @OneToMany(() => Comment, (comment) => comment.tag, {
+    cascade: true,
+  })
+  taggedComments: Comment[];
 
   @OneToMany(() => Report, (report) => report.reportBy)
   reports: Report[];

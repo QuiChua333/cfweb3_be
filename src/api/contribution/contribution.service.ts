@@ -2,7 +2,15 @@ import { Injectable } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
 import { ITokenPayload } from '../auth/auth.interface';
 import { CampaignService } from '../campaign/campaign.service';
-import { PaymentDto, PerkPaymentDto, UpdateContributionDto } from './dto';
+import {
+  ContributionFinishQueryStatus,
+  ContributionPaginationDto,
+  ContributionSortContributionDateQueryStatus,
+  ContributionSortMoneyQueryStatus,
+  PaymentDto,
+  PerkPaymentDto,
+  UpdateContributionDto,
+} from './dto';
 import Stripe from 'stripe';
 import { envs } from '@/config';
 import { PaymentMethod, PaymentStatus } from '@/constants';
@@ -19,8 +27,86 @@ export class ContributionService {
   ) {}
   private readonly stripe = new Stripe(envs.stripe.apiKeySecret);
 
-  findAll() {
-    return `This action returns all contribution`;
+  async getAllContributionsByCampaign(contributionPaginationDto: ContributionPaginationDto) {
+    const {
+      page = 1,
+      limit = 10,
+      searchString,
+      sortContributionDate,
+      sortMoney,
+      status,
+      campaignId,
+    } = contributionPaginationDto;
+    const query = this.repository.contribution
+      .createQueryBuilder('contribution')
+      .leftJoinAndSelect('contribution.campaign', 'campaign')
+      .leftJoinAndSelect('contribution.user', 'user')
+      .where('campaign.id = :campaignId', { campaignId });
+
+    if (searchString && searchString.trim() !== '') {
+      if ('khách vãng lai'.includes(searchString.trim().toLowerCase())) {
+        query.andWhere("user.fullName IS NULL OR user.fullName = ''");
+      } else {
+        // Tìm kiếm theo email hoặc fullName
+        query.andWhere(
+          '(contribution.email ILIKE :searchString OR user.fullName ILIKE :searchString)',
+          { searchString: `%${searchString}%` },
+        );
+      }
+    }
+
+    // Sorting (based on different fields if provided)
+    if (
+      sortContributionDate &&
+      sortContributionDate !== ContributionSortContributionDateQueryStatus.ALL
+    ) {
+      query.addOrderBy(
+        'contribution.date',
+        sortContributionDate === ContributionSortContributionDateQueryStatus.Nearest
+          ? 'DESC'
+          : 'ASC',
+      );
+    }
+
+    if (sortMoney && sortMoney !== ContributionSortMoneyQueryStatus.ALL) {
+      query.addOrderBy(
+        'contribution.amount',
+        sortMoney === ContributionSortMoneyQueryStatus.ASC ? 'ASC' : 'DESC',
+      );
+    }
+
+    // Filter by status if provided
+    if (status && status !== ContributionFinishQueryStatus.ALL) {
+      query.andWhere('contribution.isFinish = :status', {
+        status: status === ContributionFinishQueryStatus.FINISH,
+      });
+    }
+
+    query.skip((page - 1) * limit).take(limit);
+
+    const [contributions, total] = await query.getManyAndCount();
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      contributions: contributions.map((contribution) => ({
+        id: contribution.id,
+        email: contribution.email,
+        fullName: contribution.user?.fullName || null,
+        isFinish: contribution.isFinish,
+        amount: contribution.amount,
+        totalPayment: contribution.totalPayment,
+        date: contribution.date,
+        bankName: contribution.bankName,
+        bankAccountNumber: contribution.bankAccountNumber,
+        bankUsername: contribution.bankUsername,
+        perks: JSON.parse(contribution.perks as string),
+        shippingInfo: JSON.parse(contribution.shippingInfo as string),
+        estDeliveryDate: JSON.parse(contribution.shippingInfo as string).estDeliveryDate,
+      })),
+      totalPages,
+      page,
+      limit,
+    };
   }
 
   async getTopContributionsByCampaign(currenUser: ITokenPayload, campaignId: string) {

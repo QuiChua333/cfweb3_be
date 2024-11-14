@@ -1,18 +1,18 @@
-import { Body, Controller, Param, Req, Res } from '@nestjs/common';
+import { Body, Controller, Param, Query, Req, Res } from '@nestjs/common';
 import { ContributionService } from './contribution.service';
 import ContributionRoute from './contribution.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
-import { PaymentDto, UpdateContributionDto } from './dto';
+import { ContributionPaginationDto, PaymentDto, UpdateContributionDto } from './dto';
 import { Request } from 'express';
 
 @Controller(ContributionRoute.root)
 export class ContributionController {
   constructor(private readonly contributionService: ContributionService) {}
 
-  @InjectRoute(ContributionRoute.findAll)
-  findAll() {
-    return this.contributionService.findAll();
+  @InjectRoute(ContributionRoute.getAllContributionsByCampaign)
+  getAllContributionsByCampaign(@Query() contributionPaginationDto: ContributionPaginationDto) {
+    return this.contributionService.getAllContributionsByCampaign(contributionPaginationDto);
   }
 
   @InjectRoute(ContributionRoute.getTopContributionsByCampaign)

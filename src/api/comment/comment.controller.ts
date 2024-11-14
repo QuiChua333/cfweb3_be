@@ -10,7 +10,7 @@ export class CommentController {
   constructor(private readonly commentService: CommentService) {}
 
   @InjectRoute(CommentRoute.createComment)
-  createComment(@User() user: ITokenPayload, createCommentDto: CreateCommentDto) {
+  createComment(@User() user: ITokenPayload, @Body() createCommentDto: CreateCommentDto) {
     return this.commentService.createComment(user, createCommentDto);
   }
 
@@ -26,5 +26,10 @@ export class CommentController {
     @Body() updateCommentDto: UpdateCommentDto,
   ) {
     return this.commentService.updateComment(user, commentId, updateCommentDto);
+  }
+
+  @InjectRoute(CommentRoute.getCommentsByCampaignId)
+  getCommentsByCampaignId(@Param('campaignId') campaignId: string) {
+    return this.commentService.getCommentsByCampaignId(campaignId);
   }
 }

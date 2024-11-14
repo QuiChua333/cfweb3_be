@@ -1,13 +1,12 @@
 import { HttpStatus, RequestMethod } from '@nestjs/common';
 
 import type { IRouteParams } from '@/decorators';
-import { Role } from '@/constants';
 
 const ContributionRoute = {
   root: 'contribution',
 
-  findAll: <IRouteParams>{
-    path: '/',
+  getAllContributionsByCampaign: <IRouteParams>{
+    path: '/campaign/:campaignId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: false,

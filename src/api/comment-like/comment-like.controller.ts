@@ -10,7 +10,7 @@ export class CommentLikeController {
   constructor(private readonly commentLikeService: CommentLikeService) {}
 
   @InjectRoute(CommentLikeRoute.likeComment)
-  likeComment(@User() user: ITokenPayload, createCommenLikeDto: CreateCommentLikeDto) {
+  likeComment(@User() user: ITokenPayload, @Body() createCommenLikeDto: CreateCommentLikeDto) {
     return this.commentLikeService.likeComment(user, createCommenLikeDto);
   }
 }

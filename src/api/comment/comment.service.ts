@@ -21,12 +21,12 @@ export class CommentService {
   }
 
   async createComment(user: ITokenPayload, createCommentDto: CreateCommentDto) {
-    const { content, campaignId, replyId } = createCommentDto;
+    const { content, campaignId, replyId, tagId } = createCommentDto;
     if (replyId) {
       const replyComment = await this.repository.comment.findOneBy({ id: replyId });
       if (!replyComment) throw new NotFoundException('Reply comment không tồn tại');
     }
-    return await this.repository.comment.save({
+    const newComment = await this.repository.comment.save({
       content,
       author: {
         id: user.id,
@@ -34,10 +34,48 @@ export class CommentService {
       reply: {
         id: replyId,
       },
+      tag: {
+        id: tagId,
+      },
       campaign: {
         id: campaignId,
       },
     });
+
+    const response = await this.repository.comment.findOne({
+      where: {
+        id: newComment.id,
+      },
+      relations: {
+        author: true,
+        tag: true,
+        replies: true,
+        reply: true,
+        commentLikes: {
+          user: true,
+        },
+      },
+      select: {
+        reply: {
+          id: true,
+        },
+        author: {
+          id: true,
+          avatar: true,
+          fullName: true,
+        },
+        tag: {
+          id: true,
+          avatar: true,
+          fullName: true,
+        },
+        replies: true,
+      },
+    });
+    return {
+      ...response,
+      commentLikes: response.commentLikes.map((item) => item.user.id),
+    };
   }
 
   async deleteComment(user: ITokenPayload, commentId: string) {
@@ -49,5 +87,45 @@ export class CommentService {
     const comment = await this.checkAuthorComment(user, commentId);
     comment.content = updateCommentDto.content;
     return await this.repository.comment.save(comment);
+  }
+
+  async getCommentsByCampaignId(campaignId: string) {
+    const comments = await this.repository.comment.find({
+      where: {
+        campaign: {
+          id: campaignId,
+        },
+      },
+      relations: {
+        author: true,
+        tag: true,
+        replies: true,
+        reply: true,
+        commentLikes: {
+          user: true,
+        },
+      },
+      select: {
+        reply: {
+          id: true,
+        },
+        author: {
+          id: true,
+          avatar: true,
+          fullName: true,
+        },
+        tag: {
+          id: true,
+          avatar: true,
+          fullName: true,
+        },
+        replies: true,
+      },
+    });
+
+    return comments.map((comment) => ({
+      ...comment,
+      commentLikes: comment.commentLikes.map((item) => item.user.id),
+    }));
   }
 }

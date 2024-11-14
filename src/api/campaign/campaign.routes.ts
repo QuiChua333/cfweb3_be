@@ -20,8 +20,15 @@ const CampaignRoute = {
     jwtSecure: false,
   },
 
+  getPopularCampaigns: <IRouteParams>{
+    path: '/popularity',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   getCampaignById: <IRouteParams>{
-    path: '/:id',
+    path: '/id/:id',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: false,
@@ -85,13 +92,6 @@ const CampaignRoute = {
     path: '/quantity/user/:campaignId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
-  },
-
-  getPopulateCampaigns: <IRouteParams>{
-    path: '/populate',
-    method: RequestMethod.GET,
-    code: HttpStatus.OK,
-    jwtSecure: false,
   },
 
   CKEUpload: <IRouteParams>{

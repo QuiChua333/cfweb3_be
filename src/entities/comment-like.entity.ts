@@ -8,6 +8,8 @@ export class CommentLike extends BaseEntity {
   @ManyToOne(() => User)
   user: User;
 
-  @ManyToOne(() => Comment, (comment) => comment.commentLikes)
+  @ManyToOne(() => Comment, (comment) => comment.commentLikes, {
+    onDelete: 'CASCADE',
+  })
   comment: Comment;
 }

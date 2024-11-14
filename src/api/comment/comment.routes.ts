@@ -33,6 +33,13 @@ const CommentRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  getCommentsByCampaignId: <IRouteParams>{
+    path: '/campaign/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
 };
 
 export default CommentRoute;
