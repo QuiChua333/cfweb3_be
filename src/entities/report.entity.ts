@@ -32,6 +32,8 @@ export class Report extends BaseEntity {
   @ManyToOne(() => User, (user) => user.reports)
   reportBy: User;
 
-  @OneToOne(() => ReportResponse, (reportResponse) => reportResponse.report)
+  @OneToOne(() => ReportResponse, (reportResponse) => reportResponse.report, {
+    cascade: true,
+  })
   reportResponse: ReportResponse;
 }

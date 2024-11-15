@@ -7,6 +7,8 @@ import {
   ContributionPaginationDto,
   ContributionSortContributionDateQueryStatus,
   ContributionSortMoneyQueryStatus,
+  ContributionUserFinishQueryStatus,
+  ContributionUserPaginationDto,
   PaymentDto,
   PerkPaymentDto,
   UpdateContributionDto,
@@ -108,18 +110,66 @@ export class ContributionService {
       limit,
     };
   }
+  async getAllContributesOfUser(
+    currentUser: ITokenPayload,
+    contributionUserPaginatioDto: ContributionUserPaginationDto,
+  ) {
+    const { page = 1, limit = 10, searchString, status } = contributionUserPaginatioDto;
 
+    const query = this.repository.contribution
+      .createQueryBuilder('contribution')
+      .leftJoinAndSelect('contribution.campaign', 'campaign')
+      .leftJoinAndSelect('contribution.user', 'user')
+      .where('user.id = :userId', { userId: currentUser.id });
+
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere('(campaign.title ILIKE :searchString)', { searchString: `%${searchString}%` });
+    }
+
+    if (status && status !== ContributionUserFinishQueryStatus.ALL) {
+      query.andWhere('contribution.isFinish = :status', {
+        status: status === ContributionUserFinishQueryStatus.FINISH,
+      });
+    }
+
+    const [contributions, total] = await query.getManyAndCount();
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      contributions: contributions.map((contribution) => ({
+        id: contribution.id,
+        email: contribution.email,
+        fullName: contribution.user?.fullName || null,
+        isFinish: contribution.isFinish,
+        amount: contribution.amount,
+        totalPayment: contribution.totalPayment,
+        date: contribution.date,
+        bankName: contribution.bankName,
+        bankAccountNumber: contribution.bankAccountNumber,
+        bankUsername: contribution.bankUsername,
+        campaignTitle: contribution.campaign.title,
+        campaignId: contribution.campaign.id,
+        perks: JSON.parse(contribution.perks as string),
+        shippingInfo: JSON.parse(contribution.shippingInfo as string),
+        estDeliveryDate: JSON.parse(contribution.shippingInfo as string).estDeliveryDate,
+      })),
+      totalPages,
+      page,
+      limit,
+    };
+  }
   async getTopContributionsByCampaign(currenUser: ITokenPayload, campaignId: string) {
     const campaign = await this.campaignService.checkOwner(campaignId, currenUser);
 
-    return this.repository.contribution
+    const res = await this.repository.contribution
       .createQueryBuilder('contribution')
       .leftJoinAndSelect('contribution.user', 'user')
       .select([
         'contribution.email as email', // Chọn email từ contribution để nhóm
         'user.fullName as fullName',
         'user.avatar as avatar',
-        'user.phoneNumber as phoneNumber',
+        'user.phoneNumber as phonenumber',
+        'user.id as userid',
       ])
       .addSelect('SUM(contribution.amount)', 'totalAmount')
       .addSelect('COUNT(contribution.id)', 'contributionCount')
@@ -129,9 +179,20 @@ export class ContributionService {
       .addGroupBy('user.fullName')
       .addGroupBy('user.avatar')
       .addGroupBy('user.phoneNumber')
+      .addGroupBy('user.id')
       .orderBy('"totalAmount"', 'DESC')
       .limit(10)
       .getRawMany();
+
+    return res.map((item) => ({
+      totalAmount: item.totalAmount,
+      contributionCount: item.contributionCount,
+      email: item.email,
+      phoneNumber: item.phonenumber,
+      avatar: item.avatar,
+      fullName: item.fullname,
+      userId: item.userid,
+    }));
   }
 
   async getTotalMoneyByCampaign(campaignId: string) {
@@ -164,12 +225,13 @@ export class ContributionService {
     return await this.repository.contribution.save(contribution);
   }
 
-  async getQuantityContributionOfUser(currenUser: ITokenPayload) {
+  async getQuantityContributionOfUser(userId: string) {
     const [_, count] = await this.repository.contribution.findAndCount({
       where: {
         user: {
-          id: currenUser.id,
+          id: userId,
         },
+        status: PaymentStatus.SUCCESS,
       },
     });
     return count;

@@ -1,17 +1,24 @@
-import { IsNumber, IsObject, IsString } from 'class-validator';
+import { PerkPaymentDto, ShippingInfoDto } from '@/api/contribution/dto';
+import { IsArray, IsNumber, IsObject, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 export class CreateGiftDto {
+  @IsString()
+  email: string;
+
   @IsString()
   campaignId: string;
 
   @IsString()
-  userId: string;
+  @IsOptional()
+  userId?: string;
 
-  @IsObject()
-  perks: Object;
+  @ValidateNested({
+    each: true,
+  })
+  @IsArray()
+  perks: PerkPaymentDto[];
 
-  @IsObject()
-  shippingInfo: Object;
+  shippingInfo?: ShippingInfoDto;
 
   @IsNumber()
   money: number;

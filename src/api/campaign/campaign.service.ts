@@ -204,6 +204,20 @@ export class CampaignService {
     const number = res[1];
     return number;
   }
+
+  async getQuantitySuccessCampaignOfUser(userId: string) {
+    const res = await this.repository.campaign.findAndCount({
+      where: {
+        owner: {
+          id: userId,
+        },
+        status: CampaignStatus.COMPLETE,
+      },
+    });
+    const number = res[1];
+    return number;
+  }
+
   async checkOwner(campaignId: string, user: ITokenPayload) {
     const campaign = await this.repository.campaign.findOne({
       where: {
@@ -317,6 +331,31 @@ export class CampaignService {
     });
 
     return campaigns;
+  }
+
+  async getCampaignsOfMember(userId: string) {
+    const memberCampaigns = await this.repository.teamMember.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        campaign: {
+          teamMembers: {
+            user: true,
+          },
+          owner: true,
+        },
+      },
+    });
+
+    return memberCampaigns.map((memberCampaign) => ({
+      ...memberCampaign.campaign,
+      role: memberCampaign.role,
+      isEdit: memberCampaign.isEdit,
+      confirmStatus: memberCampaign.confirmStatus,
+    }));
   }
 
   async getQuantityCampaignsOfOwner(campaignId: string) {

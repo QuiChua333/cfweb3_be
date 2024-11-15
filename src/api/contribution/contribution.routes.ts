@@ -39,7 +39,14 @@ const ContributionRoute = {
   },
 
   getQuantityContributionOfUser: <IRouteParams>{
-    path: '/user/quantity',
+    path: '/user/:userId/quantity',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  getAllContributesOfUser: <IRouteParams>{
+    path: '/current-user',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: true,

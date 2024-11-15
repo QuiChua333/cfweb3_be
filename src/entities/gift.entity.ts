@@ -5,6 +5,9 @@ import { Campaign } from './campaign.entity';
 
 @Entity()
 export class Gift extends BaseEntity {
+  @Column()
+  email: string;
+
   @Column({
     type: 'jsonb',
   })
@@ -16,7 +19,7 @@ export class Gift extends BaseEntity {
   perks: Object;
 
   @Column()
-  money: number;
+  amount: number;
 
   @Column({
     default: false,

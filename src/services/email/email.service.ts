@@ -14,9 +14,10 @@ import inactiveTemplate from './templates/inactive.template';
 import fundingTemplate from './templates/funding.template';
 import terminateTemplate from './templates/terminate.template';
 import refundingTemplate from './templates/refunding.template';
-import { Contribution } from '@/entities';
+import { Contribution, Gift } from '@/entities';
 import contributionSuccessHasPerksTemplate from './templates/contribution-success-has-perks.template';
 import contributionSuccessNoPerksTemplate from './templates/contribution-success-no-perks.template';
+import giftSuccessHasPerksTemplate from './templates/gift-success-has-perks.template';
 
 @Injectable()
 export class EmailService {
@@ -98,6 +99,15 @@ export class EmailService {
     return this.sendMail({
       email: contribution.email,
       subject: 'ĐÓNG GÓP CHIẾN DỊCH THÀNH CÔNG',
+      html,
+    });
+  }
+
+  async sendGiftSuccessHasPerk(gift: Gift) {
+    const html = giftSuccessHasPerksTemplate(gift);
+    return this.sendMail({
+      email: gift.email,
+      subject: 'QUÀ TẶNG TRI ÂN ĐÓNG GÓP CHIẾN DỊCH',
       html,
     });
   }

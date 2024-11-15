@@ -1,4 +1,4 @@
-import { Column, Entity, ManyToOne, OneToOne } from 'typeorm';
+import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
 import { Campaign } from './campaign.entity';
 import { PaymentMethod, PaymentStatus } from '@/constants';

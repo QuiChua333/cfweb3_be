@@ -41,7 +41,7 @@ export class PaymentDto {
   money: number;
 }
 
-class ShippingInfoDto {
+export class ShippingInfoDto {
   @IsString()
   @IsOptional()
   estDeliveryDate?: string;

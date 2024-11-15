@@ -3,7 +3,13 @@ import { ContributionService } from './contribution.service';
 import ContributionRoute from './contribution.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
-import { ContributionPaginationDto, PaymentDto, UpdateContributionDto } from './dto';
+import {
+  ContributionPaginationDto,
+  ContributionUserFinishQueryStatus,
+  ContributionUserPaginationDto,
+  PaymentDto,
+  UpdateContributionDto,
+} from './dto';
 import { Request } from 'express';
 
 @Controller(ContributionRoute.root)
@@ -42,8 +48,19 @@ export class ContributionController {
   }
 
   @InjectRoute(ContributionRoute.getQuantityContributionOfUser)
-  getQuantityContributionOfUser(@User() currenUser: ITokenPayload) {
-    return this.contributionService.getQuantityContributionOfUser(currenUser);
+  getQuantityContributionOfUser(@Param('userId') userId: string) {
+    return this.contributionService.getQuantityContributionOfUser(userId);
+  }
+
+  @InjectRoute(ContributionRoute.getAllContributesOfUser)
+  getAllContributesOfUser(
+    @User() currentUser: ITokenPayload,
+    @Query() contributionUserPaginatioDto: ContributionUserPaginationDto,
+  ) {
+    return this.contributionService.getAllContributesOfUser(
+      currentUser,
+      contributionUserPaginatioDto,
+    );
   }
 
   @InjectRoute(ContributionRoute.paymentStripe)

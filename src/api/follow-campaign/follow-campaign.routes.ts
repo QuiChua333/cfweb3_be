@@ -14,10 +14,10 @@ const FollowCampaignRoute = {
   },
 
   getCampaignsFollowed: <IRouteParams>{
-    path: '/me',
+    path: '/user/:userId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
-    jwtSecure: true,
+    jwtRefresh: false,
   },
 
   follow: <IRouteParams>{

@@ -35,6 +35,6 @@ export enum PaymentStatus {
 }
 
 export enum ReportStatus {
-  NO_RESPONSE = 'CHƯA PHẢN HỒI',
-  RESPONSE = 'ĐÃ PHẢN HỒI',
+  NO_RESPONSE = 'Chưa phản hồi',
+  RESPONSE = 'Đã phản hồi',
 }

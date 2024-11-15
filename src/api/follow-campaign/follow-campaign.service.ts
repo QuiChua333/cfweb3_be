@@ -7,17 +7,20 @@ import { FollowCampaignDto } from './dto';
 export class FollowCampaignService {
   constructor(private readonly repository: RepositoryService) {}
 
-  async getCampaignsFollowed(user: ITokenPayload) {
-    const userId = user.id;
+  async getCampaignsFollowed(userId: string) {
     const followedCampaigns = await this.repository.followCampaign.find({
       where: {
         user: {
           id: userId,
         },
       },
-      relations: ['campaign'],
+      relations: {
+        campaign: {
+          owner: true,
+        },
+      },
     });
-    return followedCampaigns;
+    return followedCampaigns.map((item) => item.campaign);
   }
 
   async follow(user: ITokenPayload, followCampaignDto: FollowCampaignDto) {

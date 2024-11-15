@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { FollowCampaignService } from './follow-campaign.service';
 import FollowCampaignRoute from './follow-campaign.routes';
 import { InjectRoute, User } from '@/decorators';
@@ -10,8 +10,8 @@ export class FollowCampaignController {
   constructor(private readonly followCampaignService: FollowCampaignService) {}
 
   @InjectRoute(FollowCampaignRoute.getCampaignsFollowed)
-  getCampaignsFollowed(@User() user: ITokenPayload) {
-    return this.followCampaignService.getCampaignsFollowed(user);
+  getCampaignsFollowed(@Query('userId') userId: string) {
+    return this.followCampaignService.getCampaignsFollowed(userId);
   }
 
   @InjectRoute(FollowCampaignRoute.follow)

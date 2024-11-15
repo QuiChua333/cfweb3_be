@@ -11,9 +11,11 @@ export class ReportResponse extends BaseEntity {
   date: Date;
 
   @Column()
-  image: string;
+  images: string;
 
-  @OneToOne(() => Report, (report) => report.reportResponse)
+  @OneToOne(() => Report, (report) => report.reportResponse, {
+    onDelete: 'CASCADE',
+  })
   @JoinColumn()
   report: Report;
 }

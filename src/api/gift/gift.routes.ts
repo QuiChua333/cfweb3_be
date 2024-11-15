@@ -6,12 +6,11 @@ import { Role } from '@/constants';
 const GiftRoute = {
   root: 'gift',
 
-  findAll: <IRouteParams>{
-    path: '/',
+  getAllGiftsByCampaign: <IRouteParams>{
+    path: '/campaign/:campaignId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
-    jwtSecure: true,
-    roles: [Role.Admin],
+    jwtSecure: false,
   },
 
   addGift: <IRouteParams>{

@@ -74,22 +74,32 @@ const CampaignRoute = {
     path: '/owner/:userId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  getCampaignsOfMember: <IRouteParams>{
+    path: '/member/:userId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
   },
 
   getQuantityCampaignsOfOwner: <IRouteParams>{
     path: '/quantity/owner/:campaignId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  getQuantityCampaignsOfUser: <IRouteParams>{
+    path: '/quantity/user/:userId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
   },
 
   getCampaignsOfUser: <IRouteParams>{
     path: '/user/:userId',
-    method: RequestMethod.GET,
-    code: HttpStatus.OK,
-  },
-
-  getQuantityCampaignsOfUser: <IRouteParams>{
-    path: '/quantity/user/:campaignId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
   },
@@ -111,6 +121,13 @@ const CampaignRoute = {
 
   getQuantitySuccessCampaignByCampaignId: <IRouteParams>{
     path: '/quantity-success/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  getQuantitySuccessCampaignOfUser: <IRouteParams>{
+    path: '/quantity-success/user/:userId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: false,

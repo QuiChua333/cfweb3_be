@@ -49,6 +49,11 @@ export class CampaignController {
     return this.campaignService.getQuantitySuccessCampaignByCampaignId(campaignId);
   }
 
+  @InjectRoute(CampaignRoute.getQuantitySuccessCampaignOfUser)
+  getQuantitySuccessCampaignOfUser(@Param('userId') userId: string) {
+    return this.campaignService.getQuantitySuccessCampaignOfUser(userId);
+  }
+
   @InjectRoute(CampaignRoute.checkOwner)
   checkOwner(@User() user: ITokenPayload, @Param('id') campaignId: string) {
     return this.campaignService.checkOwner(campaignId, user);
@@ -78,6 +83,11 @@ export class CampaignController {
   @InjectRoute(CampaignRoute.getCampaignsOfOwner)
   getCampaignsOfOwner(@Param('userId') userId: string) {
     return this.campaignService.getCampaignsOfOwner(userId);
+  }
+
+  @InjectRoute(CampaignRoute.getCampaignsOfMember)
+  getCampaignsOfMember(@Param('userId') userId: string) {
+    return this.campaignService.getCampaignsOfMember(userId);
   }
 
   @InjectRoute(CampaignRoute.getQuantityCampaignsOfOwner)
