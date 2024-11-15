@@ -114,13 +114,22 @@ export class ContributionService {
 
     return this.repository.contribution
       .createQueryBuilder('contribution')
-      .select('user.id', 'userId')
-      .addSelect('user.email', 'email')
+      .leftJoinAndSelect('contribution.user', 'user')
+      .select([
+        'contribution.email as email', // Chọn email từ contribution để nhóm
+        'user.fullName as fullName',
+        'user.avatar as avatar',
+        'user.phoneNumber as phoneNumber',
+      ])
       .addSelect('SUM(contribution.amount)', 'totalAmount')
-      .innerJoin('contribution.user', 'user')
+      .addSelect('COUNT(contribution.id)', 'contributionCount')
+
       .where('contribution.campaign.id = :campaignId', { campaignId })
-      .groupBy('user.id')
-      .orderBy('totalAmount', 'DESC')
+      .groupBy('contribution.email')
+      .addGroupBy('user.fullName')
+      .addGroupBy('user.avatar')
+      .addGroupBy('user.phoneNumber')
+      .orderBy('"totalAmount"', 'DESC')
       .limit(10)
       .getRawMany();
   }

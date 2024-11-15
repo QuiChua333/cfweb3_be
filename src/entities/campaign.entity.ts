@@ -84,7 +84,6 @@ export class Campaign extends BaseEntity {
   bankUsername: string;
 
   @Column({
-    type: 'bigint',
     nullable: true,
   })
   goal: number;

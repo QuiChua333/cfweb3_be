@@ -79,7 +79,9 @@ export class CampaignService {
       .leftJoinAndSelect('field.fieldGroup', 'fieldGroup') // Liên kết với FieldGroup
       .leftJoin('campaign.contributions', 'contribution') // Thêm join với bảng contributions
       .addSelect('COALESCE(SUM(contribution.amount), 0)', 'totalAmount') // Tính tổng số tiền đóng góp cho chiến dịch
-
+      .where('campaign.status NOT IN (:...excludedStatuses)', {
+        excludedStatuses: [CampaignStatus.FAILED, CampaignStatus.DRAFT],
+      })
       .select([
         'campaign.id',
         'campaign.title',
@@ -107,11 +109,7 @@ export class CampaignService {
 
     // Lọc theo trạng thái của chiến dịch
     if (status && status !== CampaignExploreQueryStatus.ALL) {
-      query
-        .andWhere('campaign.status = :status', { status })
-        .andWhere('campaign.status NOT IN (:...excludedStatuses)', {
-          excludedStatuses: [CampaignStatus.FAILED, CampaignStatus.DRAFT],
-        });
+      query.andWhere('campaign.status = :status', { status });
     }
 
     // Lọc theo tên lĩnh vực
