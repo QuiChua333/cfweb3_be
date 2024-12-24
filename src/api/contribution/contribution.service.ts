@@ -376,7 +376,9 @@ export class ContributionService {
       userId,
       shippingFee,
     } = paymentDto;
-
+    // foreach perk
+    // transactionHash
+    // nftAddress
     const contributionInstance = this.repository.contribution.create({
       campaign: {
         id: campaignId,

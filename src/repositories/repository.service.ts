@@ -19,6 +19,8 @@ import {
   UserVerify,
 } from '@/entities';
 import { Gift } from '@/entities/gift.entity';
+import { NFTCreateion } from '@/entities/nft-creation.entity';
+import { NFT } from '@/entities/nft.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -45,5 +47,8 @@ export class RepositoryService {
     @InjectRepository(TeamMember) public readonly teamMember: Repository<TeamMember>,
     @InjectRepository(UserVerify) public readonly userVerify: Repository<UserVerify>,
     @InjectRepository(User) public readonly user: Repository<User>,
+
+    @InjectRepository(NFTCreateion) public readonly nftCreation: Repository<NFTCreateion>,
+    @InjectRepository(NFT) public readonly nft: Repository<NFT>,
   ) {}
 }

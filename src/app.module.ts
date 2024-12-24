@@ -25,6 +25,10 @@ import { FollowCampaignModule } from './api/follow-campaign/follow-campaign.modu
 import { CloudinaryModule } from './services/cloudinary/cloudinary.module';
 import { GiftModule } from './api/gift/gift.module';
 import { AdminModule } from './api/admin/admin.module';
+import { NftModule } from './api/nft/nft.module';
+import { Web3Module } from './services/web3/web3.module';
+import { PinataModule } from './services/pinata/pinata.module';
+import { ScheduleModule } from './services/schedule/schedule.module';
 
 @Module({
   imports: [
@@ -53,6 +57,10 @@ import { AdminModule } from './api/admin/admin.module';
     CloudinaryModule,
     GiftModule,
     AdminModule,
+    NftModule,
+    Web3Module,
+    PinataModule,
+    ScheduleModule,
   ],
   controllers: [AppController],
   providers: [],

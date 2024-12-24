@@ -52,6 +52,12 @@ interface EnvVars {
 
   STRIPE_API_KEY_SECRET: string;
   STRIPE_ENDPOINT_SECRET: string;
+
+  WEB3_FACTORY_CONTRACT_ADDRESS: string;
+  WEB3_PRIVATE_KEY: string;
+  WEB3_RPC_URL: string;
+
+  PINATA_JWT: string;
 }
 
 const envSchema = joi
@@ -105,6 +111,12 @@ const envSchema = joi
 
     STRIPE_API_KEY_SECRET: joi.string().required(),
     STRIPE_ENDPOINT_SECRET: joi.string().required(),
+
+    WEB3_FACTORY_CONTRACT_ADDRESS: joi.string().required(),
+    WEB3_PRIVATE_KEY: joi.string().required(),
+    WEB3_RPC_URL: joi.string().required(),
+
+    PINATA_JWT: joi.string().required(),
   })
   .unknown(true);
 
@@ -195,5 +207,16 @@ export const envs = {
 
   momo: {
     hookdeckUrl: envVars.MOMO_HOOKDECK_URL,
+  },
+
+  web3: {
+    network: 'localhost',
+    rpcUrl: envVars.WEB3_RPC_URL,
+    privateKey: envVars.WEB3_PRIVATE_KEY,
+    factoryContractAddress: envVars.WEB3_FACTORY_CONTRACT_ADDRESS,
+  },
+
+  pinata: {
+    jwt: envVars.PINATA_JWT,
   },
 };

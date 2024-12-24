@@ -88,6 +88,16 @@ export class Campaign extends BaseEntity {
   })
   goal: number;
 
+  @Column({
+    default: false,
+  })
+  cryptocurrencyMode: boolean;
+
+  @Column({
+    nullable: true,
+  })
+  walletAddress: string;
+
   @ManyToOne(() => User, (user) => user.userVerify)
   owner: User;
 

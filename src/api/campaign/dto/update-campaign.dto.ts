@@ -1,6 +1,7 @@
 import { Type } from 'class-transformer';
 import {
   IsArray,
+  IsBoolean,
   IsEnum,
   IsNumber,
   IsOptional,
@@ -82,4 +83,12 @@ export class UpdateCampaignDto {
   @IsString()
   @IsOptional()
   bankUsername?: string;
+
+  @IsBoolean()
+  @IsOptional()
+  cryptocurrencyMode?: boolean;
+
+  @IsString()
+  @IsOptional()
+  walletAddress?: string;
 }

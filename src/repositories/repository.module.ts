@@ -22,6 +22,8 @@ import {
 import { Global, Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { RepositoryService } from './repository.service';
+import { NFTCreateion } from '@/entities/nft-creation.entity';
+import { NFT } from '@/entities/nft.entity';
 
 @Global()
 @Module({
@@ -46,6 +48,9 @@ import { RepositoryService } from './repository.service';
       TeamMember,
       UserVerify,
       User,
+
+      NFTCreateion,
+      NFT,
     ]),
   ],
   providers: [RepositoryService],
