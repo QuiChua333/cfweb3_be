@@ -78,6 +78,11 @@ export class ContributionController {
     return this.contributionService.paymentMomo(paymentDto);
   }
 
+  @InjectRoute(ContributionRoute.paymentCrypto)
+  paymentCrypto(@Body() paymentDto: PaymentDto) {
+    return this.contributionService.paymentCrypto(paymentDto);
+  }
+
   @InjectRoute(ContributionRoute.webhookMomo)
   webhookMomo(@Body() momoBody) {
     return this.contributionService.webhookMomo(momoBody);

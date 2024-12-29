@@ -26,25 +26,32 @@ export class Web3Service {
     return number;
   }
 
-  async createNFT(createNFTDto: CreateNFTDto) {
+  async createNFT(createNFTDto: CreateNFTDto, uri: string) {
     const valuePriceInWei = ethers.parseEther(createNFTDto.nftPrice.toString());
     const tx = await this.contract.createNFT(
       createNFTDto.authorAddress,
       createNFTDto.name,
       createNFTDto.symbol,
+      uri,
       valuePriceInWei,
     );
+
     return tx;
   }
 
   async watchContractEvent() {
     this.contract.on(
       'NewNFT',
-      async (nftContractAddress, authorAddress, name, symbol, price, event) => {
+      async (nftContractAddress, authorAddress, name, symbol, price, uri, event) => {
         console.log(`Event NewNFT: updating database...`);
         await this.updateNFTCreation(nftContractAddress, event);
       },
     );
+
+    this.contract.on('MintNFT', async (minter, nftAddress, price, name, symbol, tokenId, event) => {
+      console.log(`Event MintNFT: updating database...`);
+      await this.updateMintNFT(minter, tokenId);
+    });
 
     this.contract.on('SetPrice', async (nftContractAddress, newPrice) => {
       console.log(`Event SetPrice: updating database...`);
@@ -68,14 +75,32 @@ export class Web3Service {
     console.log(`Event NewNFT: updating database successfully...`);
   }
 
-  async updatePriceNFT(nftContractAddress: string, newPrice: number) {
-    const nftCreation = await this.repositoryService.nftCreation.findOne({
+  async updateMintNFT(minter: string, tokenId: number) {
+    const nft = await this.repositoryService.nft.findOne({
       where: {
-        nftContractAddress,
+        tokenId,
       },
     });
-    nftCreation.price = Number(formatEther(newPrice));
-    await this.repositoryService.nftCreation.save(nftCreation);
-    console.log(`Event SetPrice: updating database successfully...`);
+
+    if (!nft) return;
+    if (nft.isMinted) return;
+    nft.isMinted = true;
+    nft.ownerAddress = minter;
+
+    await this.repositoryService.nft.save(nft);
+    console.log(`Event MintNFT: updating database successfully...`);
+  }
+
+  async updatePriceNFT(nftContractAddress: string, newPrice: number) {
+    // const perk = await this.repositoryService.perk.findOne({
+    //   where: {
+    //     nftCreation: {
+    //       nftContractAddress,
+    //     },
+    //   },
+    // });
+    // perk.ethPrice = Number(formatEther(newPrice)) ?? 0;
+    // await this.repositoryService.perk.save(perk);
+    // console.log(`Event SetPrice: updating database successfully...`);
   }
 }

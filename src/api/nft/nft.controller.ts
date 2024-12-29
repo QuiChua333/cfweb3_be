@@ -3,7 +3,7 @@ import { NftService } from './nft.service';
 import NftRoute from './nft.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
-import { CreateNFTDto } from './dto';
+import { CreateNFTDto, MintNFTDto } from './dto';
 
 @Controller(NftRoute.root)
 export class NftController {
@@ -12,5 +12,10 @@ export class NftController {
   @InjectRoute(NftRoute.createNFT)
   createNFT(@User() user: ITokenPayload, @Body() createNFTDto: CreateNFTDto) {
     return this.nftService.createNFT(user, createNFTDto);
+  }
+
+  @InjectRoute(NftRoute.mintNFT)
+  mintNFT(@Body() mintNFTDto: MintNFTDto) {
+    return this.nftService.mintNFT(mintNFTDto);
   }
 }

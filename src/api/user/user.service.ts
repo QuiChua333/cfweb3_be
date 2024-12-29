@@ -158,6 +158,9 @@ export class UserService {
       id: user.id,
       ...updateUserDto,
     });
+
+    const newUser = await this.findOneDetail(currentUser.id);
+    return newUser;
   }
 
   async updateRefreshToken(userId: string, refreshToken: string) {

@@ -60,7 +60,7 @@ import { ScheduleModule } from './services/schedule/schedule.module';
     NftModule,
     Web3Module,
     PinataModule,
-    ScheduleModule,
+    // ScheduleModule,
   ],
   controllers: [AppController],
   providers: [],

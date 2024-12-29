@@ -112,6 +112,12 @@ export const factoryAbi = [
         name: 'price',
         type: 'uint256',
       },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'uri',
+        type: 'string',
+      },
     ],
     name: 'NewNFT',
     type: 'event',
@@ -227,110 +233,12 @@ export const factoryAbi = [
       },
       {
         indexed: false,
-        internalType: 'address',
-        name: 'merchant',
-        type: 'address',
-      },
-      {
-        indexed: false,
         internalType: 'uint256',
         name: 'amount',
         type: 'uint256',
       },
-      {
-        indexed: false,
-        internalType: 'uint8',
-        name: 'tax',
-        type: 'uint8',
-      },
     ],
-    name: 'TransferFunds',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'admin',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'merchant',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'amount',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'orderId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint8',
-        name: 'tax',
-        type: 'uint8',
-      },
-    ],
-    name: 'TransferProfits',
-    type: 'event',
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'from',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address',
-        name: 'admin',
-        type: 'address',
-      },
-      {
-        indexed: false,
-        internalType: 'address[]',
-        name: '_merchants',
-        type: 'address[]',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256[]',
-        name: '_amounts',
-        type: 'uint256[]',
-      },
-      {
-        indexed: false,
-        internalType: 'uint256',
-        name: 'orderId',
-        type: 'uint256',
-      },
-      {
-        indexed: false,
-        internalType: 'uint8',
-        name: 'tax',
-        type: 'uint8',
-      },
-    ],
-    name: 'TransferProfitsMerchantsArray',
+    name: 'TransferFund',
     type: 'event',
   },
   {
@@ -412,6 +320,11 @@ export const factoryAbi = [
       {
         internalType: 'string',
         name: 'symbol',
+        type: 'string',
+      },
+      {
+        internalType: 'string',
+        name: 'uri',
         type: 'string',
       },
       {
@@ -579,29 +492,6 @@ export const factoryAbi = [
   {
     inputs: [
       {
-        internalType: 'address',
-        name: '_nftAddress',
-        type: 'address',
-      },
-      {
-        internalType: 'uint256',
-        name: 'tokenId',
-        type: 'uint256',
-      },
-      {
-        internalType: 'string',
-        name: '_uri',
-        type: 'string',
-      },
-    ],
-    name: 'mintNFT',
-    outputs: [],
-    stateMutability: 'payable',
-    type: 'function',
-  },
-  {
-    inputs: [
-      {
         internalType: 'bytes32',
         name: 'role',
         type: 'bytes32',
@@ -701,6 +591,53 @@ export const factoryAbi = [
       },
     ],
     stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'transferFund',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        components: [
+          {
+            internalType: 'uint256',
+            name: 'quantity',
+            type: 'uint256',
+          },
+          {
+            internalType: 'bool',
+            name: 'isNFT',
+            type: 'bool',
+          },
+          {
+            internalType: 'address',
+            name: 'nftContractAddress',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'priceWhenNotNFT',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256[]',
+            name: 'tokenIds',
+            type: 'uint256[]',
+          },
+        ],
+        internalType: 'struct NFTFactory.PerkPurchase[]',
+        name: 'perks',
+        type: 'tuple[]',
+      },
+    ],
+    name: 'transferPerk',
+    outputs: [],
+    stateMutability: 'payable',
     type: 'function',
   },
 ];

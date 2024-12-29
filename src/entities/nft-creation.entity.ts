@@ -1,6 +1,6 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
-import { NFTCurrency } from '@/constants';
+import { CryptoCurrency } from '@/constants';
 import { Perk } from './perk.entity';
 import { NFT } from './nft.entity';
 
@@ -29,16 +29,14 @@ export class NFTCreateion extends BaseEntity {
   @Column()
   symbol: string;
 
-  @Column({
-    nullable: true,
-  })
-  currency: NFTCurrency;
+  @Column()
+  price: string;
 
   @Column({
-    type: 'float',
-    nullable: true,
+    enum: CryptoCurrency,
+    default: CryptoCurrency.ETH,
   })
-  price: number;
+  currency: CryptoCurrency;
 
   @OneToOne(() => Perk, (perk) => perk.nftCreation, {
     onDelete: 'CASCADE',

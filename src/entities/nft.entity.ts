@@ -1,44 +1,34 @@
 import { Column, Entity, ManyToOne } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
-import { NFTCurrency } from '@/constants';
+import { CryptoCurrency } from '@/constants';
 import { NFTCreateion } from './nft-creation.entity';
+import { User } from './user.entity';
 
 @Entity()
 export class NFT extends BaseEntity {
-  @Column()
-  nftContractAddress: string;
-
-  @Column()
-  transactionHash: string;
-
-  @Column()
+  @Column({
+    nullable: true,
+  })
   ownerAddress: string;
 
-  @Column()
-  tokenId: string;
+  @Column({
+    type: 'bigint',
+  })
+  tokenId: number;
 
   @Column()
   uri: string;
 
   @Column({
-    nullable: true,
+    default: false,
   })
-  currency: NFTCurrency;
-
-  @Column({
-    type: 'float',
-    nullable: true,
-  })
-  price: number;
-
-  @Column({
-    nullable: true,
-    type: 'jsonb',
-  })
-  metadataInfo: Object;
+  isMinted: boolean;
 
   @ManyToOne(() => NFTCreateion, (nftCreation) => nftCreation.nfts)
   nftCreation: NFTCreateion;
+
+  @ManyToOne(() => User, (user) => user.nfts, { nullable: true })
+  user: User;
 }
 
 // metadataInfo = {

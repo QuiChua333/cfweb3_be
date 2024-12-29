@@ -18,4 +18,9 @@ export class FollowCampaignController {
   follow(@User() user: ITokenPayload, @Body() followCampaignDto: FollowCampaignDto) {
     return this.followCampaignService.follow(user, followCampaignDto);
   }
+
+  @InjectRoute(FollowCampaignRoute.getQuantityFollowsOfCampaign)
+  getQuantityFollowsOfCampaign(@Param('campaignId') id: string) {
+    return this.followCampaignService.getQuantityFollowsOfCampaign(id);
+  }
 }

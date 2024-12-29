@@ -13,6 +13,6 @@ export class CreateNFTDto {
   @IsString()
   symbol: string;
 
-  @IsNumber()
-  nftPrice: number;
+  @IsString()
+  nftPrice: string;
 }

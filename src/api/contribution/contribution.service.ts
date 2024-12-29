@@ -97,6 +97,10 @@ export class ContributionService {
         isFinish: contribution.isFinish,
         amount: contribution.amount,
         totalPayment: contribution.totalPayment,
+        method: contribution.method,
+        amountCrypto: contribution.amountCrypto,
+        transactionHash: contribution.transactionHash,
+        customerWalletAddress: contribution.customerWalletAddress,
         date: contribution.date,
         bankName: contribution.bankName,
         bankAccountNumber: contribution.bankAccountNumber,
@@ -114,7 +118,13 @@ export class ContributionService {
     currentUser: ITokenPayload,
     contributionUserPaginatioDto: ContributionUserPaginationDto,
   ) {
-    const { page = 1, limit = 10, searchString, status } = contributionUserPaginatioDto;
+    const {
+      page = 1,
+      limit = 10,
+      searchString,
+      status,
+      sortContributionDate,
+    } = contributionUserPaginatioDto;
 
     const query = this.repository.contribution
       .createQueryBuilder('contribution')
@@ -124,6 +134,19 @@ export class ContributionService {
 
     if (searchString && searchString.trim() !== '') {
       query.andWhere('(campaign.title ILIKE :searchString)', { searchString: `%${searchString}%` });
+    }
+
+    // Sorting (based on different fields if provided)
+    if (
+      sortContributionDate &&
+      sortContributionDate !== ContributionSortContributionDateQueryStatus.ALL
+    ) {
+      query.addOrderBy(
+        'contribution.date',
+        sortContributionDate === ContributionSortContributionDateQueryStatus.Nearest
+          ? 'DESC'
+          : 'ASC',
+      );
     }
 
     if (status && status !== ContributionUserFinishQueryStatus.ALL) {
@@ -144,8 +167,12 @@ export class ContributionService {
         amount: contribution.amount,
         totalPayment: contribution.totalPayment,
         date: contribution.date,
+        method: contribution.method,
+        amountCrypto: contribution.amountCrypto,
         bankName: contribution.bankName,
         bankAccountNumber: contribution.bankAccountNumber,
+        transactionHash: contribution.transactionHash,
+        customerWalletAddress: contribution.customerWalletAddress,
         bankUsername: contribution.bankUsername,
         campaignTitle: contribution.campaign.title,
         campaignId: contribution.campaign.id,
@@ -355,6 +382,12 @@ export class ContributionService {
     return result.data;
   }
 
+  async paymentCrypto(paymentDto: PaymentDto) {
+    const contribution = await this.createNewContribution(paymentDto, PaymentMethod.CRYPTO);
+    this.sendMailContributionSuccess(contribution.id);
+    return contribution.id;
+  }
+
   async webhookMomo(momoBody) {
     const contributionId = momoBody['orderId'];
     await this.updateContributionPaymentSuccess({ contributionId });
@@ -375,6 +408,9 @@ export class ContributionService {
       email,
       userId,
       shippingFee,
+      amountCrypto,
+      customerWalletAddress,
+      transactionHash,
     } = paymentDto;
     // foreach perk
     // transactionHash
@@ -389,11 +425,14 @@ export class ContributionService {
       bankName,
       bankUsername,
       email,
+      amountCrypto,
+      customerWalletAddress,
+      transactionHash,
       isFinish: false,
       method: method,
       shippingInfo: JSON.stringify(shippingInfo),
       perks: JSON.stringify(perks),
-      status: PaymentStatus.PENDING,
+      status: method === PaymentMethod.CRYPTO ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
       ...(userId
         ? {
             user: {
@@ -401,6 +440,7 @@ export class ContributionService {
             },
           }
         : {}),
+      date: new Date(),
     });
 
     const contribution = await this.repository.contribution.save(contributionInstance);

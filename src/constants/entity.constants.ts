@@ -26,7 +26,7 @@ export enum ConfirmMemberStatus {
 export enum PaymentMethod {
   STRIPE = 'stripe',
   MOMO = 'momo',
-  ETH = 'ETH',
+  CRYPTO = 'crypto',
 }
 
 export enum PaymentStatus {
@@ -40,6 +40,6 @@ export enum ReportStatus {
   RESPONSE = 'Đã phản hồi',
 }
 
-export enum NFTCurrency {
+export enum CryptoCurrency {
   ETH = 'ETH',
 }

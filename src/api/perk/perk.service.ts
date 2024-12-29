@@ -282,6 +282,9 @@ export class PerkService {
         },
         shippingFees: true,
       },
+      order: {
+        isFeatured: 'DESC',
+      },
     });
     const claimeds: number[] = [];
     for (let i = 0; i < perks.length; i++) {

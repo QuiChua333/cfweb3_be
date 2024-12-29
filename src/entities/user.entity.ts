@@ -9,6 +9,7 @@ import { Contribution } from './contribution.entity';
 import { Report } from './report.entity';
 import { Gift } from './gift.entity';
 import { Comment } from './comment.entity';
+import { NFT } from './nft.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -72,6 +73,11 @@ export class User extends BaseEntity {
   })
   address: string;
 
+  @Column({
+    nullable: true,
+  })
+  story: string;
+
   @OneToOne(() => UserVerify, (userVerify) => userVerify.user)
   userVerify: UserVerify;
 
@@ -102,4 +108,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => Gift, (gift) => gift.campaign)
   gifts: Gift[];
+
+  @OneToMany(() => NFT, (nft) => nft.user)
+  nfts: NFT[];
 }

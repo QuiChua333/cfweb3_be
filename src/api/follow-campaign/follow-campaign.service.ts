@@ -50,4 +50,16 @@ export class FollowCampaignService {
       });
     }
   }
+
+  async getQuantityFollowsOfCampaign(id: string) {
+    const quantity = await this.repository.followCampaign.count({
+      where: {
+        campaign: {
+          id,
+        },
+      },
+    });
+
+    return quantity;
+  }
 }

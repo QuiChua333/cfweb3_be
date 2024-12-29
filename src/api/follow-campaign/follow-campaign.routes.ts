@@ -17,7 +17,7 @@ const FollowCampaignRoute = {
     path: '/user/:userId',
     method: RequestMethod.GET,
     code: HttpStatus.OK,
-    jwtRefresh: false,
+    jwtSecure: false,
   },
 
   follow: <IRouteParams>{
@@ -25,6 +25,13 @@ const FollowCampaignRoute = {
     method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: true,
+  },
+
+  getQuantityFollowsOfCampaign: <IRouteParams>{
+    path: '/quantity/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
   },
 };
 

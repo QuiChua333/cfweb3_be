@@ -66,6 +66,13 @@ const ContributionRoute = {
     jwtSecure: false,
   },
 
+  paymentCrypto: <IRouteParams>{
+    path: '/payment/crypto',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   webhookStripe: <IRouteParams>{
     path: '/webhook/stripe',
     method: RequestMethod.POST,

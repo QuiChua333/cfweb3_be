@@ -39,6 +39,18 @@ export class PaymentDto {
   @IsNumber()
   @Type(() => Number)
   money: number;
+
+  @IsString()
+  @IsOptional()
+  amountCrypto?: string;
+
+  @IsString()
+  @IsOptional()
+  customerWalletAddress?: string;
+
+  @IsString()
+  @IsOptional()
+  transactionHash?: string;
 }
 
 export class ShippingInfoDto {

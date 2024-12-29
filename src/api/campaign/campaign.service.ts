@@ -37,7 +37,7 @@ export class CampaignService {
 
     // Tìm kiếm không phân biệt hoa thường theo searchString trong title
     if (searchString && searchString.trim() !== '') {
-      query.andWhere('campaign.title ILIKE :searchString', {
+      query.andWhere('campaign.title ILIKE :searchString OR owner.fullName ILIKE :searchString', {
         searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
       });
     }

@@ -7,24 +7,16 @@ const NftRoute = {
   root: 'nft',
 
   createNFT: <IRouteParams>{
-    path: '/',
+    path: '/create',
     method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: true,
   },
 
-  getNumber: <IRouteParams>{
-    path: '/getNumber',
-    method: RequestMethod.GET,
-    code: HttpStatus.OK,
-    jwtSecure: false,
-  },
-
-  setNumber: <IRouteParams>{
-    path: '/setNumber',
+  mintNFT: <IRouteParams>{
+    path: '/mint',
     method: RequestMethod.POST,
     code: HttpStatus.OK,
-    jwtSecure: false,
   },
 };
 

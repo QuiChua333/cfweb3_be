@@ -34,7 +34,7 @@ const UserRoute = {
   },
 
   updateProfile: <IRouteParams>{
-    path: '/:id',
+    path: '/profile',
     method: RequestMethod.PATCH,
     code: HttpStatus.OK,
     jwtSecure: true,

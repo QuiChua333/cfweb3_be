@@ -16,6 +16,11 @@ export class Perk extends BaseEntity {
   price: number;
 
   @Column({
+    nullable: true,
+  })
+  ethPrice: string;
+
+  @Column({
     default: false,
   })
   isFeatured: boolean;

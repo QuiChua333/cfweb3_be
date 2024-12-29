@@ -46,21 +46,19 @@ export class Contribution extends BaseEntity {
   totalPayment: number;
 
   @Column({
-    type: 'float',
     nullable: true,
   })
-  amountCoin: number;
-
-  @Column({
-    type: 'float',
-    nullable: true,
-  })
-  totalPaymentCoin: number;
+  amountCrypto: string;
 
   @Column({
     nullable: true,
   })
-  customerWallet: string;
+  customerWalletAddress: string;
+
+  @Column({
+    nullable: true,
+  })
+  transactionHash: string;
 
   @Column({
     type: 'enum',
