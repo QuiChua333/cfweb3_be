@@ -29,6 +29,9 @@ import { NftModule } from './api/nft/nft.module';
 import { Web3Module } from './services/web3/web3.module';
 import { PinataModule } from './services/pinata/pinata.module';
 import { ScheduleModule } from './services/schedule/schedule.module';
+import { ChatModule } from './api/chat/chat.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { OpenAIModule } from './api/openai/openai.module';
 
 @Module({
   imports: [
@@ -58,9 +61,16 @@ import { ScheduleModule } from './services/schedule/schedule.module';
     GiftModule,
     AdminModule,
     NftModule,
-    Web3Module,
+    // Web3Module,
     PinataModule,
+    ChatModule,
     // ScheduleModule,
+    MulterModule.register({
+      limits: {
+        fileSize: 5 * 1024 * 1024, // Giới hạn kích thước file 5MB
+      },
+    }),
+    OpenAIModule,
   ],
   controllers: [AppController],
   providers: [],

@@ -6,6 +6,13 @@ import { Role } from '@/constants';
 const UserRoute = {
   root: 'user',
 
+  getAll: <IRouteParams>{
+    path: '/getAll',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   findAll: <IRouteParams>{
     path: '/',
     method: RequestMethod.GET,

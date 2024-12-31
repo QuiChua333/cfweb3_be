@@ -10,6 +10,9 @@ import { Report } from './report.entity';
 import { Gift } from './gift.entity';
 import { Comment } from './comment.entity';
 import { NFT } from './nft.entity';
+import { ChatRoom } from './chat-room.entity';
+import { Message } from './message.entity';
+import { UnreadMessage } from './unread-message.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -111,4 +114,19 @@ export class User extends BaseEntity {
 
   @OneToMany(() => NFT, (nft) => nft.user)
   nfts: NFT[];
+
+  // Quan hệ với ChatRoom
+  @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.user1)
+  chatRoomsAsUser1: ChatRoom[];
+
+  @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.user2)
+  chatRoomsAsUser2: ChatRoom[];
+
+  // Quan hệ với Message
+  @OneToMany(() => Message, (message) => message.sender)
+  messages: Message[];
+
+  // Quan hệ với UnreadMessage
+  @OneToMany(() => UnreadMessage, (unreadMessage) => unreadMessage.user)
+  unreadMessages: UnreadMessage[];
 }

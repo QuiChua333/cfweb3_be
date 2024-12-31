@@ -1,7 +1,6 @@
 import { HttpStatus, RequestMethod } from '@nestjs/common';
 
 import type { IRouteParams } from '@/decorators';
-import { Role } from '@/constants';
 
 const CommentRoute = {
   root: 'comment',
@@ -18,6 +17,13 @@ const CommentRoute = {
     method: RequestMethod.POST,
     code: HttpStatus.OK,
     jwtSecure: true,
+  },
+
+  validateComment: <IRouteParams>{
+    path: '/validate',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
   },
 
   deleteComment: <IRouteParams>{

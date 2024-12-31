@@ -6,6 +6,14 @@ import { User } from './user.entity';
 
 @Entity()
 export class Contribution extends BaseEntity {
+  @Column({
+    nullable: true,
+  })
+  proofImage: string;
+  @Column({
+    default: false,
+  })
+  isRefund: boolean;
   @Column()
   email: string;
 

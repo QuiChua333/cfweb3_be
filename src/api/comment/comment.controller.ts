@@ -1,4 +1,5 @@
-import { Body, Controller, Param } from '@nestjs/common';
+import { OpenAIService } from './../openai/openai.service';
+import { Body, Controller, HttpException, HttpStatus, Param } from '@nestjs/common';
 import { CommentService } from './comment.service';
 import CommentRoute from './comment.routes';
 import { InjectRoute, User } from '@/decorators';
@@ -7,7 +8,10 @@ import { CreateCommentDto, UpdateCommentDto } from './dto';
 
 @Controller(CommentRoute.root)
 export class CommentController {
-  constructor(private readonly commentService: CommentService) {}
+  constructor(
+    private readonly commentService: CommentService,
+    private readonly openAIService: OpenAIService
+  ) {}
 
   @InjectRoute(CommentRoute.createComment)
   createComment(@User() user: ITokenPayload, @Body() createCommentDto: CreateCommentDto) {
@@ -31,5 +35,10 @@ export class CommentController {
   @InjectRoute(CommentRoute.getCommentsByCampaignId)
   getCommentsByCampaignId(@Param('campaignId') campaignId: string) {
     return this.commentService.getCommentsByCampaignId(campaignId);
+  }
+
+  @InjectRoute(CommentRoute.validateComment)
+  validateComment(@Body('content') content: string) {
+    return this.commentService.validateComment(content);
   }
 }
