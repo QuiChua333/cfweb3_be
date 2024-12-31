@@ -29,6 +29,8 @@ import { NftModule } from './api/nft/nft.module';
 import { Web3Module } from './services/web3/web3.module';
 import { PinataModule } from './services/pinata/pinata.module';
 import { ScheduleModule } from './services/schedule/schedule.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { OpenAIModule } from './api/openai/openai.module';
 
 @Module({
   imports: [
@@ -58,9 +60,12 @@ import { ScheduleModule } from './services/schedule/schedule.module';
     GiftModule,
     AdminModule,
     NftModule,
-    Web3Module,
+    // Web3Module,
     PinataModule,
+
     // ScheduleModule,
+
+    OpenAIModule,
   ],
   controllers: [AppController],
   providers: [],

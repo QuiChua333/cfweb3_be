@@ -1,11 +1,21 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  HttpException,
+  HttpStatus,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
 import { ITokenPayload } from '../auth/auth.interface';
 import { CreateCommentDto, UpdateCommentDto } from './dto';
+import { OpenAIService } from '../openai/openai.service';
 
 @Injectable()
 export class CommentService {
-  constructor(private readonly repository: RepositoryService) {}
+  constructor(
+    private readonly repository: RepositoryService,
+    private readonly openAIService: OpenAIService,
+  ) {}
 
   async checkAuthorComment(user: ITokenPayload, commentId: string) {
     const comment = await this.repository.comment.findOne({
@@ -26,6 +36,9 @@ export class CommentService {
       const replyComment = await this.repository.comment.findOneBy({ id: replyId });
       if (!replyComment) throw new NotFoundException('Reply comment không tồn tại');
     }
+
+    await this.openAIService.moderateContent(content);
+
     const newComment = await this.repository.comment.save({
       content,
       author: {

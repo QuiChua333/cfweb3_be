@@ -1,7 +1,6 @@
 import { HttpStatus, RequestMethod } from '@nestjs/common';
 
 import type { IRouteParams } from '@/decorators';
-import { Role } from '@/constants';
 
 const CommentRoute = {
   root: 'comment',
