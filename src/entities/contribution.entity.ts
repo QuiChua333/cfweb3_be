@@ -87,6 +87,16 @@ export class Contribution extends BaseEntity {
   })
   stripePaymentId: string;
 
+  @Column({
+    default: false,
+  })
+  isRefund: boolean;
+
+  @Column({
+    nullable: true,
+  })
+  proofImage: string;
+
   @ManyToOne(() => Campaign, (campaign) => campaign.contributions)
   campaign: Campaign;
 

@@ -1,4 +1,13 @@
-import { Body, Controller, Param, Query, Req, Res } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Param,
+  Query,
+  Req,
+  Res,
+  UploadedFile,
+  UseInterceptors,
+} from '@nestjs/common';
 import { ContributionService } from './contribution.service';
 import ContributionRoute from './contribution.routes';
 import { InjectRoute, User } from '@/decorators';
@@ -8,9 +17,12 @@ import {
   ContributionUserFinishQueryStatus,
   ContributionUserPaginationDto,
   PaymentDto,
+  RefundPaginationDto,
   UpdateContributionDto,
+  UpdateRefundDto,
 } from './dto';
 import { Request } from 'express';
+import { FileInterceptor } from '@nestjs/platform-express';
 
 @Controller(ContributionRoute.root)
 export class ContributionController {
@@ -19,6 +31,11 @@ export class ContributionController {
   @InjectRoute(ContributionRoute.getAllContributionsByCampaign)
   getAllContributionsByCampaign(@Query() contributionPaginationDto: ContributionPaginationDto) {
     return this.contributionService.getAllContributionsByCampaign(contributionPaginationDto);
+  }
+
+  @InjectRoute(ContributionRoute.getAllRefundsByCampaign)
+  getAllRefundsByCampaign(@Query() refundPaginationDto: RefundPaginationDto) {
+    return this.contributionService.getAllRefundsByCampaign(refundPaginationDto);
   }
 
   @InjectRoute(ContributionRoute.getTopContributionsByCampaign)
@@ -45,6 +62,16 @@ export class ContributionController {
     @Body() updateContributionDto: UpdateContributionDto,
   ) {
     return this.contributionService.editStatus(contributionId, updateContributionDto);
+  }
+
+  @InjectRoute(ContributionRoute.editRefundStatus)
+  @UseInterceptors(FileInterceptor('file'))
+  editRefundStatus(
+    @Param('contributionId') contributionId: string,
+    @Body() updateRefundDto: UpdateRefundDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.contributionService.editRefundStatus(contributionId, updateRefundDto, file);
   }
 
   @InjectRoute(ContributionRoute.getQuantityContributionOfUser)

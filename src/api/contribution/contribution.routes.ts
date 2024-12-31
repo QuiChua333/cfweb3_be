@@ -12,6 +12,13 @@ const ContributionRoute = {
     jwtSecure: false,
   },
 
+  getAllRefundsByCampaign: <IRouteParams>{
+    path: '/refund/campaign/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   getTopContributionsByCampaign: <IRouteParams>{
     path: '/campaign/:campaignId/top-contributions',
     method: RequestMethod.GET,
@@ -33,6 +40,13 @@ const ContributionRoute = {
 
   editStatus: <IRouteParams>{
     path: '/:contributionId/status',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
+  editRefundStatus: <IRouteParams>{
+    path: '/refund/:contributionId/status',
     method: RequestMethod.PATCH,
     code: HttpStatus.OK,
     jwtSecure: true,

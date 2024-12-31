@@ -11,7 +11,11 @@ import {
   ContributionUserPaginationDto,
   PaymentDto,
   PerkPaymentDto,
+  RefundPaginationDto,
+  RefundQueryStatus,
+  RefundSortMoneyQueryStatus,
   UpdateContributionDto,
+  UpdateRefundDto,
 } from './dto';
 import Stripe from 'stripe';
 import { envs } from '@/config';
@@ -20,12 +24,14 @@ import { Request } from 'express';
 import { IPayloadStripeSuccess } from './contribution.interface';
 import axios from 'axios';
 import { EmailService } from '@/services/email/email.service';
+import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 @Injectable()
 export class ContributionService {
   constructor(
     private readonly repository: RepositoryService,
     private readonly campaignService: CampaignService,
     private readonly emailService: EmailService,
+    private readonly cloudinaryService: CloudinaryService,
   ) {}
   private readonly stripe = new Stripe(envs.stripe.apiKeySecret);
 
@@ -108,6 +114,80 @@ export class ContributionService {
         perks: JSON.parse(contribution.perks as string),
         shippingInfo: JSON.parse(contribution.shippingInfo as string),
         estDeliveryDate: JSON.parse(contribution.shippingInfo as string).estDeliveryDate,
+      })),
+      totalPages,
+      page,
+      limit,
+    };
+  }
+
+  async getAllRefundsByCampaign(refundPaginationDto: RefundPaginationDto) {
+    const {
+      page = 1,
+      limit = 10,
+      searchString,
+      sortMoney,
+      status,
+      campaignId,
+    } = refundPaginationDto;
+    const query = this.repository.contribution
+      .createQueryBuilder('contribution')
+      .leftJoinAndSelect('contribution.campaign', 'campaign')
+      .leftJoinAndSelect('contribution.user', 'user')
+      .where('campaign.id = :campaignId', { campaignId });
+
+    if (searchString && searchString.trim() !== '') {
+      if ('khách vãng lai'.includes(searchString.trim().toLowerCase())) {
+        query.andWhere("user.fullName IS NULL OR user.fullName = ''");
+      } else {
+        // Tìm kiếm theo email hoặc fullName
+        query.andWhere(
+          '(contribution.email ILIKE :searchString OR user.fullName ILIKE :searchString)',
+          { searchString: `%${searchString}%` },
+        );
+      }
+    }
+
+    if (sortMoney && sortMoney !== RefundSortMoneyQueryStatus.ALL) {
+      query.addOrderBy(
+        'contribution.amount',
+        sortMoney === RefundSortMoneyQueryStatus.ASC ? 'ASC' : 'DESC',
+      );
+    }
+
+    // Filter by status if provided
+    if (status && status !== RefundQueryStatus.ALL) {
+      query.andWhere('contribution.isRefund = :status', {
+        status: status === RefundQueryStatus.FINISH,
+      });
+    }
+
+    query.skip((page - 1) * limit).take(limit);
+
+    const [refunds, total] = await query.getManyAndCount();
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      refunds: refunds.map((refund) => ({
+        id: refund.id,
+        email: refund.email,
+        fullName: refund.user?.fullName || null,
+        isFinish: refund.isFinish,
+        isRefund: refund.isRefund,
+        proofImage: refund.proofImage,
+        amount: refund.amount,
+        totalPayment: refund.totalPayment,
+        method: refund.method,
+        amountCrypto: refund.amountCrypto,
+        transactionHash: refund.transactionHash,
+        customerWalletAddress: refund.customerWalletAddress,
+        date: refund.date,
+        bankName: refund.bankName,
+        bankAccountNumber: refund.bankAccountNumber,
+        bankUsername: refund.bankUsername,
+        perks: JSON.parse(refund.perks as string),
+        shippingInfo: JSON.parse(refund.shippingInfo as string),
+        estDeliveryDate: JSON.parse(refund.shippingInfo as string).estDeliveryDate,
       })),
       totalPages,
       page,
@@ -249,6 +329,29 @@ export class ContributionService {
   async editStatus(contributionId: string, updateContributionDto: UpdateContributionDto) {
     const contribution = await this.repository.contribution.findOneBy({ id: contributionId });
     contribution.isFinish = updateContributionDto.isFinish;
+    return await this.repository.contribution.save(contribution);
+  }
+
+  async editRefundStatus(
+    contributionId: string,
+    updateRefundDto: UpdateRefundDto,
+    file: Express.Multer.File,
+  ) {
+    const contribution = await this.repository.contribution.findOneBy({ id: contributionId });
+    if ('isRefund' in updateRefundDto) {
+      contribution.isRefund = this.getBoolean(updateRefundDto.isRefund);
+    }
+
+    if (file) {
+      const url = contribution.proofImage;
+      if (url) {
+        await this.cloudinaryService.destroyFile(url);
+      }
+      const res = await this.cloudinaryService.uploadFile(file);
+      const image = res.secure_url as string;
+      contribution.proofImage = image;
+    }
+
     return await this.repository.contribution.save(contribution);
   }
 
@@ -552,5 +655,11 @@ export class ContributionService {
     } else {
       await this.emailService.sendContributionSuccessNoPerk(contribution);
     }
+  }
+
+  getBoolean(value: string) {
+    let res: boolean;
+    ['1', 'true'].includes(value) ? (res = true) : (res = false);
+    return res;
   }
 }
