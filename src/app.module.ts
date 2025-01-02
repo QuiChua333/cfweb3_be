@@ -31,6 +31,7 @@ import { PinataModule } from './services/pinata/pinata.module';
 import { ScheduleModule } from './services/schedule/schedule.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { OpenAIModule } from './api/openai/openai.module';
+import { ChatModule } from './api/chat/chat.module';
 
 @Module({
   imports: [
@@ -66,6 +67,8 @@ import { OpenAIModule } from './api/openai/openai.module';
     // ScheduleModule,
 
     OpenAIModule,
+
+    ChatModule,
   ],
   controllers: [AppController],
   providers: [],

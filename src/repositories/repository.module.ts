@@ -24,6 +24,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { RepositoryService } from './repository.service';
 import { NFTCreateion } from '@/entities/nft-creation.entity';
 import { NFT } from '@/entities/nft.entity';
+import { ChatRoom } from '@/entities/chat-room.entity';
+import { Message } from '@/entities/message.entity';
 
 @Global()
 @Module({
@@ -48,7 +50,8 @@ import { NFT } from '@/entities/nft.entity';
       TeamMember,
       UserVerify,
       User,
-
+      ChatRoom,
+      Message,
       NFTCreateion,
       NFT,
     ]),

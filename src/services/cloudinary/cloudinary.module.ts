@@ -3,6 +3,7 @@ import { CloudinaryService } from './cloudinary.service';
 import { v2 as cloudinary } from 'cloudinary';
 import { CLOUDINARY } from '@/constants';
 import { envs } from '@/config';
+import { CloudinaryController } from './cloudinary.controller';
 
 @Module({
   providers: [
@@ -12,6 +13,7 @@ import { envs } from '@/config';
       useFactory: () => cloudinary.config(envs.cloudinary),
     },
   ],
+  controllers: [CloudinaryController],
   exports: [CloudinaryService],
 })
 export class CloudinaryModule {}

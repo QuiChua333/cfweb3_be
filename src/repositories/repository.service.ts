@@ -18,7 +18,9 @@ import {
   User,
   UserVerify,
 } from '@/entities';
+import { ChatRoom } from '@/entities/chat-room.entity';
 import { Gift } from '@/entities/gift.entity';
+import { Message } from '@/entities/message.entity';
 import { NFTCreateion } from '@/entities/nft-creation.entity';
 import { NFT } from '@/entities/nft.entity';
 import { Injectable } from '@nestjs/common';
@@ -50,5 +52,7 @@ export class RepositoryService {
 
     @InjectRepository(NFTCreateion) public readonly nftCreation: Repository<NFTCreateion>,
     @InjectRepository(NFT) public readonly nft: Repository<NFT>,
+    @InjectRepository(ChatRoom) public readonly chatRoom: Repository<ChatRoom>,
+    @InjectRepository(Message) public readonly message: Repository<Message>,
   ) {}
 }

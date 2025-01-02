@@ -53,4 +53,31 @@ export class CloudinaryService {
       });
     });
   }
+
+  uploadFiles(
+    file: Express.Multer.File,
+    folder: string = 'default-folder',
+  ): Promise<CloudinaryResponse> {
+    return new Promise<CloudinaryResponse>((resolve, reject) => {
+      const uploadStream = cloudinary.uploader.upload_stream(
+        {
+          folder: folder,
+          resource_type: file.mimetype.startsWith('image')
+            ? 'image'  // Nếu file là ảnh, upload như ảnh
+            : file.mimetype.startsWith('video')
+            ? 'video'  // Nếu file là video, upload như video
+            : 'raw',    // Nếu không phải ảnh hay video, upload như raw (tài liệu, âm thanh, v.v.)
+        },
+        (error, result) => {
+          if (error) return reject(error);
+          resolve({
+            ...result,
+            fileName: file.originalname,  // Trả về tên file gốc
+          });
+        },
+      );
+
+      streamifier.createReadStream(file.buffer).pipe(uploadStream);
+    });
+  }
 }
