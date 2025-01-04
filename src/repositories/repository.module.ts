@@ -26,6 +26,7 @@ import { NFTCreateion } from '@/entities/nft-creation.entity';
 import { NFT } from '@/entities/nft.entity';
 import { ChatRoom } from '@/entities/chat-room.entity';
 import { Message } from '@/entities/message.entity';
+import { ChatGemini } from '@/entities/chat-gemini.entity';
 import { ChatRoomUser } from '@/entities/chat-room-user.entity';
 
 @Global()
@@ -56,6 +57,7 @@ import { ChatRoomUser } from '@/entities/chat-room-user.entity';
       ChatRoomUser,
       NFTCreateion,
       NFT,
+      ChatGemini,
     ]),
   ],
   providers: [RepositoryService],

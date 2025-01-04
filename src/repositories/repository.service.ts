@@ -1,3 +1,4 @@
+import { ChatGemini } from '@/entities/chat-gemini.entity';
 import {
   Campaign,
   Comment,
@@ -55,6 +56,7 @@ export class RepositoryService {
     @InjectRepository(NFT) public readonly nft: Repository<NFT>,
     @InjectRepository(ChatRoom) public readonly chatRoom: Repository<ChatRoom>,
     @InjectRepository(Message) public readonly message: Repository<Message>,
+    @InjectRepository(ChatGemini) public readonly chatGemini: Repository<ChatGemini>,
     @InjectRepository(ChatRoomUser) public readonly chatRoomUser: Repository<ChatRoomUser>,
   ) {}
 }
