@@ -459,6 +459,7 @@ export class CampaignService {
       },
       select: {
         owner: {
+          id: true,
           email: true,
           avatar: true,
           fullName: true,

@@ -26,6 +26,7 @@ import { NFTCreateion } from '@/entities/nft-creation.entity';
 import { NFT } from '@/entities/nft.entity';
 import { ChatRoom } from '@/entities/chat-room.entity';
 import { Message } from '@/entities/message.entity';
+import { ChatRoomUser } from '@/entities/chat-room-user.entity';
 
 @Global()
 @Module({
@@ -52,6 +53,7 @@ import { Message } from '@/entities/message.entity';
       User,
       ChatRoom,
       Message,
+      ChatRoomUser,
       NFTCreateion,
       NFT,
     ]),

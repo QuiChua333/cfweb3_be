@@ -11,11 +11,6 @@ import { UserPaginationDto } from './dto/user-pagination.dto';
 export class UserController {
   constructor(private readonly userService: UserService) {}
 
-  @InjectRoute(UserRoute.getAll)
-  getAll() {
-    return this.userService.getAll();
-  }
-
   @InjectRoute(UserRoute.findAll)
   findAll(@Query() userPaginationDto: UserPaginationDto) {
     return this.userService.findAll(userPaginationDto);

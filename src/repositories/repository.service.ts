@@ -18,6 +18,7 @@ import {
   User,
   UserVerify,
 } from '@/entities';
+import { ChatRoomUser } from '@/entities/chat-room-user.entity';
 import { ChatRoom } from '@/entities/chat-room.entity';
 import { Gift } from '@/entities/gift.entity';
 import { Message } from '@/entities/message.entity';
@@ -54,5 +55,6 @@ export class RepositoryService {
     @InjectRepository(NFT) public readonly nft: Repository<NFT>,
     @InjectRepository(ChatRoom) public readonly chatRoom: Repository<ChatRoom>,
     @InjectRepository(Message) public readonly message: Repository<Message>,
+    @InjectRepository(ChatRoomUser) public readonly chatRoomUser: Repository<ChatRoomUser>,
   ) {}
 }

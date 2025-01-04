@@ -12,6 +12,7 @@ import { Comment } from './comment.entity';
 import { NFT } from './nft.entity';
 import { Message } from './message.entity';
 import { ChatRoom } from './chat-room.entity';
+import { ChatRoomUser } from './chat-room-user.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -116,10 +117,6 @@ export class User extends BaseEntity {
   @OneToMany(() => Message, (message) => message.sender)
   sentMessages: Message[];
 
-  @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.userA)
-  chatRoomsA: ChatRoom[];
-
-  @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.userB)
-  chatRoomsB: ChatRoom[];
-
+  @OneToMany(() => ChatRoomUser, (chatRoomUser) => chatRoomUser.user)
+  chatRoomUsers: ChatRoomUser[];
 }

@@ -6,17 +6,15 @@ export class BaseEntity {
 
   @CreateDateColumn({
     name: 'created_at',
-    type: 'timestamp',
     nullable: false,
-    default: () => 'CURRENT_TIMESTAMP(6)',
+    default: new Date(),
   })
   createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
-    type: 'timestamp',
     nullable: false,
-    default: () => 'CURRENT_TIMESTAMP(6)',
+    default: new Date(),
   })
   updatedAt: Date;
 }

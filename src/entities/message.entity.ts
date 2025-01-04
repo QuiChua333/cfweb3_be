@@ -13,7 +13,7 @@ export class Message extends BaseEntity {
   isRead: boolean;
 
   @Column('json', {
-    nullable: true
+    nullable: true,
   })
   metadata: MetadataMessageDto;
 
@@ -24,7 +24,4 @@ export class Message extends BaseEntity {
     nullable: false,
   })
   chatRoom: ChatRoom;
-
-  @Column()
-  sentAt: Date;
 }

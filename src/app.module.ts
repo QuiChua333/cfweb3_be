@@ -32,6 +32,7 @@ import { ScheduleModule } from './services/schedule/schedule.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { OpenAIModule } from './api/openai/openai.module';
 import { ChatModule } from './api/chat/chat.module';
+import { SocketModule } from './services/socket/socket.module';
 
 @Module({
   imports: [
@@ -69,8 +70,9 @@ import { ChatModule } from './api/chat/chat.module';
     OpenAIModule,
 
     ChatModule,
+
+    SocketModule,
   ],
   controllers: [AppController],
-  providers: [],
 })
 export class AppModule {}

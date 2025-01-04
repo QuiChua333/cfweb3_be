@@ -21,7 +21,7 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
   handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
-    client.emit('activeUsers', Array.from(this.activeUsers.keys()));
+    client.broadcast.emit('activeUsers', Array.from(this.activeUsers.keys()));
   }
 
   handleDisconnect(client: Socket) {
@@ -36,37 +36,31 @@ export class ChatGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage('register')
-  async handleRegister(
-    @MessageBody() userId: string,
-    @ConnectedSocket() client: Socket,
-  ) {
+  async handleRegister(@MessageBody() userId: string, @ConnectedSocket() client: Socket) {
     this.activeUsers.set(userId, client.id);
     console.log(`User ${userId} registered with socket ID ${client.id}`);
   }
 
-  @SubscribeMessage('getMessages')
-  async handleGetMessages(
-    @MessageBody() userId: string,
-    @ConnectedSocket() client: Socket,
-  ) {
-    try {
-      const messages = await this.chatService.getMessages(userId);
-      client.emit('messagesList', messages);
-    } catch (error) {
-      console.error('Error fetching messages:', error);
-      client.emit('error', 'Failed to fetch messages');
-    }
-  }
+  // @SubscribeMessage('getMessages')
+  // async handleGetMessages(@MessageBody() userId: string, @ConnectedSocket() client: Socket) {
+  //   try {
+  //     const messages = await this.chatService.getMessages(userId);
+  //     client.emit('messagesList', messages);
+  //   } catch (error) {
+  //     console.error('Error fetching messages:', error);
+  //     client.emit('error', 'Failed to fetch messages');
+  //   }
+  // }
 
   @SubscribeMessage('sendMessage')
   async handleMessage(
     @MessageBody()
-    data: { senderId: string; receiverId: string; message: string },
+    data: { chatRoomId: string; senderId: string; receiverId: string; message: string },
     @ConnectedSocket() client: Socket,
   ) {
     try {
-      const { senderId, receiverId, message } = data;
-      await this.chatService.saveMessage(senderId, receiverId, message);
+      const { chatRoomId, senderId, receiverId, message } = data;
+      await this.chatService.saveMessage(chatRoomId, senderId, receiverId, message);
 
       const receiverSocketId = this.activeUsers.get(receiverId);
       if (receiverSocketId) {

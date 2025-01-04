@@ -23,10 +23,6 @@ export class UserService {
     private readonly emailService: EmailService,
   ) {}
 
-  async getAll() {
-    const user = this.repository.user.find();
-    return user;
-  }
   async findAll(userPaginationDto: UserPaginationDto) {
     const { page = 1, limit = 10, searchString, userStatus, userVerifyStatus } = userPaginationDto;
 
