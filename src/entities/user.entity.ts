@@ -121,5 +121,4 @@ export class User extends BaseEntity {
 
   @OneToMany(() => ChatRoom, (chatRoom) => chatRoom.userB)
   chatRoomsB: ChatRoom[];
-
 }

@@ -32,6 +32,7 @@ import { ScheduleModule } from './services/schedule/schedule.module';
 import { MulterModule } from '@nestjs/platform-express';
 import { OpenAIModule } from './api/openai/openai.module';
 import { ChatModule } from './api/chat/chat.module';
+import { ChatGeminiModule } from './api/chat-gemini/chat-gemini.module';
 
 @Module({
   imports: [
@@ -63,12 +64,10 @@ import { ChatModule } from './api/chat/chat.module';
     NftModule,
     // Web3Module,
     PinataModule,
-
     // ScheduleModule,
-
     OpenAIModule,
-
     ChatModule,
+    ChatGeminiModule,
   ],
   controllers: [AppController],
   providers: [],
