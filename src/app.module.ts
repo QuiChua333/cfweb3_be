@@ -26,14 +26,12 @@ import { CloudinaryModule } from './services/cloudinary/cloudinary.module';
 import { GiftModule } from './api/gift/gift.module';
 import { AdminModule } from './api/admin/admin.module';
 import { NftModule } from './api/nft/nft.module';
-import { Web3Module } from './services/web3/web3.module';
 import { PinataModule } from './services/pinata/pinata.module';
-import { ScheduleModule } from './services/schedule/schedule.module';
-import { MulterModule } from '@nestjs/platform-express';
 import { OpenAIModule } from './api/openai/openai.module';
 import { ChatModule } from './api/chat/chat.module';
 import { ChatGeminiModule } from './api/chat-gemini/chat-gemini.module';
 import { SocketModule } from './services/socket/socket.module';
+import { NotificationModule } from './api/notification/notification.module';
 
 @Module({
   imports: [
@@ -71,6 +69,8 @@ import { SocketModule } from './services/socket/socket.module';
     ChatGeminiModule,
 
     SocketModule,
+
+    NotificationModule,
   ],
   controllers: [AppController],
 })

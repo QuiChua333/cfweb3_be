@@ -13,6 +13,7 @@ export class ChatService {
 
   async getHistoryChatList(currentUser: ITokenPayload) {
     const userId = currentUser.id;
+
     const user = await this.repository.user.findOne({
       where: {
         id: userId,
@@ -38,6 +39,7 @@ export class ChatService {
       const chatRoomUsersTmp = chatRoom.chatRoomUsers;
       const targetUser = chatRoomUsersTmp.find((item) => item.user.id !== userId).user;
       const lastSeenTime = chatRoomUser.lastSeenTime;
+
       const unreadMessage = await this.repository.message.find({
         where: {
           chatRoom: {
@@ -49,10 +51,14 @@ export class ChatService {
           createdAt: MoreThan(lastSeenTime),
         },
       });
+
       const lastMessage = await this.repository.message.findOne({
         where: {
           chatRoom: {
             id: chatRoom.id,
+          },
+          sender: {
+            id: Not(userId),
           },
         },
         order: {
@@ -60,7 +66,7 @@ export class ChatService {
         },
       });
 
-      const lastMessageTime = lastMessage.createdAt;
+      const lastMessageTime = lastMessage?.createdAt;
 
       chatListResponse.push({
         user: {
@@ -139,6 +145,7 @@ export class ChatService {
       await this.repository.chatRoomUser.save({
         chatRoom: newChatRoom,
         user: receiver,
+        lastSeenTime: new Date(),
       });
 
       return newChatRoom;
@@ -182,6 +189,24 @@ export class ChatService {
       return newMessageResponse;
     });
   }
+
+  async seenMessage(chatRoomId: string, userId: string) {
+    const chatRoom = await this.repository.chatRoom.findOne({
+      where: {
+        id: chatRoomId,
+      },
+      relations: {
+        chatRoomUsers: {
+          user: true,
+        },
+      },
+    });
+
+    if (!chatRoom) throw new BadRequestException('Phiên chat không tồn tại');
+    const chatRoomUser = chatRoom.chatRoomUsers.find((item) => item.user.id === userId);
+    chatRoomUser.lastSeenTime = new Date();
+    await this.repository.chatRoomUser.save(chatRoomUser);
+  }
   async saveMessageWithFile(chatRoomId: string, file: CloudinaryResponse): Promise<Message> {
     const chatRoom = await this.repository.chatRoom.findOne({ where: { id: chatRoomId } });
     if (!chatRoom) throw new NotFoundException('Chat room not found');
@@ -204,5 +229,41 @@ export class ChatService {
 
     message.isRead = true;
     return await this.repository.message.save(message);
+  }
+
+  async countUnreadMessage(userId: string) {
+    const chatRoomUsers = await this.repository.chatRoomUser.find({
+      where: {
+        user: {
+          id: userId,
+        },
+      },
+      relations: {
+        chatRoom: true,
+      },
+    });
+    let totalUnreadMessage = 0;
+    const chatRoomUsersLength = chatRoomUsers.length;
+    for (let i = 0; i < chatRoomUsersLength; i++) {
+      const chatRoomUser = chatRoomUsers[i];
+      const lastSeenTime = chatRoomUser.lastSeenTime;
+      const chatRoom = chatRoomUser.chatRoom;
+
+      const message = await this.repository.message.find({
+        where: {
+          chatRoom: {
+            id: chatRoom.id,
+          },
+          sender: {
+            id: Not(userId),
+          },
+          createdAt: MoreThan(lastSeenTime),
+        },
+      });
+
+      totalUnreadMessage += message.length;
+    }
+
+    return totalUnreadMessage;
   }
 }

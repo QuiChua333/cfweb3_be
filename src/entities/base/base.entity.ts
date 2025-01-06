@@ -7,14 +7,14 @@ export class BaseEntity {
   @CreateDateColumn({
     name: 'created_at',
     nullable: false,
-    default: new Date(),
+    type: 'timestamptz',
   })
   createdAt: Date;
 
   @UpdateDateColumn({
     name: 'updated_at',
+    type: 'timestamptz',
     nullable: false,
-    default: new Date(),
   })
   updatedAt: Date;
 }

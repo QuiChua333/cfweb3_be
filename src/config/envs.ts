@@ -58,6 +58,10 @@ interface EnvVars {
   WEB3_RPC_URL: string;
 
   PINATA_JWT: string;
+
+  // FIREBASE_PROJECT_ID: string;
+  // FIREBASE_PRIVATE_KEY: string;
+  // FIREBASE_CLIENT_EMAIL: string;
 }
 
 const envSchema = joi
@@ -117,6 +121,10 @@ const envSchema = joi
     WEB3_RPC_URL: joi.string().required(),
 
     PINATA_JWT: joi.string().required(),
+
+    // FIREBASE_PROJECT_ID: joi.string().required(),
+    // FIREBASE_PRIVATE_KEY: joi.string().required(),
+    // FIREBASE_CLIENT_EMAIL: joi.string().required(),
   })
   .unknown(true);
 
@@ -219,4 +227,10 @@ export const envs = {
   pinata: {
     jwt: envVars.PINATA_JWT,
   },
+
+  // firebase: {
+  //   projectId: envVars.FIREBASE_PROJECT_ID,
+  //   privateKey: envVars.FIREBASE_PRIVATE_KEY,
+  //   clientEmail: envVars.FIREBASE_CLIENT_EMAIL,
+  // },
 };

@@ -15,7 +15,8 @@ export class OpenAIService {
       model: 'omni-moderation-latest',
       input: content,
     });
+
     const flagged = response.results?.[0].flagged;
-    if (flagged === false) throw new BadRequestException('Nội dung bình luận không phù hợp');
+    if (flagged === true) throw new BadRequestException('Nội dung bình luận không phù hợp');
   }
 }

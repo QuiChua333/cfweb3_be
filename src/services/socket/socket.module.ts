@@ -6,5 +6,6 @@ import { ChatModule } from '@/api/chat/chat.module';
 @Module({
   imports: [ChatModule],
   providers: [SocketService, SocketGateway],
+  exports: [SocketGateway],
 })
 export class SocketModule {}

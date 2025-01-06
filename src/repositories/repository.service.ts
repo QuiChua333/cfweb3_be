@@ -28,6 +28,7 @@ import { NFT } from '@/entities/nft.entity';
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { Notification } from '@/entities/notification.entity';
 
 @Injectable()
 export class RepositoryService {
@@ -58,5 +59,6 @@ export class RepositoryService {
     @InjectRepository(Message) public readonly message: Repository<Message>,
     @InjectRepository(ChatGemini) public readonly chatGemini: Repository<ChatGemini>,
     @InjectRepository(ChatRoomUser) public readonly chatRoomUser: Repository<ChatRoomUser>,
+    @InjectRepository(Notification) public readonly notification: Repository<Notification>,
   ) {}
 }

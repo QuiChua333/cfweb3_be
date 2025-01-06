@@ -14,6 +14,7 @@ export class ChatRoomUser extends BaseEntity {
 
   @Column({
     nullable: true,
+    type: 'timestamptz',
   })
   lastSeenTime: Date;
 }

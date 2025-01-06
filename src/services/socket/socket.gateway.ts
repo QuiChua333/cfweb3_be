@@ -23,7 +23,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @WebSocketServer()
   server: Server;
 
-  handleConnection(client: Socket) {
+  async handleConnection(client: Socket) {
     console.log(`Client connected: ${client.id}`);
 
     const userId = (client.handshake.query.userId || '') as string;
@@ -39,6 +39,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       'activeUsers',
       this.activeUsers.map((item) => item.userId),
     );
+
+    const totalUnreadMessage = await this.countUnreadMessage(newActiveUser.userId);
+    client.emit('totalUnreadMessage', totalUnreadMessage);
   }
 
   handleDisconnect(client: Socket) {
@@ -73,11 +76,42 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       message,
     );
 
-    const senderClientId = this.activeUsers.find((item) => item.userId === senderId).clientId;
-    const receiverClientId = this.activeUsers.find((item) => item.userId === receiverId);
-    if (receiverClientId) {
-      this.server.to(receiverClientId.clientId).emit('newMessage', newMessage);
+    const receiverClientIds = this.activeUsers
+      .filter((item) => item.userId === receiverId)
+      .map((item) => item.clientId);
+    const totalUnreadMessage = await this.countUnreadMessage(receiverId);
+    if (receiverClientIds?.length > 0) {
+      this.server.to(receiverClientIds).emit('newMessage', newMessage);
+      this.server.to(receiverClientIds).emit('totalUnreadMessage', totalUnreadMessage);
     }
-    this.server.to(senderClientId).emit('newMessage', newMessage);
+    client.emit('newMessage', newMessage);
+  }
+
+  @SubscribeMessage('seenMessage')
+  async seenMessage(
+    @MessageBody()
+    data: { chatRoomId: string },
+    @ConnectedSocket() client: Socket,
+  ) {
+    const { chatRoomId } = data;
+
+    const userId = this.activeUsers.find((item) => item.clientId === client.id).userId;
+    await this.chatService.seenMessage(chatRoomId, userId);
+  }
+
+  async countUnreadMessage(userId: string) {
+    const totalUnreadMessage = await this.chatService.countUnreadMessage(userId);
+    return totalUnreadMessage;
+  }
+
+  emitEvent(event: string, data: any, userIds?: string[]) {
+    console.log(data);
+    if (userIds && userIds.length > 0) {
+      const clientIds = this.activeUsers
+        .filter((user) => userIds.includes(user.userId))
+        .map((user) => user.clientId);
+
+      this.server.to(clientIds).emit(event, data);
+    }
   }
 }

@@ -13,6 +13,7 @@ import { NFT } from './nft.entity';
 import { Message } from './message.entity';
 import { ChatRoom } from './chat-room.entity';
 import { ChatRoomUser } from './chat-room-user.entity';
+import { Notification } from './notification.entity';
 
 @Entity()
 export class User extends BaseEntity {
@@ -119,4 +120,7 @@ export class User extends BaseEntity {
 
   @OneToMany(() => ChatRoomUser, (chatRoomUser) => chatRoomUser.user)
   chatRoomUsers: ChatRoomUser[];
+
+  @OneToMany(() => Notification, (notification) => notification.user)
+  notifications: Notification[];
 }

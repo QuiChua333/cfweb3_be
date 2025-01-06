@@ -28,6 +28,7 @@ import { ChatRoom } from '@/entities/chat-room.entity';
 import { Message } from '@/entities/message.entity';
 import { ChatGemini } from '@/entities/chat-gemini.entity';
 import { ChatRoomUser } from '@/entities/chat-room-user.entity';
+import { Notification } from '@/entities/notification.entity';
 
 @Global()
 @Module({
@@ -58,6 +59,7 @@ import { ChatRoomUser } from '@/entities/chat-room-user.entity';
       NFTCreateion,
       NFT,
       ChatGemini,
+      Notification,
     ]),
   ],
   providers: [RepositoryService],
