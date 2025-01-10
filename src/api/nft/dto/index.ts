@@ -1,2 +1,2 @@
-export * from './CreateNFT.dto';
+export * from './createNFT.dto';
 export * from './mintNFT.dto';

@@ -39,6 +39,11 @@ export class CampaignController {
     return this.campaignService.getCampaignsExplore(campaignExplorePaginationDto);
   }
 
+  @InjectRoute(CampaignRoute.getCampaignsExplore2)
+  getCampaignsExplore2(@Query() campaignExplorePaginationDto: CampaignExplorePaginationDto) {
+    return this.campaignService.getCampaignsExplore2(campaignExplorePaginationDto);
+  }
+
   @InjectRoute(CampaignRoute.getCampaignById)
   getCampaignById(@Param('id') id: string) {
     return this.campaignService.findOneDetail(id);

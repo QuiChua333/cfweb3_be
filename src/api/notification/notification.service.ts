@@ -1,5 +1,6 @@
 import { RepositoryService } from '@/repositories/repository.service';
 import { BadRequestException, Injectable } from '@nestjs/common';
+import { ITokenPayload } from '../auth/auth.interface';
 
 @Injectable()
 export class NotificationService {
@@ -16,5 +17,20 @@ export class NotificationService {
 
     notification.isRead = true;
     await this.repository.notification.save(notification);
+  }
+
+  async getNotification(currentUser: ITokenPayload) {
+    const notifications = await this.repository.notification.find({
+      where: {
+        user: {
+          id: currentUser.id,
+        },
+      },
+      order: {
+        createdAt: 'DESC',
+      },
+    });
+
+    return notifications;
   }
 }

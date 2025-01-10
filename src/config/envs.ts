@@ -62,6 +62,8 @@ interface EnvVars {
   // FIREBASE_PROJECT_ID: string;
   // FIREBASE_PRIVATE_KEY: string;
   // FIREBASE_CLIENT_EMAIL: string;
+
+  ES_NODE: string;
 }
 
 const envSchema = joi
@@ -125,6 +127,8 @@ const envSchema = joi
     // FIREBASE_PROJECT_ID: joi.string().required(),
     // FIREBASE_PRIVATE_KEY: joi.string().required(),
     // FIREBASE_CLIENT_EMAIL: joi.string().required(),
+
+    ES_NODE: joi.string().required(),
   })
   .unknown(true);
 
@@ -233,4 +237,8 @@ export const envs = {
   //   privateKey: envVars.FIREBASE_PRIVATE_KEY,
   //   clientEmail: envVars.FIREBASE_CLIENT_EMAIL,
   // },
+
+  es: {
+    node: envVars.ES_NODE,
+  },
 };

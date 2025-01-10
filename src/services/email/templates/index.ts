@@ -9,3 +9,5 @@ export * from './refunding.template';
 export * from './contribution-success-has-perks.template';
 export * from './contribution-success-no-perks.template';
 export * from './gift-success-has-perks.template';
+export * from './campaignFailureNotification.template';
+export * from './campaignSuccessNotification.template';

@@ -32,6 +32,9 @@ import { ChatModule } from './api/chat/chat.module';
 import { ChatGeminiModule } from './api/chat-gemini/chat-gemini.module';
 import { SocketModule } from './services/socket/socket.module';
 import { NotificationModule } from './api/notification/notification.module';
+import { Web3Module } from './services/web3/web3.module';
+import { ScheduleModule } from './services/schedule/schedule.module';
+import { SearchModule } from './services/search/search.module';
 
 @Module({
   imports: [
@@ -71,6 +74,8 @@ import { NotificationModule } from './api/notification/notification.module';
     SocketModule,
 
     NotificationModule,
+
+    // SearchModule,
   ],
   controllers: [AppController],
 })

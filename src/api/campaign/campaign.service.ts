@@ -6,7 +6,14 @@ import {
 } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
 import { ITokenPayload } from '../auth/auth.interface';
-import { CampaignStatus, ConfirmMemberStatus, PaymentStatus, Role, UserStatus } from '@/constants';
+import {
+  CAMPAIGN_INDEX_NAME,
+  CampaignStatus,
+  ConfirmMemberStatus,
+  PaymentStatus,
+  Role,
+  UserStatus,
+} from '@/constants';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 import {
   CampaignExplorePaginationDto,
@@ -16,9 +23,11 @@ import {
   FaqDto,
   UpdateCampaignDto,
 } from './dto';
-import { FAQ } from '@/entities';
+import { Campaign, FAQ } from '@/entities';
 import { envs } from '@/config';
 import { EmailService } from '@/services/email/email.service';
+import { SearchService } from '@/services/search/search.service';
+import { QueryDslQueryContainer } from '@elastic/elasticsearch/lib/api/types';
 
 @Injectable()
 export class CampaignService {
@@ -26,6 +35,7 @@ export class CampaignService {
     private readonly repository: RepositoryService,
     private readonly cloudinaryService: CloudinaryService,
     private readonly emailService: EmailService,
+    private readonly searchService: SearchService,
   ) {}
 
   async findAll(campaignPaginationDto: CampaignPaginationDto) {
@@ -80,7 +90,7 @@ export class CampaignService {
       .leftJoin('campaign.contributions', 'contribution') // Thêm join với bảng contributions
       .addSelect('COALESCE(SUM(contribution.amount), 0)', 'totalAmount') // Tính tổng số tiền đóng góp cho chiến dịch
       .where('campaign.status NOT IN (:...excludedStatuses)', {
-        excludedStatuses: [CampaignStatus.FAILED, CampaignStatus.DRAFT],
+        excludedStatuses: [CampaignStatus.DRAFT],
       })
       .select([
         'campaign.id',
@@ -152,7 +162,7 @@ export class CampaignService {
           status: PaymentStatus.SUCCESS,
         })
         .getRawOne();
-      campaign['currentMoney'] = total ? Number(total.totalAmount) : 0;
+      campaign['currentMoney'] = Number(total?.totalAmount || 0);
 
       const endDate = new Date(campaign.publishedAt);
       endDate.setDate(endDate.getDate() + campaign.duration); // Cộng duration vào publishedAt
@@ -173,9 +183,195 @@ export class CampaignService {
     if (criteria === 'most') {
       results.sort((a, b) => b['currentMoney'] - a['currentMoney']);
     }
+
+    const failedCampaigns = results.filter((campaign) => campaign.status === CampaignStatus.FAILED);
+    const nonFailedCampaigns = results.filter(
+      (campaign) => campaign.status !== CampaignStatus.FAILED,
+    );
+
     return {
-      campaigns: results,
+      campaigns: [...nonFailedCampaigns, ...failedCampaigns],
       totalPages,
+      page,
+      limit,
+    };
+  }
+
+  async getCampaignsExplore2(campaignExplorePaginationDto: CampaignExplorePaginationDto) {
+    const {
+      page = 1,
+      limit = 10,
+      searchString,
+      status,
+      field,
+      criteria,
+      fieldGroup,
+    } = campaignExplorePaginationDto;
+
+    const from = (page - 1) * limit; // Tính toán vị trí bắt đầu
+    const size = limit; // Số lượng kết quả mỗi trang
+
+    const isEmailPattern = searchString?.includes('@') || false;
+
+    const query: QueryDslQueryContainer = {
+      bool: {
+        must: [
+          ...(field && field !== 'Tất cả'
+            ? [
+                {
+                  match_phrase: {
+                    field: {
+                      query: field,
+                      boost: 2,
+                    },
+                  },
+                },
+              ]
+            : []),
+
+          // Kiểm tra điều kiện cho fieldGroup
+          ...(fieldGroup && fieldGroup !== 'Tất cả'
+            ? [
+                {
+                  match_phrase: {
+                    fieldGroup: {
+                      query: fieldGroup,
+                      boost: 2,
+                    },
+                  },
+                },
+              ]
+            : []),
+
+          ...(status !== 'Tất cả'
+            ? [
+                {
+                  match_phrase: {
+                    status: {
+                      query: status,
+                      boost: 2,
+                    },
+                  },
+                },
+              ]
+            : []),
+        ].filter(Boolean) as QueryDslQueryContainer[],
+        should: searchString.trim()
+          ? ([
+              {
+                match: {
+                  title: {
+                    query: searchString,
+                    boost: 3,
+                    operator: 'or',
+                  },
+                },
+              },
+              {
+                match: {
+                  tagline: {
+                    query: searchString,
+                    boost: 1,
+                    operator: 'or',
+                  },
+                },
+              },
+              {
+                match: {
+                  story: {
+                    query: searchString,
+                    operator: 'or',
+                  },
+                },
+              },
+              {
+                match: {
+                  location: {
+                    query: searchString,
+                    operator: 'and',
+                  },
+                },
+              },
+
+              {
+                match: {
+                  authorName: {
+                    query: searchString,
+                    boost: 2,
+                    operator: 'or',
+                  },
+                },
+              },
+              isEmailPattern && {
+                wildcard: {
+                  authorEmail: {
+                    value: `*${searchString}*`,
+                    boost: 3,
+                  },
+                },
+              },
+            ].filter(Boolean) as QueryDslQueryContainer[])
+          : [],
+        minimum_should_match: searchString.trim() ? 1 : 0,
+      },
+    };
+    const sortCriteria = criteria === 'new' ? [{ publishedAt: 'desc' }] : [];
+
+    const result = await this.searchService.search(
+      CAMPAIGN_INDEX_NAME,
+      query,
+      from,
+      size,
+      sortCriteria,
+    );
+    let totalHits = 0;
+    if (typeof result.hits.total === 'object') {
+      totalHits = result.hits.total.value;
+    } else if (typeof result.hits.total === 'number') {
+      totalHits = result.hits.total;
+    } else {
+      totalHits = 0;
+    }
+
+    const campaigns = await Promise.all(
+      result.hits.hits.map(async (hit) => {
+        const campaign = hit._source as Campaign;
+        const endDate = new Date(campaign.publishedAt);
+        endDate.setDate(endDate.getDate() + campaign.duration);
+        const currentTime = new Date();
+        const remainingHours = Math.ceil(
+          (endDate.getTime() - currentTime.getTime()) / (1000 * 60 * 60),
+        );
+        let daysLeft = '';
+        if (remainingHours > 24) daysLeft = Math.ceil(remainingHours / 24) + ' ngày';
+        else if (remainingHours > 0) daysLeft = Math.ceil(remainingHours) + ' giờ';
+        else daysLeft = 'Hết hạn';
+
+        const total = await this.repository.contribution
+          .createQueryBuilder('contribution')
+          .select('SUM(contribution.amount)', 'totalAmount')
+          .where('contribution.campaignId = :campaignId', { campaignId: campaign.id })
+          .andWhere('contribution.status = :status', {
+            status: PaymentStatus.SUCCESS,
+          })
+          .getRawOne();
+        const currentMoney = Number(total?.totalAmount || 0);
+
+        const percentProgress = (currentMoney / campaign.goal) * 100;
+        campaign['percentProgress'] = percentProgress;
+        campaign['daysLeft'] = daysLeft;
+        campaign['currentMoney'] = currentMoney;
+        return campaign;
+      }),
+    );
+    if (criteria === 'most') {
+      campaigns.sort((a, b) => b['currentMoney'] - a['currentMoney']);
+    }
+    const failedCampaigns = campaigns.filter((c) => c['status'] === CampaignStatus.FAILED);
+    const nonFailedCampaigns = campaigns.filter((c) => c['status'] !== CampaignStatus.FAILED);
+    return {
+      campaigns: [...nonFailedCampaigns, ...failedCampaigns],
+      totalPages: Math.ceil(totalHits / limit),
       page,
       limit,
     };
@@ -198,7 +394,7 @@ export class CampaignService {
         owner: {
           id: ownerId,
         },
-        status: CampaignStatus.COMPLETE,
+        status: CampaignStatus.SUCCESS,
       },
     });
     const number = res[1];
@@ -211,7 +407,7 @@ export class CampaignService {
         owner: {
           id: userId,
         },
-        status: CampaignStatus.COMPLETE,
+        status: CampaignStatus.SUCCESS,
       },
     });
     const number = res[1];

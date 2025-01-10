@@ -11,7 +11,7 @@ export enum UserStatus {
 
 export enum CampaignStatus {
   FUNDING = 'Đang gây quỹ',
-  COMPLETE = 'Đã hoàn thành',
+  SUCCESS = 'Thành công',
   PENDING = 'Chờ xác nhận',
   TERMINATE = 'Tạm dừng',
   FAILED = 'Thất bại',

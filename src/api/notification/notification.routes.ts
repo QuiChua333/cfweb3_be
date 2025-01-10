@@ -19,6 +19,13 @@ const NotificationRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  getNotification: <IRouteParams>{
+    path: '/me',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default NotificationRoute;

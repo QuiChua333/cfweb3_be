@@ -18,6 +18,8 @@ import { Contribution, Gift } from '@/entities';
 import contributionSuccessHasPerksTemplate from './templates/contribution-success-has-perks.template';
 import contributionSuccessNoPerksTemplate from './templates/contribution-success-no-perks.template';
 import giftSuccessHasPerksTemplate from './templates/gift-success-has-perks.template';
+import campaignFailureNotificationTemplate from './templates/campaignFailureNotification.template';
+import campaignSuccessNotificationTemplate from './templates/campaignSuccessNotification.template';
 
 @Injectable()
 export class EmailService {
@@ -53,6 +55,30 @@ export class EmailService {
       subject: 'KÍCH HOẠT LẠI CHIẾN DỊCH THÀNH CÔNG',
       html,
     });
+  }
+
+  async sendCampaignFailureNotificationEmail(emails: string[], campaignTitle: string) {
+    const html = campaignFailureNotificationTemplate({ campaignTitle });
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
+      this.sendMail({
+        email,
+        subject: 'THÔNG BÁO CHIẾN DỊCH THẤT BẠI',
+        html,
+      });
+    }
+  }
+
+  async sendCampaignSuccessNotificationEmail(emails: string[], campaignTitle: string) {
+    const html = campaignSuccessNotificationTemplate({ campaignTitle });
+    for (let i = 0; i < emails.length; i++) {
+      const email = emails[i];
+      this.sendMail({
+        email,
+        subject: 'THÔNG BÁO CHIẾN DỊCH THÀNH CÔNG',
+        html,
+      });
+    }
   }
 
   async sendTerminateEmail({ email, campaignTitle }: { email: string; campaignTitle: string }) {

@@ -5,7 +5,9 @@ import { IsEnum, IsOptional, IsString } from 'class-validator';
 
 export enum CampaignExploreQueryStatus {
   FUNDING = 'Đang gây quỹ',
-  COMPLETE = 'Đã hoàn thành',
+  SUCCESS = 'Thành công',
+  FAILED = 'Thất bại',
+  TERMINATE = 'Tạm dừng',
   ALL = 'Tất cả',
 }
 

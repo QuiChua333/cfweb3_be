@@ -12,6 +12,7 @@ import { Comment } from './comment.entity';
 import { Contribution } from './contribution.entity';
 import { Report } from './report.entity';
 import { Gift } from './gift.entity';
+import { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
 
 @Entity()
 export class Campaign extends BaseEntity {
@@ -141,3 +142,22 @@ export class Campaign extends BaseEntity {
   @DeleteDateColumn()
   deletedAt?: Date;
 }
+
+export const ESCampaignMapping: MappingTypeMapping = {
+  properties: {
+    id: { type: 'keyword' },
+    title: { type: 'text' },
+    tagline: { type: 'text' },
+    location: { type: 'text' },
+    status: { type: 'keyword' },
+    publishedAt: { type: 'date' },
+    duration: { type: 'integer' },
+    goal: { type: 'float' },
+    authorName: { type: 'text' },
+    authorEmail: { type: 'text' },
+    story: { type: 'text' },
+    field: { type: 'keyword' },
+    fieldGroup: { type: 'keyword' },
+    cardImage: { type: 'text' },
+  },
+};

@@ -20,6 +20,13 @@ const CampaignRoute = {
     jwtSecure: false,
   },
 
+  getCampaignsExplore2: <IRouteParams>{
+    path: '/explore2',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   getPopularCampaigns: <IRouteParams>{
     path: '/popularity',
     method: RequestMethod.GET,

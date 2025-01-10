@@ -1,7 +1,8 @@
 import { Body, Controller, Param } from '@nestjs/common';
 import { NotificationService } from './notification.service';
 import NotificationRoute from './notification.routes';
-import { InjectRoute } from '@/decorators';
+import { InjectRoute, User } from '@/decorators';
+import { ITokenPayload } from '../auth/auth.interface';
 
 @Controller(NotificationRoute.root)
 export class NotificationController {
@@ -15,5 +16,10 @@ export class NotificationController {
   @InjectRoute(NotificationRoute.seen)
   seen(@Param('id') notificationId: string) {
     return this.notificationService.seen(notificationId);
+  }
+
+  @InjectRoute(NotificationRoute.getNotification)
+  getNotification(@User() currentUser: ITokenPayload) {
+    return this.notificationService.getNotification(currentUser);
   }
 }
