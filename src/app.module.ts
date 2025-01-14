@@ -75,7 +75,7 @@ import { SearchModule } from './services/search/search.module';
 
     NotificationModule,
 
-    // SearchModule,
+    SearchModule,
   ],
   controllers: [AppController],
 })

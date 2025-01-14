@@ -1,10 +1,11 @@
 import { CAMPAIGN_INDEX_NAME, CampaignStatus } from '@/constants';
-import { ESCampaignMapping } from '@/entities';
+import { Campaign, ESCampaignMapping } from '@/entities';
 import { RepositoryService } from '@/repositories/repository.service';
 import { QueryDslQueryContainer } from '@elastic/elasticsearch/lib/api/types';
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { ElasticsearchService } from '@nestjs/elasticsearch';
 import { Not } from 'typeorm';
+import { IUpdateCampaignES } from './search.interface';
 
 @Injectable()
 export class SearchService implements OnModuleInit {
@@ -74,7 +75,38 @@ export class SearchService implements OnModuleInit {
     }
   }
 
-  async addCampaignToES() {}
+  async addCampaignToES(campaign: Campaign) {
+    const response = await this.elasticsearchService.index({
+      index: CAMPAIGN_INDEX_NAME, // Tên index
+      id: campaign.id, // ID duy nhất cho chiến dịch
+      document: {
+        id: campaign.id,
+        title: campaign.title,
+        tagline: campaign.tagline,
+        location: campaign.location,
+        status: campaign.status,
+        publishedAt: campaign.publishedAt,
+        duration: campaign.duration,
+        goal: campaign.goal,
+        authorName: campaign.owner.fullName,
+        authorEmail: campaign.owner.email,
+        field: campaign.field.name,
+        fieldGroup: campaign.field.fieldGroup.name,
+        story: campaign.story,
+        cardImage: campaign.cardImage,
+      },
+    });
+  }
+
+  async updateCampaignOnES(campaignId: string, body: IUpdateCampaignES) {
+    await this.elasticsearchService.update({
+      index: CAMPAIGN_INDEX_NAME,
+      id: campaignId,
+      body: {
+        doc: body,
+      },
+    });
+  }
 
   async search(
     index: string,

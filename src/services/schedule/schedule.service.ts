@@ -3,12 +3,14 @@ import { RepositoryService } from '@/repositories/repository.service';
 import { Injectable, Logger } from '@nestjs/common';
 import { Cron } from '@nestjs/schedule';
 import { EmailService } from '../email/email.service';
+import { SearchService } from '../search/search.service';
 
 @Injectable()
 export class ScheduleService {
   constructor(
     private readonly repositoryService: RepositoryService,
     private readonly emailService: EmailService,
+    private readonly searchService: SearchService,
   ) {}
   private readonly logger = new Logger(ScheduleService.name);
 
@@ -44,7 +46,9 @@ export class ScheduleService {
       } else {
         campaign.status = CampaignStatus.SUCCESS;
       }
-
+      this.searchService.updateCampaignOnES(campaign.id, {
+        status: campaign.status,
+      });
       await this.repositoryService.campaign.save(campaign);
 
       const contributions = await this.repositoryService.contribution.find({

@@ -28,6 +28,7 @@ import { envs } from '@/config';
 import { EmailService } from '@/services/email/email.service';
 import { SearchService } from '@/services/search/search.service';
 import { QueryDslQueryContainer } from '@elastic/elasticsearch/lib/api/types';
+import { IUpdateCampaignES } from '@/services/search/search.interface';
 
 @Injectable()
 export class CampaignService {
@@ -444,6 +445,7 @@ export class CampaignService {
     await this.checkOwner(campaignId, user);
     const campaign = await this.findOneById(campaignId);
     const { imageTypeName, faqs, fieldId, ...dataUpdate } = data;
+    let updateCampaignOnESBody: IUpdateCampaignES = {};
 
     if (file) {
       if (!imageTypeName) throw new BadRequestException('Vui lòng bổ sung loại hình ảnh');
@@ -453,6 +455,10 @@ export class CampaignService {
       }
       const res = await this.cloudinaryService.uploadFile(file);
       dataUpdate[imageTypeName] = res.secure_url as string;
+
+      if (imageTypeName === 'cardImage') {
+        updateCampaignOnESBody.cardImage = dataUpdate[imageTypeName];
+      }
     }
     if (faqs) {
       await this.repository.faq.delete({
@@ -473,6 +479,33 @@ export class CampaignService {
         newFaqs.push(faq);
       });
       await this.repository.faq.save(newFaqs);
+    }
+
+    if (fieldId) {
+      const field = await this.repository.field.findOne({
+        where: {
+          id: fieldId,
+        },
+        relations: {
+          fieldGroup: true,
+        },
+      });
+
+      updateCampaignOnESBody.field = field.name;
+      updateCampaignOnESBody.fieldGroup = field.fieldGroup.name;
+    }
+    const allowedKeys = ['title', 'tagline', 'location', 'duration', 'goal', 'story'];
+    const filteredData = Object.fromEntries(
+      Object.entries(dataUpdate).filter(([key]) => allowedKeys.includes(key)),
+    );
+
+    updateCampaignOnESBody = {
+      ...updateCampaignOnESBody,
+      ...filteredData,
+    };
+
+    if (campaign.status !== CampaignStatus.DRAFT) {
+      this.searchService.updateCampaignOnES(campaign.id, updateCampaignOnESBody);
     }
 
     return await this.repository.campaign.save({
@@ -722,16 +755,27 @@ export class CampaignService {
         email: campaign.owner.email,
         campaignTitle: campaign.title,
       });
+
+      this.searchService.addCampaignToES({
+        ...campaign,
+        status: CampaignStatus.FUNDING,
+      });
     }
     if (campaign.status === CampaignStatus.TERMINATE && status === CampaignStatus.FUNDING) {
       this.emailService.sendReFundingEmail({
         email: campaign.owner.email,
         campaignTitle: campaign.title,
       });
+      this.searchService.updateCampaignOnES(campaign.id, {
+        status,
+      });
     } else if (status === CampaignStatus.TERMINATE) {
       this.emailService.sendTerminateEmail({
         email: campaign.owner.email,
         campaignTitle: campaign.title,
+      });
+      this.searchService.updateCampaignOnES(campaign.id, {
+        status,
       });
     }
     campaign.status = status;
