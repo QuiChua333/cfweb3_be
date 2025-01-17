@@ -8,6 +8,7 @@ import { AuthService } from '../auth/auth.service';
 import { ConfirmMemberStatus, Role, VerifyStatus } from '@/constants';
 import { JwtService } from '@nestjs/jwt';
 import { envs } from '@/config';
+import { id } from 'ethers';
 
 @Injectable()
 export class TeamMemberService {
@@ -145,6 +146,28 @@ export class TeamMemberService {
     await this.repository.teamMember.save(member);
 
     return { existedUser: true, email, campaignId };
+  }
+
+  async updateUserIdMember(campaignId: string, email: string) {
+    const teamMember = await this.repository.teamMember.findOne({
+      where: {
+        campaign: {
+          id: campaignId,
+        },
+        email,
+      },
+    });
+
+    if (!teamMember) throw new BadRequestException('Thành viên không tồn tại');
+    const user = await this.repository.user.findOneBy({ email });
+    if (!user) throw new BadRequestException('Người dùng không tồn tại');
+
+    await this.repository.teamMember.save({
+      id: teamMember.id,
+      user: {
+        id: user.id,
+      },
+    });
   }
   async deleteMember(campaignId: string, email: string, curerntUser: ITokenPayload) {
     // checkowner

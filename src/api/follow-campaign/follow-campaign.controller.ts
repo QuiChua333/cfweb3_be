@@ -10,7 +10,7 @@ export class FollowCampaignController {
   constructor(private readonly followCampaignService: FollowCampaignService) {}
 
   @InjectRoute(FollowCampaignRoute.getCampaignsFollowed)
-  getCampaignsFollowed(@Query('userId') userId: string) {
+  getCampaignsFollowed(@Param('userId') userId: string) {
     return this.followCampaignService.getCampaignsFollowed(userId);
   }
 

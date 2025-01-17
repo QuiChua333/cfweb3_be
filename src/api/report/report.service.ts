@@ -41,7 +41,7 @@ export class ReportService {
     // Tìm kiếm không phân biệt hoa thường theo searchString trong title
     if (searchString && searchString.trim() !== '') {
       query.andWhere(
-        'report.title ILIKE :searchString OR campaign.title ILIKE :searchString OR reportBy.email ILIKE :searchString OR reportBy.fullName ILIKE :searchString',
+        '(report.title ILIKE :searchString OR campaign.title ILIKE :searchString OR reportBy.email ILIKE :searchString OR reportBy.fullName ILIKE :searchString)',
         {
           searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
         },
@@ -105,5 +105,62 @@ export class ReportService {
       ...createData,
     });
     return await this.repository.report.save(report);
+  }
+
+  async getAllReportOfCurrentUser(
+    reportPaginationDto: ReportPaginationDto,
+    currentUser: ITokenPayload,
+  ) {
+    const { page = 1, limit = 10, searchString, status } = reportPaginationDto;
+
+    const query = this.repository.report
+      .createQueryBuilder('report')
+      .leftJoinAndSelect('report.campaign', 'campaign') // Tham chiếu đúng đến report.campaign
+      .leftJoinAndSelect('report.reportBy', 'reportBy') // Tham chiếu đúng đến report.reportBy
+      .leftJoinAndSelect('report.reportResponse', 'reportResponse')
+      .select([
+        'report.id',
+        'report.title',
+        'report.content',
+        'report.images',
+        'report.date',
+        'report.status',
+        'campaign.id', // Chỉ lấy ID để liên kết, nếu cần
+        'campaign.title', // Lấy title từ campaign
+        'reportBy.id', // Chỉ lấy ID để liên kết, nếu cần
+        'reportBy.fullName', // Lấy fullName từ reportBy
+        'reportBy.avatar',
+        'reportBy.email', // Lấy email từ reportBy
+        'reportResponse.id',
+        'reportResponse.content', // Thay đổi theo các trường bạn muốn lấy từ ReportResponse
+        'reportResponse.date', // Ví dụ t
+        'reportResponse.images', // Ví dụ t
+      ]);
+
+    query.andWhere('reportBy.id = :id', { id: currentUser.id });
+    // Tìm kiếm không phân biệt hoa thường theo searchString trong title
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere('(report.title ILIKE :searchString OR campaign.title ILIKE :searchString)', {
+        searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
+      });
+    }
+
+    // Tìm kiếm theo status
+    if (status && status !== ReportQueryStatus.ALL) {
+      query.andWhere('report.status = :status', { status });
+    }
+
+    // Phân trang
+    const [results, total] = await query
+      .take(limit) // Giới hạn số bản ghi trên mỗi trang
+      .skip((page - 1) * limit) // Bắt đầu từ vị trí dựa trên trang
+      .getManyAndCount(); // Lấy dữ liệu và tổng số bản ghi
+    const totalPages = Math.ceil(total / limit);
+    return {
+      reports: results,
+      totalPages,
+      page,
+      limit,
+    };
   }
 }

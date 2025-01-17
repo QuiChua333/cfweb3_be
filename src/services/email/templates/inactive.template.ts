@@ -32,6 +32,7 @@ const inactiveTemplate = () => {
           <h2>Thông báo khóa tài khoản</h2>
          
           <p>Tài khoản của bạn trên hệ thống tạm thời bị khóa bởi một số nguyên nhân nào đó</p>
+          <p>Tạm thời, bạn không thể tạo bất kỳ chiến dịch gây quỹ nào</p>
           <p>Vui lòng liên hệ với đội ngũ của GIVE FUN để được hỗ trợ</p>
           
         </td>

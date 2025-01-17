@@ -39,7 +39,10 @@ export class TeamMemberController {
       await this.teamMemberService.confirmInvitation(token);
 
     if (!existedUser) res.redirect(`${envs.fe.homeUrl}/login`);
-    else res.redirect(`${envs.fe.homeUrl}/campaigns/${campaignId}/edit/team`);
+    else {
+      await this.teamMemberService.updateUserIdMember(campaignId, email);
+      res.redirect(`${envs.fe.homeUrl}/campaigns/${campaignId}/edit/team`);
+    }
     //redirect to fe verify email success
   }
 

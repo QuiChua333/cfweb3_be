@@ -201,7 +201,7 @@ export class PerkService {
       }
       const res = await this.cloudinaryService.uploadFile(file);
       const image = res.secure_url as string;
-      updatePerkDto.image = image;
+      updateData.image = image;
     }
 
     let date: Date;

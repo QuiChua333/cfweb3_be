@@ -20,6 +20,13 @@ const ReportRoute = {
     code: HttpStatus.OK,
     jwtSecure: true,
   },
+
+  getAllReportOfCurrentUser: <IRouteParams>{
+    path: '/me',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
 };
 
 export default ReportRoute;

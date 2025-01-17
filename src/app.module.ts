@@ -35,6 +35,7 @@ import { NotificationModule } from './api/notification/notification.module';
 import { Web3Module } from './services/web3/web3.module';
 import { ScheduleModule } from './services/schedule/schedule.module';
 import { SearchModule } from './services/search/search.module';
+import { StatisticModule } from './api/statistic/statistic.module';
 
 @Module({
   imports: [
@@ -64,7 +65,7 @@ import { SearchModule } from './services/search/search.module';
     GiftModule,
     AdminModule,
     NftModule,
-    // Web3Module,
+    Web3Module,
     PinataModule,
     // ScheduleModule,
     OpenAIModule,
@@ -76,6 +77,8 @@ import { SearchModule } from './services/search/search.module';
     NotificationModule,
 
     SearchModule,
+
+    StatisticModule,
   ],
   controllers: [AppController],
 })

@@ -37,6 +37,7 @@ export class CommentService {
 
   async createComment(user: ITokenPayload, createCommentDto: CreateCommentDto) {
     const { content, campaignId, replyId, tagId } = createCommentDto;
+    console.log(createCommentDto);
     let replyComment: Comment;
     if (replyId) {
       replyComment = await this.repository.comment.findOne({
@@ -98,26 +99,30 @@ export class CommentService {
         replies: true,
       },
     });
-    const userComment = await this.repository.user.findOneBy({ id: user.id });
-    const notificationContent = `${userComment.fullName} đã trả lời bình luận của bạn trong một cuộc thảo luận`;
-    const url = `${envs.fe.homeUrl}/project/${campaignId}/detail`;
-    const newNotification = await this.repository.notification.save({
-      content: notificationContent,
-      url,
-      user: {
-        id: replyComment.author.id,
-      },
-      isRead: false,
-    });
 
-    this.socketGateway.emitEvent(
-      'newNotification',
-      {
-        ...newNotification,
-        to: replyComment.author.id,
-      },
-      [replyComment.author.id],
-    );
+    if (replyId) {
+      const userComment = await this.repository.user.findOneBy({ id: user.id });
+      const notificationContent = `${userComment.fullName} đã trả lời bình luận của bạn trong một cuộc thảo luận`;
+      const url = `${envs.fe.homeUrl}/project/${campaignId}/detail`;
+      const newNotification = await this.repository.notification.save({
+        content: notificationContent,
+        url,
+        user: {
+          id: replyComment.author.id,
+        },
+        isRead: false,
+      });
+
+      this.socketGateway.emitEvent(
+        'newNotification',
+        {
+          ...newNotification,
+          to: replyComment.author.id,
+        },
+        [replyComment.author.id],
+      );
+    }
+
     return {
       ...response,
       commentLikes: response.commentLikes.map((item) => item.user.id),

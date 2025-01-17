@@ -57,6 +57,11 @@ export class Campaign extends BaseEntity {
   @Column({
     nullable: true,
   })
+  finishedAt: Date;
+
+  @Column({
+    nullable: true,
+  })
   cardImage: string;
 
   @Column({
@@ -88,6 +93,21 @@ export class Campaign extends BaseEntity {
     nullable: true,
   })
   goal: number;
+
+  @Column({
+    default: false,
+  })
+  isSend: boolean;
+
+  @Column({
+    default: false,
+  })
+  isRefund: boolean;
+
+  @Column({
+    nullable: true,
+  })
+  proofImage: string;
 
   @Column({
     default: false,

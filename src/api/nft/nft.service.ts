@@ -16,7 +16,7 @@ export class NftService {
   constructor(
     private readonly repository: RepositoryService,
     private readonly campaignService: CampaignService,
-    // private readonly web3Service: Web3Service,
+    private readonly web3Service: Web3Service,
     private readonly pinataService: PinataService,
   ) {}
   async createNFT(user: ITokenPayload, createNFTDto: CreateNFTDto) {
@@ -44,24 +44,24 @@ export class NftService {
       isNFT: true,
     });
 
-    // const tx = await this.web3Service.createNFT(createNFTDto, metadataLink);
+    const tx = await this.web3Service.createNFT(createNFTDto, metadataLink);
 
-    // await this.repository.nftCreation.save({
-    //   authorAddress: createNFTDto.authorAddress,
-    //   factoryContractAddress: envs.web3.factoryContractAddress,
-    //   name: createNFTDto.name,
-    //   symbol: createNFTDto.symbol,
-    //   transactionHash: tx.hash,
-    //   price: createNFTDto.nftPrice,
-    //   metadataLink,
-    //   perk: {
-    //     id: perk.id,
-    //   },
-    // });
+    await this.repository.nftCreation.save({
+      authorAddress: createNFTDto.authorAddress,
+      factoryContractAddress: envs.web3.factoryContractAddress,
+      name: createNFTDto.name,
+      symbol: createNFTDto.symbol,
+      transactionHash: tx.hash,
+      price: createNFTDto.nftPrice,
+      metadataLink,
+      perk: {
+        id: perk.id,
+      },
+    });
 
-    // console.log('metadataNFTLink: ', metadataLink);
-    // console.log('Creating NFT transaction:', tx.hash);
-    // return tx.hash;
+    console.log('metadataNFTLink: ', metadataLink);
+    console.log('Creating NFT transaction:', tx.hash);
+    return tx.hash;
   }
 
   private async handleMetadata(perk: Perk, createNFTDto: CreateNFTDto) {

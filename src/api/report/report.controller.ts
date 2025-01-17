@@ -35,4 +35,12 @@ export class ReportController {
   ) {
     return this.reportService.createReport(currentUser, createReportDto, files);
   }
+
+  @InjectRoute(ReportRoute.getAllReportOfCurrentUser)
+  getAllReportOfCurrentUser(
+    @Query() reportPaginationDto: ReportPaginationDto,
+    @User() currentUser: ITokenPayload,
+  ) {
+    return this.reportService.getAllReportOfCurrentUser(reportPaginationDto, currentUser);
+  }
 }

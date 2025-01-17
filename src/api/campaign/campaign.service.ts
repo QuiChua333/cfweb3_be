@@ -18,10 +18,15 @@ import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 import {
   CampaignExplorePaginationDto,
   CampaignExploreQueryStatus,
+  CampaignFailedPaginationDto,
   CampaignPaginationDto,
   CampaignQueryStatus,
+  CampaignRefundStatus,
+  CampaignSendStatus,
+  CampaignSuccessPaginationDto,
   FaqDto,
   UpdateCampaignDto,
+  UpdateSendDto,
 } from './dto';
 import { Campaign, FAQ } from '@/entities';
 import { envs } from '@/config';
@@ -48,7 +53,7 @@ export class CampaignService {
 
     // Tìm kiếm không phân biệt hoa thường theo searchString trong title
     if (searchString && searchString.trim() !== '') {
-      query.andWhere('campaign.title ILIKE :searchString OR owner.fullName ILIKE :searchString', {
+      query.andWhere('(campaign.title ILIKE :searchString OR owner.fullName ILIKE :searchString)', {
         searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
       });
     }
@@ -64,6 +69,120 @@ export class CampaignService {
       .skip((page - 1) * limit) // Bắt đầu từ vị trí dựa trên trang
       .getManyAndCount(); // Lấy dữ liệu và tổng số bản ghi
     const totalPages = Math.ceil(total / limit);
+
+    for (let i = 0; i < results.length; i++) {
+      const campaign = results[i];
+      const total = await this.repository.contribution
+        .createQueryBuilder('contribution')
+        .select('SUM(contribution.amount)', 'totalAmount')
+        .where('contribution.campaignId = :campaignId', { campaignId: campaign.id })
+        .andWhere('contribution.status = :status', {
+          status: PaymentStatus.SUCCESS,
+        })
+        .getRawOne();
+      campaign['currentMoney'] = Number(total?.totalAmount || 0);
+    }
+    return {
+      campaigns: results,
+      totalPages,
+      page,
+      limit,
+    };
+  }
+
+  async findAllSuccess(campaignSuccessPaginationDto: CampaignSuccessPaginationDto) {
+    const { page = 1, limit = 10, searchString, status: sendStatus } = campaignSuccessPaginationDto;
+    const query = this.repository.campaign
+      .createQueryBuilder('campaign')
+      .leftJoinAndSelect('campaign.owner', 'owner')
+      .where('campaign.deletedAt IS NULL') // Lọc các campaign chưa bị xóa
+      .andWhere('campaign.status = :status', { status: CampaignStatus.SUCCESS });
+
+    // Tìm kiếm không phân biệt hoa thường theo searchString trong title
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere('(campaign.title ILIKE :searchString OR owner.fullName ILIKE :searchString)', {
+        searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
+      });
+    }
+
+    if (sendStatus && sendStatus !== CampaignSendStatus.ALL) {
+      query.andWhere('campaign.isSend = :isSend', {
+        isSend: sendStatus === CampaignSendStatus.SEND,
+      });
+    }
+
+    // Phân trang
+    const [results, total] = await query
+      .take(limit) // Giới hạn số bản ghi trên mỗi trang
+      .skip((page - 1) * limit) // Bắt đầu từ vị trí dựa trên trang
+      .getManyAndCount(); // Lấy dữ liệu và tổng số bản ghi
+    const totalPages = Math.ceil(total / limit);
+
+    for (let i = 0; i < results.length; i++) {
+      const campaign = results[i];
+      const total = await this.repository.contribution
+        .createQueryBuilder('contribution')
+        .select('SUM(contribution.amount)', 'totalAmount')
+        .where('contribution.campaignId = :campaignId', { campaignId: campaign.id })
+        .andWhere('contribution.status = :status', {
+          status: PaymentStatus.SUCCESS,
+        })
+        .getRawOne();
+      campaign['currentMoney'] = Number(total?.totalAmount || 0);
+    }
+    return {
+      campaigns: results,
+      totalPages,
+      page,
+      limit,
+    };
+  }
+
+  async findAllFailed(campaignFailedPaginationDto: CampaignFailedPaginationDto) {
+    const {
+      page = 1,
+      limit = 10,
+      searchString,
+      status: refundStatus,
+    } = campaignFailedPaginationDto;
+    const query = this.repository.campaign
+      .createQueryBuilder('campaign')
+      .leftJoinAndSelect('campaign.owner', 'owner')
+      .where('campaign.deletedAt IS NULL') // Lọc các campaign chưa bị xóa
+      .andWhere('campaign.status = :status', { status: CampaignStatus.FAILED });
+
+    // Tìm kiếm không phân biệt hoa thường theo searchString trong title
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere('(campaign.title ILIKE :searchString OR owner.fullName ILIKE :searchString)', {
+        searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
+      });
+    }
+
+    if (refundStatus && refundStatus !== CampaignRefundStatus.ALL) {
+      query.andWhere('campaign.isRefund = :isRefund', {
+        isRefund: refundStatus === CampaignRefundStatus.SEND,
+      });
+    }
+
+    // Phân trang
+    const [results, total] = await query
+      .take(limit) // Giới hạn số bản ghi trên mỗi trang
+      .skip((page - 1) * limit) // Bắt đầu từ vị trí dựa trên trang
+      .getManyAndCount(); // Lấy dữ liệu và tổng số bản ghi
+    const totalPages = Math.ceil(total / limit);
+
+    for (let i = 0; i < results.length; i++) {
+      const campaign = results[i];
+      const total = await this.repository.contribution
+        .createQueryBuilder('contribution')
+        .select('SUM(contribution.amount)', 'totalAmount')
+        .where('contribution.campaignId = :campaignId', { campaignId: campaign.id })
+        .andWhere('contribution.status = :status', {
+          status: PaymentStatus.SUCCESS,
+        })
+        .getRawOne();
+      campaign['currentMoney'] = Number(total?.totalAmount || 0);
+    }
     return {
       campaigns: results,
       totalPages,
@@ -669,6 +788,29 @@ export class CampaignService {
     return campaigns;
   }
 
+  async editSendFundStatus(
+    campaignId: string,
+    updateSendDto: UpdateSendDto,
+    file: Express.Multer.File,
+  ) {
+    const campaign = await this.repository.campaign.findOneBy({ id: campaignId });
+    if ('isSend' in updateSendDto) {
+      campaign.isSend = this.getBoolean(updateSendDto.isSend);
+    }
+
+    if (file) {
+      const url = campaign.proofImage;
+      if (url) {
+        await this.cloudinaryService.destroyFile(url);
+      }
+      const res = await this.cloudinaryService.uploadFile(file);
+      const image = res.secure_url as string;
+      campaign.proofImage = image;
+    }
+
+    return await this.repository.campaign.save(campaign);
+  }
+
   findOneById(id: string) {
     return this.repository.campaign.findOneBy({
       id,
@@ -746,6 +888,9 @@ export class CampaignService {
       },
       relations: {
         owner: true,
+        field: {
+          fieldGroup: true,
+        },
       },
     });
     if (!campaign) throw new NotFoundException('Chiến dịch không tồn tại');
@@ -781,5 +926,11 @@ export class CampaignService {
     campaign.status = status;
 
     return await this.repository.campaign.save(campaign);
+  }
+
+  getBoolean(value: string) {
+    let res: boolean;
+    ['1', 'true'].includes(value) ? (res = true) : (res = false);
+    return res;
   }
 }

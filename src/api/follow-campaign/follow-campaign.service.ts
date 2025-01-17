@@ -20,6 +20,7 @@ export class FollowCampaignService {
         },
       },
     });
+
     return followedCampaigns.map((item) => item.campaign);
   }
 

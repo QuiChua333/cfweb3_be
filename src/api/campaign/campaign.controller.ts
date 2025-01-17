@@ -15,7 +15,14 @@ import { CampaignService } from './campaign.service';
 import CampaignRoute from './campaign.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
-import { CampaignExplorePaginationDto, CampaignPaginationDto, UpdateCampaignDto } from './dto';
+import {
+  CampaignExplorePaginationDto,
+  CampaignFailedPaginationDto,
+  CampaignPaginationDto,
+  CampaignSuccessPaginationDto,
+  UpdateCampaignDto,
+  UpdateSendDto,
+} from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { Request } from 'express';
 import { CampaignStatus } from '@/constants';
@@ -27,6 +34,16 @@ export class CampaignController {
   @InjectRoute(CampaignRoute.createCampaign)
   create(@User() user: ITokenPayload) {
     return this.campaignService.createCampaign(user);
+  }
+
+  @InjectRoute(CampaignRoute.findAllSuccess)
+  findAllSuccess(@Query() campaignSuccessPaginationDto: CampaignSuccessPaginationDto) {
+    return this.campaignService.findAllSuccess(campaignSuccessPaginationDto);
+  }
+
+  @InjectRoute(CampaignRoute.findAllFailed)
+  findAllFailed(@Query() campaignFailedPaginationDto: CampaignFailedPaginationDto) {
+    return this.campaignService.findAllFailed(campaignFailedPaginationDto);
   }
 
   @InjectRoute(CampaignRoute.findAll)
@@ -117,5 +134,14 @@ export class CampaignController {
     @Param('campaignId') campaignId: string,
   ) {
     return this.campaignService.adminChangeStatus(campaignId, status);
+  }
+  @InjectRoute(CampaignRoute.editSendFundStatus)
+  @UseInterceptors(FileInterceptor('file'))
+  editSendFundStatus(
+    @Param('campaignId') campaignId: string,
+    @Body() updateSendDto: UpdateSendDto,
+    @UploadedFile() file: Express.Multer.File,
+  ) {
+    return this.campaignService.editSendFundStatus(campaignId, updateSendDto, file);
   }
 }

@@ -13,6 +13,20 @@ const CampaignRoute = {
     jwtSecure: false,
   },
 
+  findAllSuccess: <IRouteParams>{
+    path: '/success',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  findAllFailed: <IRouteParams>{
+    path: '/failed',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
   getCampaignsExplore: <IRouteParams>{
     path: '/explore',
     method: RequestMethod.GET,
@@ -138,6 +152,14 @@ const CampaignRoute = {
     method: RequestMethod.GET,
     code: HttpStatus.OK,
     jwtSecure: false,
+  },
+
+  editSendFundStatus: <IRouteParams>{
+    path: '/send-fund/:campaignId/status',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+    roles: [Role.Admin],
   },
 };
 

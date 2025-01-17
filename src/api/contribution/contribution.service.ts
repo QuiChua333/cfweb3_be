@@ -138,7 +138,7 @@ export class ContributionService {
 
     if (searchString && searchString.trim() !== '') {
       if ('khách vãng lai'.includes(searchString.trim().toLowerCase())) {
-        query.andWhere("user.fullName IS NULL OR user.fullName = ''");
+        query.andWhere("(user.fullName IS NULL OR user.fullName = '')");
       } else {
         // Tìm kiếm theo email hoặc fullName
         query.andWhere(

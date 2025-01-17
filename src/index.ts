@@ -16,8 +16,8 @@ export const initApplication = async (): Promise<INestApplication> => {
 
   loadGuards(app);
 
-  // const web3Service = app.get<Web3Service>(Web3Service);
-  // web3Service.watchContractEvent();
+  const web3Service = app.get<Web3Service>(Web3Service);
+  web3Service.watchContractEvent();
 
   return app;
 };

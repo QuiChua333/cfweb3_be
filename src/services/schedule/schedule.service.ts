@@ -46,6 +46,7 @@ export class ScheduleService {
       } else {
         campaign.status = CampaignStatus.SUCCESS;
       }
+      campaign.finishedAt = new Date();
       this.searchService.updateCampaignOnES(campaign.id, {
         status: campaign.status,
       });
