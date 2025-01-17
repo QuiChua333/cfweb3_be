@@ -1,9 +1,6 @@
 import { IsArray, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
-export class StatisticCampaignTimeDto {
-  @IsString()
-  quarter: string;
-
+export class StatisticMoneyTimeDto {
   @IsString()
   year: string;
 }
