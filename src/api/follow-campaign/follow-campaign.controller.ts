@@ -4,14 +4,18 @@ import FollowCampaignRoute from './follow-campaign.routes';
 import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
 import { FollowCampaignDto } from './dto';
+import { CampaignPaginationDto } from '../campaign/dto';
 
 @Controller(FollowCampaignRoute.root)
 export class FollowCampaignController {
   constructor(private readonly followCampaignService: FollowCampaignService) {}
 
   @InjectRoute(FollowCampaignRoute.getCampaignsFollowed)
-  getCampaignsFollowed(@Param('userId') userId: string) {
-    return this.followCampaignService.getCampaignsFollowed(userId);
+  getCampaignsFollowed(
+    @Param('userId') userId: string,
+    @Query() campaignPaginationDto: CampaignPaginationDto,
+  ) {
+    return this.followCampaignService.getCampaignsFollowed(userId, campaignPaginationDto);
   }
 
   @InjectRoute(FollowCampaignRoute.follow)

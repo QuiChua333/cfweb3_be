@@ -656,54 +656,77 @@ export class CampaignService {
     return await this.repository.campaign.softDelete(campaignId);
   }
 
-  async getCampaignsOfOwner(userId: string) {
-    const campaigns = await this.repository.campaign.find({
-      where: {
-        owner: {
-          id: userId,
-        },
-      },
-      relations: {
-        owner: true,
-        teamMembers: {
-          user: true,
-        },
-      },
-      select: {
-        teamMembers: {
-          user: {
-            id: true,
-          },
-        },
-      },
-    });
+  async getCampaignsOfOwner(userId: string, campaignPaginationDto: CampaignPaginationDto) {
+    const { status, searchString } = campaignPaginationDto;
 
-    return campaigns;
+    const query = this.repository.campaign
+      .createQueryBuilder('campaign')
+      .leftJoinAndSelect('campaign.owner', 'owner')
+      .leftJoinAndSelect('campaign.teamMembers', 'teamMembers')
+      .leftJoinAndSelect('teamMembers.user', 'teamMemberUser')
+      .where('campaign.ownerId = :userId', { userId });
+
+    // Tìm kiếm theo chuỗi
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere(
+        '(campaign.title ILIKE :searchString OR owner.email ILIKE :searchString OR owner.fullName ILIKE :searchString)',
+        {
+          searchString: `%${searchString}%`,
+        },
+      );
+    }
+
+    // Tìm kiếm theo trạng thái
+    if (status && status !== CampaignQueryStatus.ALL) {
+      query.andWhere('campaign.status = :status', { status });
+    }
+
+    // Phân trang
+    const [results] = await query.getManyAndCount(); // Lấy dữ liệu và tổng số bản ghi
+
+    return {
+      campaigns: results,
+    };
   }
 
-  async getCampaignsOfMember(userId: string) {
-    const memberCampaigns = await this.repository.teamMember.find({
-      where: {
-        user: {
-          id: userId,
-        },
-      },
-      relations: {
-        campaign: {
-          teamMembers: {
-            user: true,
-          },
-          owner: true,
-        },
-      },
-    });
+  async getCampaignsOfMember(userId: string, campaignPaginationDto: CampaignPaginationDto) {
+    const { status, searchString } = campaignPaginationDto;
 
-    return memberCampaigns.map((memberCampaign) => ({
-      ...memberCampaign.campaign,
-      role: memberCampaign.role,
-      isEdit: memberCampaign.isEdit,
-      confirmStatus: memberCampaign.confirmStatus,
-    }));
+    const query = this.repository.teamMember
+      .createQueryBuilder('teamMember')
+      .leftJoinAndSelect('teamMember.campaign', 'campaign')
+      .leftJoinAndSelect('campaign.owner', 'owner')
+      .leftJoinAndSelect('campaign.teamMembers', 'teamMembers')
+      .leftJoinAndSelect('teamMembers.user', 'teamMemberUser')
+      .where('teamMember.userId = :userId', { userId });
+
+    // Tìm kiếm theo chuỗi
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere(
+        '(campaign.title ILIKE :searchString OR owner.email ILIKE :searchString OR owner.fullName ILIKE :searchString)',
+        {
+          searchString: `%${searchString}%`,
+        },
+      );
+    }
+
+    // Tìm kiếm theo trạng thái
+    if (status && status !== CampaignQueryStatus.ALL) {
+      query.andWhere('campaign.status = :status', { status });
+    }
+
+    // Thực hiện truy vấn
+    const memberCampaigns = await query.getMany();
+
+    // Định dạng kết quả trả về
+    return {
+      campaigns: memberCampaigns.map((memberCampaign) => ({
+        ...memberCampaign.campaign,
+        role: memberCampaign.role,
+        isEdit: memberCampaign.isEdit,
+        confirmStatus: memberCampaign.confirmStatus,
+      })),
+    };
   }
 
   async getQuantityCampaignsOfOwner(campaignId: string) {

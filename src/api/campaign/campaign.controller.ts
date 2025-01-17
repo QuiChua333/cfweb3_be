@@ -103,13 +103,19 @@ export class CampaignController {
   }
 
   @InjectRoute(CampaignRoute.getCampaignsOfOwner)
-  getCampaignsOfOwner(@Param('userId') userId: string) {
-    return this.campaignService.getCampaignsOfOwner(userId);
+  getCampaignsOfOwner(
+    @Param('userId') userId: string,
+    @Query() campaignPaginationDto: CampaignPaginationDto,
+  ) {
+    return this.campaignService.getCampaignsOfOwner(userId, campaignPaginationDto);
   }
 
   @InjectRoute(CampaignRoute.getCampaignsOfMember)
-  getCampaignsOfMember(@Param('userId') userId: string) {
-    return this.campaignService.getCampaignsOfMember(userId);
+  getCampaignsOfMember(
+    @Param('userId') userId: string,
+    @Query() campaignPaginationDto: CampaignPaginationDto,
+  ) {
+    return this.campaignService.getCampaignsOfMember(userId, campaignPaginationDto);
   }
 
   @InjectRoute(CampaignRoute.getQuantityCampaignsOfOwner)
