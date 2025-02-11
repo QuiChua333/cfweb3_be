@@ -18,6 +18,19 @@ const NftRoute = {
     method: RequestMethod.POST,
     code: HttpStatus.OK,
   },
+
+  getNFTsByCampaign: <IRouteParams>{
+    path: '/campaign/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+
+  getNFT: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+  },
 };
 
 export default NftRoute;

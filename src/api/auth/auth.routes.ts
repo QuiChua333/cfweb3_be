@@ -77,7 +77,7 @@ const AuthRoute = {
   },
 
   updatePasswordBaseOldPassword: <IRouteParams>{
-    path: '/user/:id',
+    path: '/user/updatePassword',
     method: RequestMethod.PATCH,
     code: HttpStatus.OK,
     jwtSecure: true,

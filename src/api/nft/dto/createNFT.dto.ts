@@ -1,11 +1,9 @@
+import { Type } from 'class-transformer';
 import { IsNumber, IsString } from 'class-validator';
 
 export class CreateNFTDto {
   @IsString()
-  perkId: string;
-
-  @IsString()
-  authorAddress: string;
+  campaignId: string;
 
   @IsString()
   name: string;
@@ -13,6 +11,26 @@ export class CreateNFTDto {
   @IsString()
   symbol: string;
 
+  @IsNumber()
+  @Type(() => Number)
+  price: number;
+
   @IsString()
-  nftPrice: string;
+  ethPrice: string;
+
+  @IsString()
+  description: string;
+
+  @IsString()
+  color: string;
+
+  @IsString()
+  materials: string;
+
+  @IsString()
+  styles: string;
+
+  @IsNumber()
+  @Type(() => Number)
+  supply: number;
 }

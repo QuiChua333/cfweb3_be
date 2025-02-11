@@ -56,7 +56,7 @@ export class PerkService {
       where: {
         id: perkId,
       },
-      relations: ['detailPerks.item', 'shippingFees', 'nftCreation'],
+      relations: ['detailPerks.item', 'shippingFees'],
     });
 
     if (!perk) throw new NotFoundException('Đặc quyền không tồn tại');

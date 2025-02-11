@@ -29,9 +29,15 @@ export class UserVerifyService {
       },
     });
     const user = await this.userService.findOneById(verifyUserId);
+
     return {
       ...info,
       verifyStatus: user.verifyStatus,
+      userInfo: {
+        fullName: user.fullName,
+        phoneNumber: user.phoneNumber,
+        address: user.address,
+      },
     };
   }
 

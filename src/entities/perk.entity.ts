@@ -3,7 +3,6 @@ import { BaseEntity } from './base/base.entity';
 import { Campaign } from './campaign.entity';
 import { DetailPerk } from './detail-perk.entity';
 import { ShippingFee } from './shipping-fee.entity';
-import { NFTCreateion } from './nft-creation.entity';
 
 @Entity()
 export class Perk extends BaseEntity {
@@ -36,11 +35,6 @@ export class Perk extends BaseEntity {
   isShipping: boolean;
 
   @Column({
-    default: false,
-  })
-  isNFT: boolean;
-
-  @Column({
     type: 'int',
   })
   quantity: number;
@@ -68,9 +62,4 @@ export class Perk extends BaseEntity {
     cascade: true,
   })
   shippingFees: ShippingFee[];
-
-  @OneToOne(() => NFTCreateion, (nftCreation) => nftCreation.perk, {
-    cascade: true,
-  })
-  nftCreation: NFTCreateion;
 }
