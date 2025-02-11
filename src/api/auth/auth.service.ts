@@ -235,8 +235,17 @@ export class AuthService {
     );
     if (!isMatchedOldPassword) throw new BadRequestException('Mật khẩu hiện tại không đúng');
     const hashedPassword = await this.hashData(updatePasswordBaseOldPassword.newPassword);
-    return this.userService.updatePassword(user.id, hashedPassword);
+    const tokens = await this.getTokens({
+      id: user.id,
+      email: currentUser.email,
+      role: currentUser.isAdmin ? Role.Admin : Role.User,
+    });
+
+    await this.userService.updatePassword(user.id, hashedPassword);
+    await this.updateRefreshToken(user.id, tokens.refreshToken);
+    return tokens;
   }
+
   async validateJwtUser(email: string) {
     const user = await this.userService.findOneByEmail(email);
 

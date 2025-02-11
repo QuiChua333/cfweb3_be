@@ -17,7 +17,9 @@ export class NFTCreateion extends BaseEntity {
   @Column()
   factoryContractAddress: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
   metadataLink: string;
 
   @Column()
@@ -29,7 +31,11 @@ export class NFTCreateion extends BaseEntity {
   @Column()
   symbol: string;
 
-  @Column()
+  @Column(
+    {
+      nullable: true,
+    }
+  )
   price: string;
 
   @Column({
