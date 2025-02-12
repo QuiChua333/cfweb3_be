@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
 import { AllFieldGroupDto, CreateFieldGroupDto, UpdateFieldGroupDto } from './dto';
 import { ILike } from 'typeorm';
@@ -52,14 +52,32 @@ export class FieldGroupService {
   
 
   async create(dto: CreateFieldGroupDto) {
-    const fieldGroup = await this.repository.fieldGroup.create(dto);
+    const existingFieldGroup = await this.repository.fieldGroup.findOne({ where: { name: dto.name } });
+    if (existingFieldGroup) {
+      throw new BadRequestException(`Nhóm lĩnh vực '${dto.name}' này đã tồn tại. Vui lòng thêm một cái khác.`);
+    }
+  
+    const fieldGroup = this.repository.fieldGroup.create(dto);
     return await this.repository.fieldGroup.save(fieldGroup);
   }
+  
 
   async update(id: string, dto: UpdateFieldGroupDto) {
+    const fieldGroup = await this.repository.fieldGroup.findOne({ where: { id } });
+    if (!fieldGroup) throw new BadRequestException('FieldGroup not found');
+  
+    if (dto.name && dto.name !== fieldGroup.name) {
+      const existingFieldGroup = await this.repository.fieldGroup.findOne({ where: { name: dto.name } });
+      if (existingFieldGroup) {
+        throw new BadRequestException(`Nhóm lĩnh vực '${dto.name}' này đã tồn tại. Vui lòng thêm một cái khác.`);
+        
+      }
+    }
+  
     await this.repository.fieldGroup.update(id, dto);
     return this.repository.fieldGroup.findOne({ where: { id } });
   }
+  
 
   async delete(id: string) {
     return await this.repository.fieldGroup.delete(id);

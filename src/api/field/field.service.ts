@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { RepositoryService } from '@/repositories/repository.service';
 import { AllFieldDto, CreateFieldDto, UpdateFieldDto } from './dto';
 import { ILike } from 'typeorm';
@@ -16,7 +16,7 @@ export class FieldService {
     const skip = (page - 1) * limit;
 
     if (!idFieldGroup) {
-      throw new Error("idFieldGroup is required");
+      throw new BadRequestException("idFieldGroup is required");
     }
 
     const whereCondition = {
@@ -66,36 +66,56 @@ export class FieldService {
 
   async getDetail(id: string) {
     const field = await this.repository.field.findOne({ where: { id } });
-    if (!field) throw new Error('Field not found');
+    if (!field) throw new BadRequestException('Field not found');
     return field;
   }
 
   async create(dto: CreateFieldDto) {
     const fieldGroup = await this.repository.fieldGroup.findOne({ where: { id: dto.fieldGroupId } });
-    if (!fieldGroup) throw new Error('FieldGroup not found');
-
-    const existingField = await this.repository.field.findOne({ where: { name: dto.name } });
+    if (!fieldGroup) throw new BadRequestException('FieldGroup not found');
+  
+    const existingField = await this.repository.field.findOne({ 
+      where: { name: dto.name, fieldGroup: { id: dto.fieldGroupId } }
+    });
+  
     if (existingField) {
-        throw new Error(`Field with name '${dto.name}' already exists`);
+      if (existingField.fieldGroup.id === dto.fieldGroupId) {
+        throw new BadRequestException(`Lĩnh vực '${dto.name}' này đã tồn tại trong nhóm lĩnh vực này. Vui lòng nhập tên khác.`);
+      } else {
+        throw new BadRequestException(`Lĩnh vực '${dto.name}' này đã thuộc nhóm lĩnh vực khác. Vui lòng nhập tên khác.`);
+      }
     }
-
+  
     const field = this.repository.field.create({ name: dto.name, fieldGroup });
     return this.repository.field.save(field);
   }
+  
 
   async update(id: string, dto: UpdateFieldDto) {
     const field = await this.repository.field.findOne({ where: { id } });
-    if (!field) throw new Error('Field not found');
-
-    if (dto.fieldGroupId) {
+    if (!field) throw new BadRequestException('Field not found');
+  
+    if (dto.name && dto.name !== field.name) {
+      const existingField = await this.repository.field.findOne({ where: { name: dto.name } });
+      if (existingField) {
+        if (existingField.fieldGroup.id === dto.fieldGroupId) {
+          throw new BadRequestException(`Lĩnh vực '${dto.name}' này đã tồn tại trong nhóm lĩnh vực này. Vui lòng nhập tên khác.`);
+        } else {
+          throw new BadRequestException(`Lĩnh vực '${dto.name}' này đã thuộc nhóm lĩnh vực khác. Vui lòng nhập tên khác.`);
+        }
+      }
+      field.name = dto.name;
+    }
+  
+    if (dto.fieldGroupId && dto.fieldGroupId !== field.fieldGroup?.id) {
       const fieldGroup = await this.repository.fieldGroup.findOne({ where: { id: dto.fieldGroupId } });
-      if (!fieldGroup) throw new Error('FieldGroup not found');
+      if (!fieldGroup) throw new BadRequestException('FieldGroup not found');
       field.fieldGroup = fieldGroup;
     }
-    
-    if (dto.name) field.name = dto.name;
+  
     return this.repository.field.save(field);
   }
+  
 
   async delete(id: string) {
     return await this.repository.field.delete(id);
