@@ -1,14 +1,37 @@
 import { HttpStatus, RequestMethod } from '@nestjs/common';
 
 import type { IRouteParams } from '@/decorators';
-import { Role } from '@/constants';
 
 const FieldGroupRoute = {
   root: 'field-group',
 
-  findAll: <IRouteParams>{
+  getAll: <IRouteParams>{
     path: '/',
     method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+  getDetail: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+  create: <IRouteParams>{
+    path: '/',
+    method: RequestMethod.POST,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+  update: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.PATCH,
+    code: HttpStatus.OK,
+    jwtSecure: false,
+  },
+  delete: <IRouteParams>{
+    path: '/:id',
+    method: RequestMethod.DELETE,
     code: HttpStatus.OK,
     jwtSecure: false,
   },

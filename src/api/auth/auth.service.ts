@@ -245,6 +245,7 @@ export class AuthService {
     await this.updateRefreshToken(user.id, tokens.refreshToken);
     return tokens;
   }
+
   async validateJwtUser(email: string) {
     const user = await this.userService.findOneByEmail(email);
 

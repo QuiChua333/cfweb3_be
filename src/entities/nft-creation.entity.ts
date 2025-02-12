@@ -56,6 +56,11 @@ export class NFTCreateion extends BaseEntity {
   @Column()
   factoryContractAddress: string;
 
+  @Column({
+    nullable: true,
+  })
+  metadataLink: string;
+
   @Column()
   uri: string;
 

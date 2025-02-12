@@ -537,7 +537,7 @@ export class ContributionService {
       email,
       amountCrypto,
       customerWalletAddress,
-      isFinish: false,
+      isFinish: perks ? false : true,
       method: method,
       shippingInfo: JSON.stringify(shippingInfo),
       ...(perks
