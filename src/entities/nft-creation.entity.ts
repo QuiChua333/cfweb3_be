@@ -62,15 +62,6 @@ export class NFTCreateion extends BaseEntity {
   metadataLink: string;
 
   @Column()
-  transactionHash: string;
-
-  @Column()
-  name: string;
-
-  @Column()
-  symbol: string;
-
-  @Column()
   uri: string;
 
   @Column({
