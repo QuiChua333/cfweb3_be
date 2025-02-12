@@ -49,7 +49,10 @@ export class ContributionService {
       .createQueryBuilder('contribution')
       .leftJoinAndSelect('contribution.campaign', 'campaign')
       .leftJoinAndSelect('contribution.user', 'user')
-      .where('campaign.id = :campaignId', { campaignId });
+      .where('campaign.id = :campaignId', { campaignId })
+      .andWhere('contribution.status = :status', {
+        status: PaymentStatus.SUCCESS,
+      });
 
     if (searchString && searchString.trim() !== '') {
       if ('khách vãng lai'.includes(searchString.trim().toLowerCase())) {
@@ -112,8 +115,9 @@ export class ContributionService {
         bankAccountNumber: contribution.bankAccountNumber,
         bankUsername: contribution.bankUsername,
         perks: JSON.parse(contribution.perks as string),
+        nfts: JSON.parse(contribution.nfts as string),
         shippingInfo: JSON.parse(contribution.shippingInfo as string),
-        estDeliveryDate: JSON.parse(contribution.shippingInfo as string).estDeliveryDate,
+        estDeliveryDate: JSON.parse(contribution.shippingInfo as string)?.estDeliveryDate,
       })),
       totalPages,
       page,
@@ -186,8 +190,9 @@ export class ContributionService {
         bankAccountNumber: refund.bankAccountNumber,
         bankUsername: refund.bankUsername,
         perks: JSON.parse(refund.perks as string),
+        nfts: JSON.parse(refund.nfts as string),
         shippingInfo: JSON.parse(refund.shippingInfo as string),
-        estDeliveryDate: JSON.parse(refund.shippingInfo as string).estDeliveryDate,
+        estDeliveryDate: JSON.parse(refund.shippingInfo as string)?.estDeliveryDate,
       })),
       totalPages,
       page,
@@ -210,7 +215,10 @@ export class ContributionService {
       .createQueryBuilder('contribution')
       .leftJoinAndSelect('contribution.campaign', 'campaign')
       .leftJoinAndSelect('contribution.user', 'user')
-      .where('user.id = :userId', { userId: currentUser.id });
+      .where('user.id = :userId', { userId: currentUser.id })
+      .andWhere('contribution.status = :status', {
+        status: PaymentStatus.SUCCESS,
+      });
 
     if (searchString && searchString.trim() !== '') {
       query.andWhere('(campaign.title ILIKE :searchString)', { searchString: `%${searchString}%` });
@@ -257,8 +265,9 @@ export class ContributionService {
         campaignTitle: contribution.campaign.title,
         campaignId: contribution.campaign.id,
         perks: JSON.parse(contribution.perks as string),
+        nfts: JSON.parse(contribution.nfts as string),
         shippingInfo: JSON.parse(contribution.shippingInfo as string),
-        estDeliveryDate: JSON.parse(contribution.shippingInfo as string).estDeliveryDate,
+        estDeliveryDate: JSON.parse(contribution.shippingInfo as string)?.estDeliveryDate,
       })),
       totalPages,
       page,
@@ -487,7 +496,6 @@ export class ContributionService {
 
   async paymentCrypto(paymentDto: PaymentDto) {
     const contribution = await this.createNewContribution(paymentDto, PaymentMethod.CRYPTO);
-    this.sendMailContributionSuccess(contribution.id);
     return contribution.id;
   }
 
@@ -499,7 +507,6 @@ export class ContributionService {
   }
 
   private async createNewContribution(paymentDto: PaymentDto, method: PaymentMethod) {
-    console.log(paymentDto);
     const {
       perks,
       bankAccountNumber,
@@ -513,7 +520,7 @@ export class ContributionService {
       shippingFee,
       amountCrypto,
       customerWalletAddress,
-      transactionHash,
+      nfts,
     } = paymentDto;
     // foreach perk
     // transactionHash
@@ -530,12 +537,20 @@ export class ContributionService {
       email,
       amountCrypto,
       customerWalletAddress,
-      transactionHash,
       isFinish: false,
       method: method,
       shippingInfo: JSON.stringify(shippingInfo),
-      perks: JSON.stringify(perks),
-      status: method === PaymentMethod.CRYPTO ? PaymentStatus.SUCCESS : PaymentStatus.PENDING,
+      ...(perks
+        ? {
+            perks: JSON.stringify(perks),
+          }
+        : {}),
+      ...(nfts
+        ? {
+            nfts: JSON.stringify(nfts),
+          }
+        : {}),
+      status: PaymentStatus.PENDING,
       ...(userId
         ? {
             user: {
@@ -636,7 +651,7 @@ export class ContributionService {
     });
   }
 
-  private async sendMailContributionSuccess(contributionId: string) {
+  async sendMailContributionSuccess(contributionId: string) {
     const contribution = await this.repository.contribution.findOne({
       where: {
         id: contributionId,
@@ -652,6 +667,8 @@ export class ContributionService {
     });
     if (contribution.perks) {
       await this.emailService.sendContributionSuccessHasPerk(contribution);
+    } else if (contribution.nfts) {
+      await this.emailService.sendContributionSuccessHasNFT(contribution);
     } else {
       await this.emailService.sendContributionSuccessNoPerk(contribution);
     }

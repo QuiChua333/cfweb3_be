@@ -20,6 +20,7 @@ import contributionSuccessNoPerksTemplate from './templates/contribution-success
 import giftSuccessHasPerksTemplate from './templates/gift-success-has-perks.template';
 import campaignFailureNotificationTemplate from './templates/campaignFailureNotification.template';
 import campaignSuccessNotificationTemplate from './templates/campaignSuccessNotification.template';
+import contributionSuccessHasNFTsTemplate from './templates/contribution-success-has-nfts.template';
 
 @Injectable()
 export class EmailService {
@@ -113,6 +114,15 @@ export class EmailService {
 
   async sendContributionSuccessHasPerk(contribution: Contribution) {
     const html = contributionSuccessHasPerksTemplate(contribution);
+    return this.sendMail({
+      email: contribution.email,
+      subject: 'ĐÓNG GÓP CHIẾN DỊCH THÀNH CÔNG',
+      html,
+    });
+  }
+
+  async sendContributionSuccessHasNFT(contribution: Contribution) {
+    const html = contributionSuccessHasNFTsTemplate(contribution);
     return this.sendMail({
       email: contribution.email,
       subject: 'ĐÓNG GÓP CHIẾN DỊCH THÀNH CÔNG',

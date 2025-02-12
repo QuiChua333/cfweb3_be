@@ -31,6 +31,12 @@ export class Contribution extends BaseEntity {
   perks: Object;
 
   @Column({
+    type: 'jsonb',
+    nullable: true,
+  })
+  nfts: Object;
+
+  @Column({
     nullable: true,
   })
   date: Date;

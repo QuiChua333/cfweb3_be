@@ -36,6 +36,13 @@ export class PaymentDto {
   @IsOptional()
   perks?: PerkPaymentDto[];
 
+  @ValidateNested({
+    each: true,
+  })
+  @IsArray()
+  @IsOptional()
+  nfts?: NFTPaymentDto[];
+
   @IsNumber()
   @Type(() => Number)
   money: number;
@@ -106,6 +113,31 @@ export class PerkPaymentDto {
   })
   @IsArray()
   options: OptionPaymentDto[];
+}
+
+export class NFTPaymentDto {
+  @IsString()
+  id: string;
+
+  @IsString()
+  image: string;
+
+  @IsString()
+  name: string;
+
+  @IsNumber()
+  @Type(() => Number)
+  quantity: number;
+
+  @IsNumber()
+  @Type(() => Number)
+  price: number;
+
+  @IsString()
+  materials: string;
+
+  @IsString()
+  styles: string;
 }
 
 class OptionPaymentDto {

@@ -1,11 +1,8 @@
-import { PaymentMethod } from '@/constants';
 import { Contribution } from '@/entities';
 import { formatDate } from '@/utils';
 
-const contributionSuccessHasPerksTemplate = (contribution: Contribution) => {
-  const perks = JSON.parse(contribution.perks as string);
-  const shippingInfo = JSON.parse(contribution.shippingInfo as string);
-  const dateString = formatDate(new Date(shippingInfo.estDeliveryDate));
+const contributionSuccessHasNFTsTemplate = (contribution: Contribution) => {
+  const nfts = JSON.parse(contribution.nfts as string);
   return `<!DOCTYPE html>
   <html lang="en">
   <head>
@@ -75,23 +72,23 @@ const contributionSuccessHasPerksTemplate = (contribution: Contribution) => {
           </div>
           <div style="margin: 8px 0;">
             <span>Số tiền đóng góp: </span>
-            <span style="font-weight: bold; text-transform: uppercase;">${contribution.amount} ${contribution.method === PaymentMethod.CRYPTO && `${contribution.amountCrypto} ETH`}</span>
+            <span style="font-weight: bold; text-transform: uppercase;">${contribution.amountCrypto} ETH</span>
           </div>
         </div>
         <div style="height: 2px; background-color: #007b50; width: 100%; margin: 14px 0;"></div>
         <div class="">
-          <span style="font-size: 16px; font-weight: bold;">Danh sách đặc quyền bao gồm: </span>
+          <span style="font-size: 16px; font-weight: bold;">Danh sách NFT bao gồm: </span>
   
-          ${perks
-            .map((perk) => {
+          ${nfts
+            .map((nft) => {
               return `<div style="margin-left: 20px; margin-top: 10px;">
-              <b style="font-style: italic;">${perk.name} x ${perk.quantity}</b>
+              <b style="font-style: italic;">${nft.name} - ${nft.symbol} x ${nft.quantity}</b>
               <ul style="margin-left: 40px;">
-                  ${perk.options
-                    .map((i) => {
-                      return `<li>${i.quantity} ${i.name}: ${i.optionsString}</li>`;
-                    })
-                    .join('')}
+                  <li>Màu sắc: ${nft.color}</li>
+                  <li>Chất liệu: ${nft.materials}</li>
+                  <li>Phong cách: ${nft.styles}</li>
+                  <li>Token Ids: ${nft.tokenIds}</li>
+                  <li>Contract address: ${nft.contractAddress}</li>
               </ul>
             </div>`;
             })
@@ -100,26 +97,7 @@ const contributionSuccessHasPerksTemplate = (contribution: Contribution) => {
           
           
         </div>
-        <div style="height: 2px; background-color: #007b50; width: 100%; margin: 14px 0;"></div>
-        <div class="body3">
-          <span style="margin: 10px 0 30px; font-weight: bold; font-style: italic; text-decoration: underline;">THÔNG TIN GIAO NHẬN</span>
-          <div style="margin: 20px 0 8px;">
-            <span>Họ tên người nhận: </span>
-            <span style="font-weight: bold;">${shippingInfo.fullName}</span>
-          </div>
-          <div style="margin: 8px 0;">
-            <span>Điah chỉ nhận: </span>
-            <span style="font-weight: bold;">${shippingInfo.detail}, ${shippingInfo.ward}, ${shippingInfo.district}, ${shippingInfo.province}</span>
-          </div>
-          <div style="margin: 8px 0;">
-            <span>Số điện thoại: </span>
-            <span style="font-weight: bold;">${shippingInfo.phoneNumber}</span>
-          </div>
-          <div style="margin: 8px 0;">
-            <span>Ngày dự kiến nhận: </span>
-            <span style="font-weight: bold;">${dateString}</span>
-          </div>
-        </div>
+        
       </div>
       <div class="footer">
         <span style="color: #34CA96; font-weight: bold; font-size: 20px;">GiveFun cảm ơn bạn đã ủng hộ chiến dịch</span>
@@ -129,4 +107,4 @@ const contributionSuccessHasPerksTemplate = (contribution: Contribution) => {
   </html>`;
 };
 
-export default contributionSuccessHasPerksTemplate;
+export default contributionSuccessHasNFTsTemplate;

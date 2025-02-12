@@ -9,5 +9,6 @@ import { CloudinaryModule } from '@/services/cloudinary/cloudinary.module';
   imports: [CampaignModule, EmailModule, CloudinaryModule],
   controllers: [ContributionController],
   providers: [ContributionService],
+  exports: [ContributionService],
 })
 export class ContributionModule {}

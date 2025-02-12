@@ -6,6 +6,7 @@ import { CampaignService } from '../campaign/campaign.service';
 import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 import { DetailPerk, ShippingFee } from '@/entities';
 import { PaymentStatus } from '@/constants';
+import { Raw } from 'typeorm';
 
 @Injectable()
 export class PerkService {
@@ -29,23 +30,32 @@ export class PerkService {
         },
       },
     });
-    const claimeds: number[] = [];
-    for (let i = 0; i < perks.length; i++) {
-      const claimed = await this.repository.contribution
-        .createQueryBuilder('contribution')
-        .where('contribution.status = :status', {
-          status: PaymentStatus.SUCCESS,
-        })
-        .andWhere('contribution.perks @> :perkCondition1', {
-          perkCondition1: JSON.stringify([{ id: perks[i].id }]),
-        })
-        .getCount();
-      claimeds.push(claimed);
+    const allContributions = await this.repository.contribution.find({
+      where: {
+        status: PaymentStatus.SUCCESS,
+      },
+    });
+
+    const claimed = {};
+    for (let i = 0; i < allContributions.length; i++) {
+      const perks = allContributions[i].perks as string;
+
+      if (perks) {
+        const perksObject = JSON.parse(perks);
+
+        for (let j = 0; j < perksObject.length; j++) {
+          const perk = perksObject[j];
+          if (!claimed[perk.id]) {
+            claimed[perk.id] = 0;
+          }
+          claimed[perk.id] += perk.quantity;
+        }
+      }
     }
     const response = perks.map((perk, index) => {
       return {
         ...perk,
-        claimed: claimeds[index],
+        claimed: claimed[perk.id] ?? 0,
       };
     });
     return response;
@@ -73,20 +83,31 @@ export class PerkService {
     if (!perk) throw new NotFoundException('Đặc quyền không tồn tại');
     await this.campaignService.checkOwner(perk.campaign.id, currentUser);
 
-    const contribution = await this.repository.contribution
-      .createQueryBuilder('contribution')
-      .where('contribution.isFinish = :isFinish', {
-        isFinish: false,
-      })
-      .where('contribution.status = :status', {
+    const allContributions = await this.repository.contribution.find({
+      where: {
         status: PaymentStatus.SUCCESS,
-      })
-      .andWhere('contribution.perks @> :perkCondition', {
-        perkCondition: JSON.stringify([{ id: perkId }]),
-      })
-      .getOne();
+      },
+    });
 
-    if (contribution) throw new BadRequestException('Đặc quyền có người đặt và chưa được giao');
+    const claimed = {};
+    for (let i = 0; i < allContributions.length; i++) {
+      const perks = allContributions[i].perks as string;
+
+      if (perks) {
+        const perksObject = JSON.parse(perks);
+
+        for (let j = 0; j < perksObject.length; j++) {
+          const perk = perksObject[j];
+          if (!claimed[perk.id]) {
+            claimed[perk.id] = 0;
+          }
+          claimed[perk.id] += perk.quantity;
+        }
+      }
+    }
+
+    if (claimed[perk.id] && claimed[perk.id] > 0)
+      throw new BadRequestException('Đặc quyền đã có người đặt, không thể xóa');
     const url = perk.image;
     if (url) {
       await this.cloudinaryService.destroyFile(url);
@@ -286,23 +307,34 @@ export class PerkService {
         isFeatured: 'DESC',
       },
     });
-    const claimeds: number[] = [];
-    for (let i = 0; i < perks.length; i++) {
-      const claimed = await this.repository.contribution
-        .createQueryBuilder('contribution')
-        .where('contribution.status = :status', {
-          status: PaymentStatus.SUCCESS,
-        })
-        .andWhere('contribution.perks @> :perkCondition1', {
-          perkCondition1: JSON.stringify([{ id: perks[i].id }]),
-        })
-        .getCount();
-      claimeds.push(claimed);
+
+    const allContributions = await this.repository.contribution.find({
+      where: {
+        status: PaymentStatus.SUCCESS,
+      },
+    });
+
+    const claimed = {};
+    for (let i = 0; i < allContributions.length; i++) {
+      const perks = allContributions[i].perks as string;
+
+      if (perks) {
+        const perksObject = JSON.parse(perks);
+
+        for (let j = 0; j < perksObject.length; j++) {
+          const perk = perksObject[j];
+          if (!claimed[perk.id]) {
+            claimed[perk.id] = 0;
+          }
+          claimed[perk.id] += perk.quantity;
+        }
+      }
     }
+
     const response = perks.map((perk, index) => {
       return {
         ...perk,
-        claimed: claimeds[index],
+        claimed: claimed[perk.id] ?? 0,
       };
     });
     return response;

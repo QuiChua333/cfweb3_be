@@ -5,10 +5,15 @@ import { factoryAbi } from './abi/factoryAbi';
 import { CreateNFTDto } from '@/api/nft/dto';
 import { NftService } from '@/api/nft/nft.service';
 import { RepositoryService } from '@/repositories/repository.service';
+import { PaymentStatus } from '@/constants';
+import { ContributionService } from '@/api/contribution/contribution.service';
 @Injectable()
 export class Web3Service {
   private contract: Contract;
-  constructor(private readonly repositoryService: RepositoryService) {
+  constructor(
+    private readonly repositoryService: RepositoryService,
+    private readonly contributionService: ContributionService,
+  ) {
     const provider = new ethers.JsonRpcProvider(envs.web3.rpcUrl);
     const wallet = new ethers.Wallet(envs.web3.privateKey, provider);
     const contract = new ethers.Contract(envs.web3.factoryContractAddress, factoryAbi, wallet);
@@ -48,6 +53,11 @@ export class Web3Service {
       },
     );
 
+    this.contract.on('TransferFund', async (sender, adminAddress, price, contributionId, event) => {
+      console.log(`Event TransferFund: updating database...`);
+      await this.updateContributionTransferFund(contributionId, sender, event);
+    });
+
     this.contract.on('MintNFT', async (minter, nftAddress, price, name, symbol, tokenId, event) => {
       console.log(`Event MintNFT: updating database...`);
       await this.updateMintNFT(minter, tokenId);
@@ -81,6 +91,28 @@ export class Web3Service {
     nftCreation.createdSuccess = true;
     await this.repositoryService.nftCreation.save(nftCreation);
     console.log(`Event NewNFT: updating database successfully...`);
+  }
+
+  async updateContributionTransferFund(
+    contributionId: string,
+    sender: string,
+    event: ContractEventPayload,
+  ) {
+    const transactionHash = event.log.transactionHash;
+    const contribution = await this.repositoryService.contribution.findOne({
+      where: {
+        id: contributionId,
+      },
+    });
+    if (!contribution) return;
+    if (contribution.transactionHash) return;
+    contribution.transactionHash = transactionHash;
+    contribution.customerWalletAddress = sender;
+    contribution.status = PaymentStatus.SUCCESS;
+    contribution.isFinish = true;
+    await this.repositoryService.contribution.save(contribution);
+    this.contributionService.sendMailContributionSuccess(contribution.id);
+    console.log(`Event TransferFund: updating database successfully...`);
   }
 
   async updateMintNFT(minter: string, tokenId: number) {
