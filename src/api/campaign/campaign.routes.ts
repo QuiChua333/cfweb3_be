@@ -48,6 +48,13 @@ const CampaignRoute = {
     jwtSecure: false,
   },
 
+  getRelevantCampaigns: <IRouteParams>{
+    path: '/relevant/:campaignId',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
+
   getCampaignById: <IRouteParams>{
     path: '/id/:id',
     method: RequestMethod.GET,

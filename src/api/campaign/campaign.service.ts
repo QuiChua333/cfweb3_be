@@ -811,6 +811,101 @@ export class CampaignService {
     return campaigns;
   }
 
+  async getRelevantCampaigns(currentUser: ITokenPayload, campaignId: string) {
+    // Lấy thông tin chiến dịch hiện tại
+    const currentCampaign = await this.repository.campaign.findOne({
+      where: { id: campaignId },
+      relations: ['field', 'field.fieldGroup'],
+    });
+
+    if (!currentCampaign) {
+      throw new Error('Campaign not found');
+    }
+
+    const fieldId = currentCampaign.field?.id;
+    const fieldGroupId = currentCampaign.field?.fieldGroup?.id;
+
+    // 1️⃣ Lấy danh sách các campaign user đã đóng góp
+    const contributions = await this.repository.contribution
+      .createQueryBuilder('contribution')
+      .leftJoinAndSelect('contribution.campaign', 'campaign')
+      .leftJoinAndSelect('contribution.user', 'user')
+      .where('user.id = :userId', { userId: currentUser.id })
+      .andWhere('contribution.status = :status', { status: PaymentStatus.SUCCESS })
+      .getMany();
+
+    const contributedCampaigns = contributions.map((c) => c.campaign.id);
+
+    // 2️⃣ Lấy danh sách các campaign mà user đã follow
+    const followedCampaigns = await this.repository.followCampaign
+      .createQueryBuilder('follow')
+      .leftJoin('follow.campaign', 'campaign')
+      .leftJoin('follow.user', 'user')
+      .where('user = :userId', { userId: currentUser.id })
+      .select('campaign.id', 'campaignId')
+      .getRawMany();
+
+    const followedCampaignIds = followedCampaigns.map((f) => f.campaignId);
+
+    // 3️⃣ Truy vấn tất cả campaign và chấm điểm
+    const allCampaigns = await this.repository.campaign
+      .createQueryBuilder('campaign')
+      .leftJoinAndSelect('campaign.field', 'field')
+      .leftJoinAndSelect('field.fieldGroup', 'fieldGroup')
+      .where('campaign.id != :campaignId', { campaignId })
+      .andWhere('campaign.status = :status', { status: CampaignStatus.FUNDING })
+      .getMany();
+
+    // 4️⃣ Tính điểm từng campaign
+    const campaignScores = new Map<string, number>();
+
+    for (const campaign of allCampaigns) {
+      let score = 0;
+
+      if (contributedCampaigns.includes(campaign.id)) score += 3;
+      if (followedCampaignIds.includes(campaign.id)) score += 2;
+      if (campaign.field?.id === fieldId) score += 4;
+      if (campaign.field?.fieldGroup?.id === fieldGroupId) score += 1;
+
+      if (score > 0) campaignScores.set(campaign.id, score);
+    }
+
+    // 5️⃣ Sắp xếp và lấy top 10 campaign có điểm cao nhất
+    const topCampaigns = [...campaignScores.entries()]
+      .sort((a, b) => b[1] - a[1]) // Sắp xếp theo điểm giảm dần
+      .slice(0, 10)
+      .map(([id]) => allCampaigns.find((c) => c.id === id)); // Lấy danh sách campaign
+    for (let i = 0; i < topCampaigns.length; i++) {
+      const campaign = topCampaigns[i];
+      const total = await this.repository.contribution
+        .createQueryBuilder('contribution')
+        .select('SUM(contribution.amount)', 'totalAmount')
+        .where('contribution.campaignId = :campaignId', { campaignId: campaign.id })
+        .andWhere('contribution.status = :status', {
+          status: PaymentStatus.SUCCESS,
+        })
+        .getRawOne();
+      campaign['currentMoney'] = total ? Number(total.totalAmount) : 0;
+
+      const endDate = new Date(campaign.publishedAt);
+      endDate.setDate(endDate.getDate() + campaign.duration); // Cộng duration vào publishedAt
+
+      // Tính thời gian còn lại (milliseconds)
+      const currentTime = new Date();
+      const remainingHours = Math.ceil(
+        (endDate.getTime() - currentTime.getTime()) / (1000 * 60 * 60),
+      );
+      let daysLeft = '';
+      if (remainingHours > 24) daysLeft = Math.ceil(remainingHours / 24) + ' ngày';
+      else if (remainingHours > 0) {
+        daysLeft = Math.ceil(remainingHours) + ' giờ';
+      } else daysLeft = 'Hết hạn';
+      campaign['daysLeft'] = daysLeft;
+      campaign['percentProgress'] = (campaign['currentMoney'] / campaign.goal) * 100;
+    }
+    return topCampaigns;
+  }
+
   async editSendFundStatus(
     campaignId: string,
     updateSendDto: UpdateSendDto,

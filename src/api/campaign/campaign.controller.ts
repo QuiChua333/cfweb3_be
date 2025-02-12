@@ -128,6 +128,14 @@ export class CampaignController {
     return this.campaignService.getPopularCampaigns();
   }
 
+  @InjectRoute(CampaignRoute.getRelevantCampaigns)
+  getRelevantCampaigns(
+    @User() currentUser: ITokenPayload,
+    @Param('campaignId') campaignId: string,
+  ) {
+    return this.campaignService.getRelevantCampaigns(currentUser, campaignId);
+  }
+
   @InjectRoute(CampaignRoute.CKEUpload)
   @UseInterceptors(FileInterceptor('file'))
   CKEUpload(@UploadedFile() file: Express.Multer.File) {
