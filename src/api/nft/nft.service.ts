@@ -13,6 +13,7 @@ import { CloudinaryService } from '@/services/cloudinary/cloudinary.service';
 import { symbol } from 'joi';
 import { In } from 'typeorm';
 import { ContributionService } from '../contribution/contribution.service';
+import { NFTPaginationDto } from './dto/nft-pagination.dto';
 
 @Injectable()
 export class NftService {
@@ -61,22 +62,6 @@ export class NftService {
   }
 
   private async handleMetadata(createNFTDto: CreateNFTDto, fileExpress: Express.Multer.File) {
-    // const response = await axios.get(perk.image, { responseType: 'arraybuffer' });
-    // // Lấy MIME type từ header response
-    // const mimeType = response.headers['content-type'];
-    // if (!mimeType.startsWith('image/')) {
-    //   throw new Error('URL không phải là ảnh hợp lệ');
-    // }
-
-    // // Tách đuôi file từ MIME type
-    // const extension = mimeType.split('/')[1];
-
-    // // Tạo Blob từ dữ liệu buffer
-    // const blob = new Blob([response.data], { type: 'image/jpeg' });
-
-    // // // Tạo File từ Blob
-
-    // const fileName = `${createNFTDto.symbol}_${perk.id.slice(-5)}`;
     const file = new File([fileExpress.buffer], fileExpress.originalname, { type: 'image/jpeg' });
 
     let formData = new FormData();
@@ -283,5 +268,39 @@ export class NftService {
 
     if (!nft) throw new NotFoundException('NFT không tồn tại');
     return nft;
+  }
+
+  async getNFTOfCurrentUser(currentUser: ITokenPayload, nftPaginationDto: NFTPaginationDto) {
+    const { page, limit, searchString } = nftPaginationDto;
+    const query = this.repository.nftCreation
+      .createQueryBuilder('nftCreation')
+      .leftJoinAndSelect('nftCreation.nfts', 'nft')
+      .leftJoin('nft.user', 'user')
+      .where('user.id = :userId', { userId: currentUser.id })
+      .groupBy('nftCreation.id')
+      .addGroupBy('nft.id');
+
+    // Tìm kiếm không phân biệt hoa thường theo searchString trong title
+    if (searchString && searchString.trim() !== '') {
+      query.andWhere(
+        '(nftCreation.name ILIKE :searchString OR nftCreation.symbol ILIKE :searchString OR nftCreation.contractAddress ILIKE :searchString)',
+        {
+          searchString: `%${searchString}%`, // Thêm dấu % để tìm kiếm chuỗi con
+        },
+      );
+    }
+
+    const [results, total] = await query
+      .take(limit) // Giới hạn số bản ghi trên mỗi trang
+      .skip((page - 1) * limit) // Bắt đầu từ vị trí dựa trên trang
+      .getManyAndCount(); // Lấy dữ liệu và tổng số bản ghi
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      nfts: results,
+      totalPages,
+      page,
+      limit,
+    };
   }
 }

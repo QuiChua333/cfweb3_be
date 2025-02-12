@@ -25,7 +25,12 @@ const NftRoute = {
     code: HttpStatus.OK,
     jwtSecure: false,
   },
-
+  getNFTOfCurrentUser: <IRouteParams>{
+    path: '/current-user',
+    method: RequestMethod.GET,
+    code: HttpStatus.OK,
+    jwtSecure: true,
+  },
   getNFT: <IRouteParams>{
     path: '/:id',
     method: RequestMethod.GET,

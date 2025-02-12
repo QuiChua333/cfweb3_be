@@ -5,6 +5,7 @@ import { InjectRoute, User } from '@/decorators';
 import { ITokenPayload } from '../auth/auth.interface';
 import { CreateNFTDto, MintNFTDto } from './dto';
 import { FileInterceptor } from '@nestjs/platform-express';
+import { NFTPaginationDto } from './dto/nft-pagination.dto';
 
 @Controller(NftRoute.root)
 export class NftController {
@@ -23,6 +24,10 @@ export class NftController {
   @InjectRoute(NftRoute.getNFTsByCampaign)
   getNFTsByCampaign(@Param('id') campaignId: string) {
     return this.nftService.getNFTsByCampaign(campaignId);
+  }
+  @InjectRoute(NftRoute.getNFTOfCurrentUser)
+  getNFTOfCurrentUser(@User() user: ITokenPayload, @Body() nftPaginationDto: NFTPaginationDto) {
+    return this.nftService.getNFTOfCurrentUser(user, nftPaginationDto);
   }
 
   @InjectRoute(NftRoute.getNFT)
