@@ -1,17 +1,56 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, OneToOne } from 'typeorm';
 import { BaseEntity } from './base/base.entity';
-import { CryptoCurrency } from '@/constants';
-import { Perk } from './perk.entity';
+
 import { NFT } from './nft.entity';
+import { Campaign } from './campaign.entity';
 
 @Entity()
 export class NFTCreateion extends BaseEntity {
+  @Column()
+  name: string;
+
+  @Column()
+  symbol: string;
+
+  @Column({
+    default: '',
+  })
+  description: string;
+
+  @Column()
+  price: number;
+
+  @Column()
+  ethPrice: string;
+
+  @Column()
+  image: string;
+
+  @Column()
+  color: string;
+
+  @Column()
+  supply: number;
+
+  @Column()
+  materials: string;
+
+  @Column()
+  styles: string;
+
   @Column({
     nullable: true,
   })
-  nftContractAddress: string;
+  transactionHash: string;
 
-  @Column()
+  @Column({
+    nullable: true,
+  })
+  contractAddress: string;
+
+  @Column({
+    nullable: true,
+  })
   authorAddress: string;
 
   @Column()
@@ -31,25 +70,17 @@ export class NFTCreateion extends BaseEntity {
   @Column()
   symbol: string;
 
-  @Column(
-    {
-      nullable: true,
-    }
-  )
-  price: string;
+  @Column()
+  uri: string;
 
   @Column({
-    enum: CryptoCurrency,
-    default: CryptoCurrency.ETH,
+    default: false,
   })
-  currency: CryptoCurrency;
-
-  @OneToOne(() => Perk, (perk) => perk.nftCreation, {
-    onDelete: 'CASCADE',
-  })
-  @JoinColumn()
-  perk: Perk;
+  createdSuccess: boolean;
 
   @OneToMany(() => NFT, (nft) => nft.nftCreation)
   nfts: NFT;
+
+  @ManyToOne(() => Campaign, (campaign) => campaign.nftCreations)
+  campaign: Campaign;
 }

@@ -26,25 +26,25 @@ export class Web3Service {
     return number;
   }
 
-  async createNFT(createNFTDto: CreateNFTDto, uri: string) {
-    const valuePriceInWei = ethers.parseEther(createNFTDto.nftPrice.toString());
-    const tx = await this.contract.createNFT(
-      createNFTDto.authorAddress,
-      createNFTDto.name,
-      createNFTDto.symbol,
-      uri,
-      valuePriceInWei,
-    );
+  // async createNFT(createNFTDto: CreateNFTDto, uri: string) {
+  //   const valuePriceInWei = ethers.parseEther(createNFTDto.nftPrice.toString());
+  //   const tx = await this.contract.createNFT(
+  //     createNFTDto.authorAddress,
+  //     createNFTDto.name,
+  //     createNFTDto.symbol,
+  //     uri,
+  //     valuePriceInWei,
+  //   );
 
-    return tx;
-  }
+  //   return tx;
+  // }
 
   async watchContractEvent() {
     this.contract.on(
       'NewNFT',
-      async (nftContractAddress, authorAddress, name, symbol, price, uri, event) => {
+      async (nftContractAddress, authorAddress, name, symbol, price, uri, nftCreationId, event) => {
         console.log(`Event NewNFT: updating database...`);
-        await this.updateNFTCreation(nftContractAddress, event);
+        await this.updateNFTCreation(nftContractAddress, authorAddress, nftCreationId, event);
       },
     );
 
@@ -59,18 +59,26 @@ export class Web3Service {
     });
   }
 
-  async updateNFTCreation(nftContractAddress: string, event: ContractEventPayload) {
+  async updateNFTCreation(
+    nftContractAddress: string,
+    authorAddress: string,
+    nftCreationId: string,
+    event: ContractEventPayload,
+  ) {
     const transactionHash = event.log.transactionHash;
     const nftCreation = await this.repositoryService.nftCreation.findOne({
       where: {
-        transactionHash,
+        id: nftCreationId,
       },
     });
 
     if (!nftCreation) return;
-    if (nftCreation.nftContractAddress) return;
+    if (nftCreation.contractAddress) return;
 
-    nftCreation.nftContractAddress = nftContractAddress;
+    nftCreation.contractAddress = nftContractAddress;
+    nftCreation.authorAddress = authorAddress;
+    nftCreation.transactionHash = transactionHash;
+    nftCreation.createdSuccess = true;
     await this.repositoryService.nftCreation.save(nftCreation);
     console.log(`Event NewNFT: updating database successfully...`);
   }

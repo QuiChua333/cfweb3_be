@@ -13,6 +13,7 @@ import { Contribution } from './contribution.entity';
 import { Report } from './report.entity';
 import { Gift } from './gift.entity';
 import { MappingTypeMapping } from '@elastic/elasticsearch/lib/api/types';
+import { NFTCreateion } from './nft-creation.entity';
 
 @Entity()
 export class Campaign extends BaseEntity {
@@ -158,6 +159,9 @@ export class Campaign extends BaseEntity {
 
   @OneToMany(() => Gift, (gift) => gift.campaign)
   gifts: Gift[];
+
+  @OneToMany(() => NFTCreateion, (nftCreation) => nftCreation.campaign)
+  nftCreations: NFTCreateion[];
 
   @DeleteDateColumn()
   deletedAt?: Date;

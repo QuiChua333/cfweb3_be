@@ -118,6 +118,12 @@ export const factoryAbi = [
         name: 'uri',
         type: 'string',
       },
+      {
+        indexed: false,
+        internalType: 'string',
+        name: 'nftCreationId',
+        type: 'string',
+      },
     ],
     name: 'NewNFT',
     type: 'event',
@@ -308,11 +314,6 @@ export const factoryAbi = [
   {
     inputs: [
       {
-        internalType: 'address',
-        name: 'author',
-        type: 'address',
-      },
-      {
         internalType: 'string',
         name: 'name',
         type: 'string',
@@ -331,6 +332,16 @@ export const factoryAbi = [
         internalType: 'uint256',
         name: 'price',
         type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'maxSupply',
+        type: 'uint256',
+      },
+      {
+        internalType: 'string',
+        name: 'nftCreationId',
+        type: 'string',
       },
     ],
     name: 'createNFT',
